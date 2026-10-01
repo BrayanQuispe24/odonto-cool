@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: clinica-db
+    environment:
+      POSTGRES_DB: clinica_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      # Exponemos el puerto en el 5436 para que coincida con la configuración actual de .env
+      - "5436:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pgdata:

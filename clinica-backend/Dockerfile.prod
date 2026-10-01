@@ -1,0 +1,23 @@
+FROM php:8.3-fpm-alpine
+
+# Instalar dependencias del sistema requeridas por Laravel y PostgreSQL
+RUN apk add --no-cache libpq-dev git zip unzip \
+    && docker-php-ext-install pdo pdo_pgsql pgsql bcmath
+
+# Instalar Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Directorio de trabajo
+WORKDIR /var/www/html
+
+# Copiar TODO el código del backend a la imagen
+COPY . .
+
+# Instalar dependencias de PHP para producción
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
+# Dar permisos al servidor web para las carpetas de caché/logs
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+EXPOSE 9000
+CMD ["php-fpm"]

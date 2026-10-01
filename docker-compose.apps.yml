@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./clinica-backend
+      dockerfile: Dockerfile
+    container_name: clinica-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./clinica-backend:/app
+    environment:
+      # Conecta con la base de datos externa usando la IP del host
+      - DB_CONNECTION=pgsql
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5436
+      - DB_DATABASE=clinica_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  frontend:
+    build:
+      context: ./clinica-frontend
+      dockerfile: Dockerfile
+    container_name: clinica-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./clinica-frontend:/app
+      - /app/node_modules
+    environment:
+      # Para asegurar que Vite detecte los cambios en Windows/Mac
+      - CHOKIDAR_USEPOLLING=true
