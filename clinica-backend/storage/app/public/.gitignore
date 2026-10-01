@@ -1,2 +1,4 @@
 *
 !.gitignore
+!modelos_3d/
+!modelos_3d/*

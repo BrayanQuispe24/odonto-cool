@@ -32,6 +32,8 @@ services:
       DB_DATABASE: clinica_db
       DB_USERNAME: postgres
       DB_PASSWORD: ${DB_PASSWORD:-postgres_secure_pass}
+    volumes:
+      - ./clinica-backend/storage:/var/www/html/storage
     depends_on:
       - db
 
