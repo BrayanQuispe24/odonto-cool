@@ -9,6 +9,7 @@ RUN npm ci
 # Copiar el código fuente y construir
 COPY . .
 # En este punto se leerán las variables de entorno de producción
+ENV VITE_API_URL=/api
 RUN npm run build
 
 # ETAPA 2: Servidor Web (Nginx) para despachar la SPA
