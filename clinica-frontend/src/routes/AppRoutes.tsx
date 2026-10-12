@@ -17,9 +17,11 @@ import { OdontogramPage } from '../features/odontogram/pages/OdontogramPage';
 import { SucursalesPage } from '../features/sucursales/pages/SucursalesPage';
 import { CitasPage } from '../features/citas/pages/CitasPage';
 import { ServiciosPage } from '../features/services/pages/ServiciosPage';
+import { PiezasDentalesPage } from '../features/dientes/pages/PiezasDentalesPage';
 import { BoletasPage } from '../features/boletas/pages/BoletasPage';
 import { ReportesPage } from '../features/reportes/pages/ReportesPage';
 import { ExpedientesPage } from '../features/expedientes/pages/ExpedientesPage';
+import { ConsejosPage } from '../features/consejos/pages/ConsejosPage';
 import { BackupsPage } from '../features/backups/pages/BackupsPage';
 import { SupportPage } from '../features/support/pages/SupportPage';
 import { useSettingsStore } from '../store/useSettingsStore';
@@ -49,6 +51,8 @@ export const AppRoutes: React.FC = () => {
             <Route path="/dashboard/odontogram" element={<OdontogramPage />} />
             <Route path="/dashboard/treatments" element={<ServiciosPage />} />
             <Route path="/dashboard/servicios" element={<ServiciosPage />} />
+            <Route path="/dashboard/piezas-dentales" element={<PiezasDentalesPage />} />
+            <Route path="/dashboard/consejos" element={<ConsejosPage />} />
             <Route path="/dashboard/doctors" element={<DoctorsPage />} />
             <Route path="/dashboard/branches" element={<SucursalesPage />} />
             <Route path="/dashboard/billing" element={<BoletasPage />} />

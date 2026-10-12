@@ -27,19 +27,19 @@ export const ExpedientesPage: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white p-4 sm:p-6 transition-colors duration-300 overflow-x-hidden">
+    <div className="w-full min-h-screen bg-light-surface dark:bg-dark-bg text-primary-dark dark:text-white p-4 sm:p-6 transition-colors duration-300 overflow-x-hidden">
       {/* HEADER SECTION */}
       <div className="mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#0077D4] to-[#00C2E0] flex items-center justify-center shadow-lg shadow-[#0077D4]/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-[#0077D4]/20">
               <FolderOpen className="text-white" size={20} />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0840A8] dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-primary-dark dark:text-white tracking-tight">
               Expedientes y PDFs
             </h1>
           </div>
-          <p className="text-sm font-medium text-[#0077D4] dark:text-[#00C2E0] max-w-2xl">
+          <p className="text-sm font-medium text-primary dark:text-secondary max-w-2xl">
             Gestiona resultados de análisis, radiografías y documentos de pacientes.
           </p>
         </div>
@@ -56,8 +56,8 @@ export const ExpedientesPage: React.FC = () => {
         {/* Tabla (Columna derecha en XL) */}
         <div className="xl:col-span-8">
           {isLoading && expedientes.length === 0 ? (
-            <div className="flex justify-center items-center py-20 bg-white dark:bg-[#002D5E] rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#00C2E0]"></div>
+            <div className="flex justify-center items-center py-20 bg-white dark:bg-dark-surface rounded-2xl border border-primary-dark/15 dark:border-secondary/30">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-secondary"></div>
             </div>
           ) : (
             <ExpedientesTable

@@ -8,29 +8,28 @@ import { FloatingWhatsApp } from '../components/common/FloatingWhatsApp';
 
 import { HeroSection } from '../features/landing/components/HeroSection';
 import { SpecialtiesSection } from '../features/landing/components/SpecialtiesSection';
-import { BeforeAfterSection } from '../features/landing/components/BeforeAfterSection';
+
 import { DoctorsShowcaseSection } from '../features/landing/components/DoctorsShowcaseSection';
 import { FacilitiesSection } from '../features/landing/components/FacilitiesSection';
 import { ArticlesSection } from '../features/landing/components/ArticlesSection';
-import { PreFooterCtaSection } from '../features/landing/components/PreFooterCtaSection';
+
 import { FAQSection } from '../features/landing/components/FAQSection';
-import { AppointmentModal } from '../features/landing/components/AppointmentModal';
 
 export const LandingPage: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Initialize IntersectionObserver scroll reveal animations
   useScrollReveal();
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
+  const handleOpenModal = () => {
+    window.open('https://wa.me/59178494110?text=Hola,%20quisiera%20agendar%20una%20cita%20diagn%C3%B3stica.', '_blank');
+  };
 
   const handleToggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
   const handleCloseMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
-    <div className="min-h-screen bg-[#001C3D] text-white font-sans antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-dark-bg text-white font-sans antialiased overflow-x-hidden">
       {/* Sticky Header with embedded TopAnnouncementBar */}
       <Navbar
         onOpenModal={handleOpenModal}
@@ -49,11 +48,11 @@ export const LandingPage: React.FC = () => {
       <main>
         <HeroSection onOpenModal={handleOpenModal} />
         <SpecialtiesSection onOpenModal={handleOpenModal} />
-        <BeforeAfterSection onOpenModal={handleOpenModal} />
+
         <DoctorsShowcaseSection onOpenModal={handleOpenModal} />
         <FacilitiesSection />
         <ArticlesSection onOpenModal={handleOpenModal} />
-        <PreFooterCtaSection onOpenModal={handleOpenModal} />
+
         <FAQSection />
       </main>
 
@@ -62,9 +61,6 @@ export const LandingPage: React.FC = () => {
 
       {/* Floating WhatsApp Widget */}
       <FloatingWhatsApp />
-
-      {/* Booking Appointment Modal */}
-      <AppointmentModal isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

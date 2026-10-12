@@ -92,13 +92,13 @@ export const DashboardHeader: React.FC = () => {
 
   return (
     <>
-      <header className="h-16 shrink-0 px-4 sm:px-8 bg-white/95 dark:bg-[#0840A8]/95 backdrop-blur-md border-b border-[#0840A8]/10 dark:border-[#00C2E0]/20 flex items-center justify-between gap-4 sticky top-0 z-40 shadow-xs transition-colors duration-300">
+      <header className="h-16 shrink-0 px-4 sm:px-8 bg-white/95 dark:bg-[#0840A8]/95 backdrop-blur-md border-b border-primary-dark/10 dark:border-secondary/20 flex items-center justify-between gap-4 sticky top-0 z-40 shadow-xs transition-colors duration-300">
         {/* LEFT SECTION: MOBILE TOGGLE & SEARCH */}
         <div className="flex items-center gap-3 sm:gap-4 flex-1">
           {/* MOBILE HAMBURGER TOGGLE */}
           <button
             onClick={() => setMobileOpen(true)}
-            className="lg:hidden p-2 rounded-xl bg-[#F4F9FF] dark:bg-[#002D5E] text-[#0840A8] dark:text-white hover:bg-white transition-colors active:scale-95 cursor-pointer border border-[#0840A8]/20 dark:border-[#00C2E0]/30"
+            className="lg:hidden p-2 rounded-xl bg-light-surface dark:bg-dark-surface text-primary-dark dark:text-white hover:bg-white transition-colors active:scale-95 cursor-pointer border border-primary-dark/20 dark:border-secondary/30"
             aria-label="Abrir menú"
           >
             <Menu size={20} />
@@ -107,11 +107,11 @@ export const DashboardHeader: React.FC = () => {
           {/* DESKTOP QUICK RETRACT SIDEBAR TOGGLE ICON */}
           <button
             onClick={toggleCollapse}
-            className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#F4F9FF] dark:bg-[#002D5E] text-[#0840A8] dark:text-white hover:bg-white text-xs font-semibold border border-[#0840A8]/15 dark:border-[#00C2E0]/30 transition-all active:scale-95 cursor-pointer"
+            className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-light-surface dark:bg-dark-surface text-primary-dark dark:text-white hover:bg-white text-xs font-semibold border border-primary-dark/15 dark:border-secondary/30 transition-all active:scale-95 cursor-pointer"
             title={isCollapsed ? 'Expandir Sidebar' : 'Contraer Sidebar'}
           >
             <span className="w-2 h-2 rounded-full bg-[#00C2E0] animate-pulse" />
-            <span className="text-[11px] font-display font-extrabold text-[#0840A8] dark:text-white">
+            <span className="text-small font-display font-extrabold text-primary-dark dark:text-white">
               {isCollapsed ? 'Sidebar Retraído' : 'Modo Expandido'}
             </span>
           </button>
@@ -120,20 +120,20 @@ export const DashboardHeader: React.FC = () => {
           <div className="relative max-w-md w-full hidden sm:block">
             <Search
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#0077D4] dark:text-[#00C2E0]"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-primary dark:text-secondary"
             />
             <input
               ref={searchInputRef}
               type="text"
               placeholder="Buscar paciente, expediente, cita o doctor... (Presiona ⌘K)"
-              className="w-full pl-10 pr-12 py-2 rounded-xl bg-[#F4F9FF] dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 text-xs font-semibold text-[#0840A8] dark:text-white placeholder-[#0077D4]/60 dark:placeholder-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0077D4]/30 focus-visible:border-[#0077D4] transition-all"
+              className="w-full pl-10 pr-12 py-2 rounded-xl bg-light-surface dark:bg-dark-surface border border-primary-dark/15 dark:border-secondary/30 text-xs font-semibold text-primary-dark dark:text-white placeholder-[#0077D4]/60 dark:placeholder-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary transition-all"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   navigate(`/dashboard/patients?search=${encodeURIComponent(e.currentTarget.value)}`);
                 }
               }}
             />
-            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded-md bg-white dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 text-[10px] font-mono font-bold text-[#0840A8] dark:text-[#00C2E0] shadow-2xs">
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded-md bg-white dark:bg-dark-bg border border-primary-dark/15 dark:border-secondary/30 text-tiny font-mono font-bold text-primary-dark dark:text-secondary shadow-2xs">
               ⌘K
             </kbd>
           </div>
@@ -142,13 +142,15 @@ export const DashboardHeader: React.FC = () => {
         {/* RIGHT SECTION: ACTIONS & PROFILE */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* QUICK ACTION BUTTON */}
-          <button
-            onClick={() => navigate('/dashboard/appointments')}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#00C2E0] hover:to-[#0077D4] text-white text-xs font-extrabold shadow-md shadow-[#0077D4]/25 hover:shadow-lg active:scale-97 transition-all cursor-pointer border border-[#00C2E0]/40"
-          >
-            <Plus size={16} className="text-white" />
-            <span className="hidden md:inline">Nueva Cita</span>
-          </button>
+          {user?.rol?.nombre === 'Doctor' && (
+            <button
+              onClick={() => navigate('/dashboard/appointments')}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-[#00C2E0] hover:to-[#0077D4] text-white text-xs font-extrabold shadow-md shadow-[#0077D4]/25 hover:shadow-lg active:scale-97 transition-all cursor-pointer border border-secondary/40"
+            >
+              <Plus size={16} className="text-white" />
+              <span className="hidden md:inline">Nueva Cita</span>
+            </button>
+          )}
 
           {/* THEME TOGGLE BUTTON */}
           <button
@@ -156,7 +158,7 @@ export const DashboardHeader: React.FC = () => {
               const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
               setTheme(isDark ? 'light' : 'dark');
             }}
-            className="p-2 rounded-xl bg-[#F4F9FF] dark:bg-[#002D5E] hover:bg-white dark:hover:bg-[#0840A8] text-[#0840A8] dark:text-[#00C2E0] transition-all active:scale-95 cursor-pointer border border-[#0840A8]/15 dark:border-[#00C2E0]/30"
+            className="p-2 rounded-xl bg-light-surface dark:bg-dark-surface hover:bg-white dark:hover:bg-[#0840A8] text-primary-dark dark:text-secondary transition-all active:scale-95 cursor-pointer border border-primary-dark/15 dark:border-secondary/30"
             title={theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
           >
             {theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -170,38 +172,38 @@ export const DashboardHeader: React.FC = () => {
             <button
               onClick={() => setShowUserDropdown(!showUserDropdown)}
               aria-expanded={showUserDropdown}
-              className="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl hover:bg-[#F4F9FF] dark:hover:bg-[#002D5E] transition-colors active:scale-97 cursor-pointer border border-transparent hover:border-[#0840A8]/15 dark:hover:border-[#00C2E0]/30"
+              className="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl hover:bg-light-surface dark:hover:bg-dark-surface transition-colors active:scale-97 cursor-pointer border border-transparent hover:border-primary-dark/15 dark:hover:border-secondary/30"
             >
               <img
                 src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=200&auto=format&fit=crop"
                 alt="Avatar doctor"
-                className="w-8 h-8 rounded-lg object-cover ring-2 ring-[#0077D4]"
+                className="w-8 h-8 rounded-lg object-cover ring-2 ring-primary"
               />
               <div className="hidden lg:flex flex-col text-left">
-                <span className="text-xs font-extrabold text-[#0840A8] dark:text-white leading-tight">
+                <span className="text-xs font-extrabold text-primary-dark dark:text-white leading-tight">
                   {user?.email || 'Dr. Carlos Arispe'}
                 </span>
-                <span className="text-[10px] text-[#0077D4] dark:text-[#00C2E0] font-semibold">
+                <span className="text-tiny text-primary dark:text-secondary font-semibold">
                   {user?.rol?.nombre || 'Administrador'}
                 </span>
               </div>
-              <ChevronDown size={14} className="text-[#0840A8] dark:text-[#00C2E0] hidden sm:block" />
+              <ChevronDown size={14} className="text-primary-dark dark:text-secondary hidden sm:block" />
             </button>
 
             {/* USER MENU */}
             {showUserDropdown ? (
-              <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-[#002D5E] rounded-2xl shadow-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 p-2 z-50 animate-in fade-in zoom-in-95 duration-200">
-                <div className="p-3 bg-[#F4F9FF] dark:bg-[#0840A8]/40 rounded-xl mb-2 border border-[#0840A8]/15 dark:border-[#00C2E0]/20">
-                  <p className="text-xs font-extrabold text-[#0840A8] dark:text-white truncate">{user?.email}</p>
-                  <p className="text-[11px] text-[#0077D4] dark:text-[#00C2E0] truncate font-semibold">{user?.rol?.nombre || 'Usuario'}</p>
+              <div className="absolute right-0 mt-3 w-56 bg-white dark:bg-dark-surface rounded-2xl shadow-2xl border border-primary-dark/15 dark:border-secondary/30 p-2 z-50 animate-in fade-in zoom-in-95 duration-200">
+                <div className="p-3 bg-light-surface dark:bg-[#0840A8]/40 rounded-xl mb-2 border border-primary-dark/15 dark:border-secondary/20">
+                  <p className="text-xs font-extrabold text-primary-dark dark:text-white truncate">{user?.email}</p>
+                  <p className="text-small text-primary dark:text-secondary truncate font-semibold">{user?.rol?.nombre || 'Usuario'}</p>
                 </div>
 
                 <div className="space-y-1">
                   <button
                     onClick={() => setShowUserDropdown(false)}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-[#0840A8] dark:text-white hover:bg-[#F4F9FF] dark:hover:bg-[#0840A8]/50 transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-primary-dark dark:text-white hover:bg-light-surface dark:hover:bg-[#0840A8]/50 transition-colors cursor-pointer"
                   >
-                    <User size={15} className="text-[#0077D4] dark:text-[#00C2E0]" />
+                    <User size={15} className="text-primary dark:text-secondary" />
                     Mi Perfil Profesional
                   </button>
                   <button
@@ -209,9 +211,9 @@ export const DashboardHeader: React.FC = () => {
                       setShowUserDropdown(false);
                       openSettingsModal();
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-[#0840A8] dark:text-white hover:bg-[#F4F9FF] dark:hover:bg-[#0840A8]/50 transition-colors cursor-pointer"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-primary-dark dark:text-white hover:bg-light-surface dark:hover:bg-[#0840A8]/50 transition-colors cursor-pointer"
                   >
-                    <Settings size={15} className="text-[#0077D4] dark:text-[#00C2E0]" />
+                    <Settings size={15} className="text-primary dark:text-secondary" />
                     Ajustes de Clínica
                   </button>
                   <div className="h-px bg-[#0840A8]/15 dark:bg-[#00C2E0]/20 my-1" />

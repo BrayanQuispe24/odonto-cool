@@ -57,8 +57,7 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Helper to reset all form fields to clean default state
-  const resetFormState = () => {
+  const resetFormState = (dList: Doctor[] = doctores) => {
     const today = new Date().toISOString().split('T')[0];
     setFecha(today);
     setHoraInicio('09:00');
@@ -67,7 +66,16 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
     setIsUnregisteredPatient(false);
     setNombreUnregistered('');
     setPacienteId('');
-    setDoctorId('');
+
+    let defaultDoctorId: number | '' = '';
+    if (isDoctorRole && user?.id) {
+      const matchingDoctor = dList.find(d => String(d.usuario_id) === String(user.id));
+      if (matchingDoctor) {
+        defaultDoctorId = matchingDoctor.id;
+      }
+    }
+    setDoctorId(defaultDoctorId);
+
     setSucursalId(isDoctorRole && user?.sucursal_id ? user.sucursal_id : '');
     setDisponibilidad(null);
     setError(null);
@@ -101,13 +109,12 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
             setNombreUnregistered(cita.nombre_paciente_unregistered || '');
           }
         } else {
-          resetFormState();
+          resetFormState(dList);
         }
       })
       .catch(() => {});
   }, [cita]);
 
-  // Live availability verification
   const verifyAvailability = useCallback(async () => {
     if (!doctorId || !sucursalId || !fecha) {
       setDisponibilidad(null);
@@ -144,7 +151,7 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isDoctorRole && !cita) {
-      setError('Solo los usuarios con rol Doctor están autorizados para registrar nuevas citas médicas.');
+      setError('Solo los usuarios con rol Doctor están autorizados para registrar nuevas citas.');
       return;
     }
 
@@ -198,21 +205,18 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
     (disponibilidad !== null && !disponibilidad.disponible);
 
   return (
-    <div
-      id="cita-form-panel"
-      className="bg-white dark:bg-[#002D5E] rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-xl shadow-sm dark:shadow-[#001C3D]/50 overflow-hidden text-[#0840A8] dark:text-white flex flex-col sticky top-6 transition-all duration-300"
-    >
+    <div className="bg-white dark:bg-dark-surface rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sticky top-6">
       {/* Panel Header */}
-      <div className="p-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex items-center justify-between">
-        <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#0077D4] dark:text-[#00C2E0] flex items-center gap-2 font-mono">
+      <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between">
+        <h3 className="text-small font-bold uppercase tracking-wider text-primary-dark dark:text-slate-300 flex items-center gap-1.5">
           {cita ? (
             <>
-              <Edit3 className="text-[#0077D4] dark:text-[#00C2E0]" size={16} />
+              <Edit3 size={13} className="text-primary dark:text-secondary" />
               <span>Editar Cita {cita.numero_cita ? `#${cita.numero_cita}` : ''}</span>
             </>
           ) : (
             <>
-              <PlusCircle className="text-[#0077D4] dark:text-[#00C2E0]" size={16} />
+              <PlusCircle size={13} className="text-primary dark:text-secondary" />
               <span>Registrar Nueva Cita Médica</span>
             </>
           )}
@@ -222,198 +226,229 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
           <button
             type="button"
             onClick={onCancelEdit}
-            className="px-2.5 py-1 rounded-lg bg-[#F4F9FF] dark:bg-[#001C3D] hover:bg-[#0077D4]/30 border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-xs font-semibold text-[#0077D4] dark:text-blue-100 flex items-center gap-1 transition-all cursor-pointer"
+            className="px-2 py-1 rounded bg-slate-200 hover:bg-slate-300 dark:bg-dark-surface dark:hover:bg-[#0840A8] border border-slate-300 dark:border-slate-700 text-tiny font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1 transition-colors cursor-pointer"
             title="Cancelar edición"
           >
-            <RotateCcw size={12} />
+            <RotateCcw size={11} />
             <span>Cancelar</span>
           </button>
         )}
       </div>
 
       {/* Form Body */}
-      <form onSubmit={handleSubmit} className="p-5 space-y-4">
+      <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-4">
         {!isDoctorRole && !cita && (
-          <div className="p-3 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-200 text-xs font-semibold flex items-center gap-2">
-            <AlertTriangle size={16} className="text-amber-400 shrink-0" />
+          <div className="p-2.5 rounded-sm bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-small font-semibold flex items-center gap-2 shadow-sm">
+            <AlertTriangle size={14} className="shrink-0" />
             <span>Solo usuarios con rol Doctor están autorizados para registrar nuevas citas.</span>
           </div>
         )}
 
         {error && (
-          <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-800/80 text-rose-200 text-xs font-semibold">
+          <div className="p-2.5 rounded-sm bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-small font-semibold shadow-sm">
             {error}
           </div>
         )}
 
-        {/* Paciente Selector / Input */}
-        <div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-            <label className="text-xs font-semibold text-[#0077D4] dark:text-blue-100/90 flex items-center gap-1">
-              <User size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-              Paciente <span className="text-rose-400">*</span>
-            </label>
-            <label className="flex items-center gap-1.5 text-[11px] text-[#0077D4] dark:text-[#00C2E0] font-medium cursor-pointer select-none">
-              <input
-                type="checkbox"
-                checked={isUnregisteredPatient}
-                onChange={(e) => {
-                  setIsUnregisteredPatient(e.target.checked);
-                  setPacienteId('');
-                  setNombreUnregistered('');
-                }}
-                className="rounded border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0077D4] dark:text-[#00C2E0] focus:ring-[#00C2E0] cursor-pointer"
-              />
-              <span>No registrado</span>
-            </label>
-          </div>
-
-          {isUnregisteredPatient ? (
-            <input
-              type="text"
-              value={nombreUnregistered}
-              onChange={(e) => setNombreUnregistered(e.target.value)}
-              required={isUnregisteredPatient}
-              placeholder="Escriba nombre completo del paciente no registrado..."
-              className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
-            />
-          ) : (
-            <select
-              value={pacienteId}
-              onChange={(e) => setPacienteId(e.target.value ? Number(e.target.value) : '')}
-              required={!isUnregisteredPatient}
-              className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer"
-            >
-              <option value="" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">-- Seleccionar Paciente --</option>
-              {pacientes.map((p) => (
-                <option key={p.id} value={p.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-                  {p.nombre} {p.apellido} ({p.codigo_paciente})
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        {/* Doctor & Sucursal */}
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100/90 mb-1 flex items-center gap-1">
-              <Stethoscope size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-              Doctor Asignado <span className="text-rose-400">*</span>
-            </label>
-            <select
-              value={doctorId}
-              onChange={(e) => setDoctorId(e.target.value ? Number(e.target.value) : '')}
-              required
-              className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer"
-            >
-              <option value="" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">-- Seleccionar Doctor --</option>
-              {doctores.map((d) => (
-                <option key={d.id} value={d.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-                  Dr. {d.nombre} {d.apellido}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100/90 mb-1 flex items-center gap-1">
-              <Building2 size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-              Sucursal <span className="text-rose-400">*</span>
-            </label>
-            <select
-              value={sucursalId}
-              onChange={(e) => setSucursalId(e.target.value ? Number(e.target.value) : '')}
-              required
-              disabled={isDoctorRole}
-              className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer disabled:opacity-60"
-            >
-              <option value="" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">-- Seleccionar Sucursal --</option>
-              {sucursales.map((s) => (
-                <option key={s.id} value={s.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-                  {s.nombre || s.ubicacion} ({s.codigo_sucursal})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Fecha & Horarios */}
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100/90 mb-1 flex items-center gap-1">
-              <Calendar size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-              Fecha de la Cita <span className="text-rose-400">*</span>
-            </label>
-            <input
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              required
-              className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
+        {/* TWO-COLUMN GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          {/* COLUMN 1: General Info */}
+          <div className="space-y-3">
+            {/* Paciente Selector / Input */}
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100/90 mb-1 flex items-center gap-1">
-                <Clock size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Hora Inicio <span className="text-rose-400">*</span>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                <label className="text-small font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                  <User size={11} className="text-primary" />
+                  Paciente <span className="text-rose-500">*</span>
+                </label>
+                <label className="flex items-center gap-1.5 text-tiny text-slate-600 dark:text-slate-400 font-semibold cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isUnregisteredPatient}
+                    onChange={(e) => {
+                      setIsUnregisteredPatient(e.target.checked);
+                      setPacienteId('');
+                      setNombreUnregistered('');
+                    }}
+                    className="rounded border-slate-300 text-primary focus:ring-primary"
+                  />
+                  <span>No registrado</span>
+                </label>
+              </div>
+
+              {isUnregisteredPatient ? (
+                <input
+                  type="text"
+                  value={nombreUnregistered}
+                  onChange={(e) => setNombreUnregistered(e.target.value)}
+                  required={isUnregisteredPatient}
+                  placeholder="Escriba nombre completo del paciente..."
+                  className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                />
+              ) : (
+                <select
+                  value={pacienteId}
+                  onChange={(e) => setPacienteId(e.target.value ? Number(e.target.value) : '')}
+                  required={!isUnregisteredPatient}
+                  className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                >
+                  <option value="">-- Seleccionar Paciente --</option>
+                  {pacientes.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre} {p.apellido} ({p.codigo_paciente})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Doctor */}
+            <div>
+              <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                <Stethoscope size={11} className="text-primary" />
+                Doctor Asignado <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={doctorId}
+                onChange={(e) => setDoctorId(e.target.value ? Number(e.target.value) : '')}
+                required
+                className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+              >
+                <option value="">-- Seleccionar Doctor --</option>
+                {doctores.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    Dr. {d.nombre} {d.apellido}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sucursal */}
+            <div>
+              <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                <Building2 size={11} className="text-primary" />
+                Sucursal <span className="text-rose-500">*</span>
+              </label>
+              <select
+                value={sucursalId}
+                onChange={(e) => setSucursalId(e.target.value ? Number(e.target.value) : '')}
+                required
+                disabled={isDoctorRole}
+                className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-60"
+              >
+                <option value="">-- Seleccionar Sucursal --</option>
+                {sucursales.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.nombre || s.ubicacion} ({s.codigo_sucursal})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* COLUMN 2: Fecha y Estado */}
+          <div className="space-y-3">
+            {/* Fecha */}
+            <div>
+              <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                <Calendar size={11} className="text-primary" />
+                Fecha de la Cita <span className="text-rose-500">*</span>
               </label>
               <input
-                type="time"
-                value={horaInicio}
-                onChange={(e) => setHoraInicio(e.target.value)}
+                type="date"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
                 required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               />
             </div>
 
+            {/* Horarios */}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                  <Clock size={11} className="text-primary" />
+                  Hora Inicio <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="time"
+                  value={horaInicio}
+                  onChange={(e) => setHoraInicio(e.target.value)}
+                  required
+                  className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                  <Clock size={11} className="text-primary" />
+                  Hora Fin <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="time"
+                  value={horaFin}
+                  onChange={(e) => setHoraFin(e.target.value)}
+                  required
+                  className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                />
+              </div>
+            </div>
+
+            {/* Estado */}
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100/90 mb-1 flex items-center gap-1">
-                <Clock size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Hora Fin <span className="text-rose-400">*</span>
+              <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1">
+                Estado de la Cita
               </label>
-              <input
-                type="time"
-                value={horaFin}
-                onChange={(e) => setHoraFin(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
-              />
+              <select
+                value={estado}
+                onChange={(e) => setEstado(e.target.value as CitaEstado)}
+                disabled={!isDoctorRole}
+                className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-60"
+              >
+                <option value="confirmada">Confirmada (Aprobada)</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="finalizada">Finalizada</option>
+                <option value="cancelada">Cancelada</option>
+              </select>
+              {!isDoctorRole && (
+                <p className="text-micro text-amber-600 dark:text-amber-400 mt-1">
+                  * Solo doctores pueden cambiar el estado.
+                </p>
+              )}
             </div>
           </div>
         </div>
 
         {/* Live Availability verification output */}
         {disponibilidad && (
-          <div className="space-y-2">
+          <div className="space-y-1.5 mt-2">
             {disponibilidad.disponible ? (
-              <div className="p-3 rounded-xl bg-cyan-950/80 border border-[#0840A8]/15 dark:border-[#00C2E0]/40 text-[#0077D4] dark:text-[#00C2E0] text-xs font-semibold flex items-center gap-2">
-                <CheckCircle2 size={16} className="shrink-0 text-[#0077D4] dark:text-[#00C2E0]" />
+              <div className="p-2.5 rounded-sm bg-cyan-50 dark:bg-cyan-900/30 border border-cyan-200 dark:border-cyan-800 text-primary dark:text-secondary text-small font-semibold flex items-center gap-2 shadow-sm">
+                <CheckCircle2 size={14} className="shrink-0" />
                 <div>
                   <div>Horario Disponible para la Cita</div>
-                  <div className="text-[10px] text-[#0077D4] dark:text-blue-200/80 font-normal">
+                  <div className="text-micro font-normal opacity-80">
                     Atención sucursal: {disponibilidad.horario_sucursal}
                   </div>
                 </div>
               </div>
             ) : disponibilidad.fuera_horario_sucursal ? (
-              <div className="p-3 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-200 text-xs font-semibold flex items-center gap-2">
-                <AlertTriangle size={16} className="shrink-0 text-amber-400" />
+              <div className="p-2.5 rounded-sm bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-small font-semibold flex items-center gap-2 shadow-sm">
+                <AlertTriangle size={14} className="shrink-0" />
                 <div>
                   <div>{disponibilidad.mensaje}</div>
-                  <div className="text-[10px] text-amber-600 dark:text-amber-300/80 font-normal">
+                  <div className="text-micro font-normal opacity-80">
                     Horario de sucursal: {disponibilidad.horario_sucursal}
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-semibold flex items-center gap-2">
-                <XCircle size={16} className="shrink-0 text-rose-400" />
+              <div className="p-2.5 rounded-sm bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-small font-semibold flex items-center gap-2 shadow-sm">
+                <XCircle size={14} className="shrink-0" />
                 <div>
                   <div>Conflicto de Horario</div>
-                  <div className="text-[10px] text-rose-300/80 font-normal">
+                  <div className="text-micro font-normal opacity-80">
                     {disponibilidad.mensaje}
                   </div>
                 </div>
@@ -421,18 +456,18 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
             )}
 
             {disponibilidad.citas_ocupadas && disponibilidad.citas_ocupadas.length > 0 && (
-              <div className="p-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/30 space-y-1.5">
-                <div className="text-[11px] font-bold text-[#0077D4] dark:text-blue-200 flex items-center justify-between">
-                  <span>Citas ya agendadas en la fecha:</span>
-                  <span className="text-[10px] text-blue-300 font-mono">({disponibilidad.citas_ocupadas.length})</span>
+              <div className="p-2.5 rounded-sm bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-800 space-y-1.5">
+                <div className="text-tiny font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                  <span>Citas agendadas en la fecha:</span>
+                  <span className="font-mono">({disponibilidad.citas_ocupadas.length})</span>
                 </div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap gap-1">
                   {disponibilidad.citas_ocupadas.map((c) => (
                     <span
                       key={c.id}
-                      className="px-2 py-0.5 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[10px] font-mono font-medium flex items-center gap-1"
+                      className="px-1.5 py-0.5 rounded-sm bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-900/30 dark:border-rose-800 dark:text-rose-400 text-micro font-mono font-bold flex items-center gap-1"
                     >
-                      <Clock size={10} />
+                      <Clock size={9} />
                       {c.hora_inicio} - {c.hora_fin} ({c.paciente})
                     </span>
                   ))}
@@ -443,42 +478,19 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
         )}
 
         {checkingAvailability && (
-          <div className="text-[11px] text-[#0077D4] dark:text-[#00C2E0] font-medium flex items-center gap-1.5">
-            <Info size={13} className="animate-spin" />
-            <span>Verificando disponibilidad de horario...</span>
+          <div className="text-tiny text-primary dark:text-secondary font-medium flex items-center gap-1 mt-1">
+            <Info size={11} className="animate-spin" />
+            <span>Verificando disponibilidad...</span>
           </div>
         )}
 
-        {/* Estado Selector */}
-        <div>
-          <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100/90 mb-1">
-            Estado de la Cita
-          </label>
-          <select
-            value={estado}
-            onChange={(e) => setEstado(e.target.value as CitaEstado)}
-            disabled={!isDoctorRole}
-            className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer disabled:opacity-60"
-          >
-            <option value="confirmada" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Confirmada (Aprobada)</option>
-            <option value="pendiente" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Pendiente</option>
-            <option value="finalizada" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Finalizada</option>
-            <option value="cancelada" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Cancelada</option>
-          </select>
-          {!isDoctorRole && (
-            <p className="text-[10px] text-amber-600 dark:text-amber-300/80 mt-1">
-              * Solo los usuarios con rol Doctor pueden cambiar el estado.
-            </p>
-          )}
-        </div>
-
         {/* Action Buttons */}
-        <div className="pt-3 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex items-center gap-2">
+        <div className="pt-3 mt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2">
           {cita && onCancelEdit && (
             <button
               type="button"
               onClick={onCancelEdit}
-              className="w-1/3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] hover:bg-white/10 text-[#0840A8] dark:text-white border border-white/10 text-xs font-semibold cursor-pointer transition-all text-center"
+              className="px-4 py-1.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 text-small font-semibold transition-colors"
             >
               Cancelar
             </button>
@@ -487,9 +499,9 @@ export const CitaFormPanel: React.FC<CitaFormPanelProps> = ({
           <button
             type="submit"
             disabled={isFormDisabled}
-            className={`${cita ? 'w-2/3' : 'w-full'} py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#00C2E0] hover:to-[#0077D4] text-white text-xs font-extrabold shadow-md shadow-[#0077D4]/30 hover:shadow-[#00C2E0]/40 disabled:opacity-40 cursor-pointer transition-all border border-white/10 flex items-center justify-center gap-2`}
+            className="px-6 py-1.5 rounded bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-bold shadow-sm disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
           >
-            <CheckCircle2 size={16} />
+            <CheckCircle2 size={13} />
             <span>{isSubmitting ? 'Guardando...' : cita ? 'Guardar Cambios' : 'Registrar Cita'}</span>
           </button>
         </div>

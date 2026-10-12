@@ -22,6 +22,11 @@ export const getServiciosApi = async (filters?: {
   return response.data.servicios;
 };
 
+export const getPublicServiciosApi = async (): Promise<Servicio[]> => {
+  const response = await api.get<ServiciosResponse>('/public/servicios');
+  return response.data.servicios;
+};
+
 export const createServicioApi = async (data: ServicioFormData): Promise<Servicio> => {
   const response = await api.post<ServicioSingleResponse>('/servicios', data);
   return response.data.servicio;

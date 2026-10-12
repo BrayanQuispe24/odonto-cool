@@ -8,11 +8,11 @@ import {
   User,
   Stethoscope,
   Building2,
-  Calendar,
   CheckCircle2,
   AlertTriangle,
   CreditCard,
-  Percent,
+  FlaskConical,
+  ListChecks,
 } from 'lucide-react';
 import type { Cita } from '../../citas/types/cita';
 import type { Servicio } from '../../services/types/servicio';
@@ -21,28 +21,53 @@ import type { BoletaFormData, DetalleServicioItem, BoletaEstado } from '../types
 import { getServiciosApi } from '../../services/services/servicioService';
 import { getDientesApi } from '../../dientes/services/dienteService';
 import { getCitasApi } from '../../citas/services/citaService';
+import { getPacientesApi } from '../../patients/services/patientService';
+import { getDoctoresApi } from '../../doctors/services/doctorService';
+import type { Paciente } from '../../patients/types/patient';
+import type { Doctor } from '../../doctors/types/doctor';
 import { useAuthStore } from '../../auth/store/authStore';
 
 interface BoletaCreateModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  isModal?: boolean;
+  onClose?: () => void;
+  onCancel?: () => void;
   onSubmit: (data: BoletaFormData) => Promise<void>;
   preselectedCita?: Cita | null;
 }
 
+/* ---------- Enterprise design tokens ---------- */
+const inputClass =
+  'w-full px-2.5 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:opacity-60 disabled:bg-slate-50 dark:disabled:bg-dark-bg';
+const labelClass =
+  'block text-tiny font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1';
+const panelClass =
+  'bg-white dark:bg-dark-surface rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden';
+const panelHeaderClass =
+  'px-3 py-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between gap-2 text-small font-bold uppercase tracking-wider text-primary-dark dark:text-white';
+
 export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
-  isOpen,
+  isOpen = false,
+  isModal = true,
   onClose,
+  onCancel,
   onSubmit,
   preselectedCita,
 }) => {
   const { user } = useAuthStore();
 
   const [citas, setCitas] = useState<Cita[]>([]);
+  const [pacientes, setPacientes] = useState<Paciente[]>([]);
+  const [doctores, setDoctores] = useState<Doctor[]>([]);
   const [servicios, setServicios] = useState<Servicio[]>([]);
   const [dientes, setDientes] = useState<Diente[]>([]);
 
   const [selectedCitaId, setSelectedCitaId] = useState<number | ''>('');
+  const [selectedPacienteId, setSelectedPacienteId] = useState<number | ''>('');
+  const [selectedDoctorId, setSelectedDoctorId] = useState<number | ''>('');
+
+  const [hasCita, setHasCita] = useState<boolean>(true);
+
   const [tipoPaga, setTipoPaga] = useState<string>('Contado');
   const [metodoPago, setMetodoPago] = useState<string>('Efectivo');
   const [cantidadCuotas, setCantidadCuotas] = useState<number>(1);
@@ -53,31 +78,44 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
 
   // Temp line item form state
   const [selectedServicioId, setSelectedServicioId] = useState<number | ''>('');
-  const [selectedDienteId, setSelectedDienteId] = useState<number | ''>('');
+  const [customPrecio, setCustomPrecio] = useState<number | ''>('');
   const [itemDescripcion, setItemDescripcion] = useState('');
   const [itemDescuento, setItemDescuento] = useState<number>(0);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isActive = isOpen || !isModal;
+
   useEffect(() => {
-    if (isOpen) {
+    if (!isActive) {
       setError(null);
-      Promise.all([getCitasApi(), getServiciosApi(), getDientesApi()])
-        .then(([cList, sList, dList]) => {
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    if (isActive) {
+      Promise.all([
+        getCitasApi(),
+        getServiciosApi(),
+        getDientesApi(),
+        getPacientesApi(),
+        getDoctoresApi(),
+      ])
+        .then(([cList, sList, dList, pList, docList]) => {
           setCitas(cList);
           setServicios(sList);
           setDientes(dList);
+          setPacientes(pList);
+          setDoctores(docList);
 
           if (preselectedCita) {
             setSelectedCitaId(preselectedCita.id);
-          } else if (cList.length > 0) {
-            setSelectedCitaId(cList[0].id);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
-  }, [isOpen, preselectedCita]);
+  }, [isActive, preselectedCita]);
 
   const activeCita = useMemo(() => {
     if (preselectedCita && preselectedCita.id === Number(selectedCitaId)) {
@@ -100,8 +138,8 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
   }, [subtotal, totalDescuentos]);
 
   const handleAddItem = () => {
-    if (!selectedServicioId) {
-      setError('Selecciona un servicio para agregar a la boleta.');
+    if (!selectedServicioId || customPrecio === '') {
+      setError('Selecciona un servicio y establece su precio para agregarlo.');
       return;
     }
 
@@ -110,15 +148,15 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
 
     const newItem: DetalleServicioItem = {
       servicio_id: serv.id,
-      diente_id: selectedDienteId ? Number(selectedDienteId) : null,
+      diente_id: null,
       descripcion: itemDescripcion.trim() || serv.nombre,
       descuento: Math.max(0, Number(itemDescuento) || 0),
-      precio_unitario: Number(serv.precio) || 0,
+      precio_unitario: Number(customPrecio) || 0,
     };
 
     setDetallesItems((prev) => [...prev, newItem]);
     setSelectedServicioId('');
-    setSelectedDienteId('');
+    setCustomPrecio('');
     setItemDescripcion('');
     setItemDescuento(0);
     setError(null);
@@ -131,21 +169,26 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
   const [costoLaboratorio, setCostoLaboratorio] = useState<number>(0);
   const [porcentajeComisionDr, setPorcentajeComisionDr] = useState<number>(40);
 
-  // Installment payments breakdown (Only Cuota 1 registered initially)
   const [montoCuenta1, setMontoCuenta1] = useState<number>(0);
   const [metodoPagoCuenta1, setMetodoPagoCuenta1] = useState<string>('QR');
 
-  // Auto-calculated Doctor Commission
   const montoComisionDr = useMemo(() => {
     const base = Math.max(0, montoTotal - (Number(costoLaboratorio) || 0));
     return (base * (Number(porcentajeComisionDr) || 0)) / 100;
   }, [montoTotal, costoLaboratorio, porcentajeComisionDr]);
 
+  const baseComision = Math.max(0, montoTotal - (Number(costoLaboratorio) || 0));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedCitaId) {
+    if (hasCita && !selectedCitaId) {
       setError('Debes seleccionar una cita médica.');
+      return;
+    }
+
+    if (!hasCita && (!selectedPacienteId || !selectedDoctorId)) {
+      setError('Debes seleccionar un Paciente y un Doctor.');
       return;
     }
 
@@ -158,12 +201,18 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
     setError(null);
 
     try {
-      const emitidoPor = user ? (user.name || user.email) : 'Sistema ODONTO COOL';
-      const doctorId = activeCita?.doctor_id || null;
+      const emitidoPor = user ? user.name || user.email : 'Sistema ODONTO COOL';
+
+      let doctorId = activeCita?.doctor_id || null;
+      let pacienteId = activeCita?.paciente_id || null;
+
+      if (!hasCita || !selectedCitaId) {
+        doctorId = selectedDoctorId ? Number(selectedDoctorId) : null;
+        pacienteId = selectedPacienteId ? Number(selectedPacienteId) : null;
+      }
 
       const isContado = tipoPaga === 'Contado';
 
-      // Construct cuotas array with Cuota 1
       const cuotasList = [];
       if (!isContado && montoCuenta1 > 0) {
         cuotasList.push({
@@ -177,7 +226,8 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
       }
 
       await onSubmit({
-        cita_id: Number(selectedCitaId),
+        cita_id: hasCita && selectedCitaId ? Number(selectedCitaId) : null,
+        paciente_id: pacienteId,
         doctor_id: doctorId,
         fecha_emision: new Date().toISOString().split('T')[0],
         emitido_por: emitidoPor,
@@ -194,12 +244,13 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
         cuotas: cuotasList.length > 0 ? cuotasList : undefined,
       });
 
-      // Reset
       setDetallesItems([]);
       setCostoLaboratorio(0);
       setPorcentajeComisionDr(40);
       setMontoCuenta1(0);
-      onClose();
+      if (onClose) onClose();
+      if (onCancel) onCancel();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Error al generar la boleta de servicios prestados.');
     } finally {
@@ -207,192 +258,269 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
+  const segmentClass = (active: boolean) =>
+    `flex-1 px-3 py-1 text-small font-bold uppercase tracking-wider transition-colors cursor-pointer ${active
+      ? 'bg-[#0077D4] text-white'
+      : 'bg-white dark:bg-dark-surface text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-secondary'
+    }`;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 rounded-2xl shadow-2xl shadow-[#001C3D]/80 w-full max-w-3xl overflow-hidden text-[#0840A8] dark:text-white flex flex-col max-h-[92vh]">
-        {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-between bg-gradient-to-r from-[#0840A8] to-[#0077D4]">
-          <h3 className="text-base font-bold flex items-center gap-2 text-[#0840A8] dark:text-white">
-            <Receipt className="text-[#0077D4] dark:text-[#00C2E0]" size={20} />
-            <span>Emitir Boleta de Servicios Prestados (Venta)</span>
-          </h3>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-[#0077D4] dark:text-blue-100/80 hover:text-[#0840A8] dark:text-white hover:bg-white/10 cursor-pointer transition-colors"
-          >
-            <X size={18} />
-          </button>
+  const formContent = (
+    <form
+      onSubmit={handleSubmit}
+      className={isModal ? 'p-4 overflow-y-auto flex-1 bg-slate-50/60 dark:bg-dark-bg/40 space-y-4' : 'space-y-4'}
+    >
+      {error && (
+        <div className="p-2.5 rounded-sm bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-small font-bold flex items-center gap-2">
+          <AlertTriangle size={14} className="shrink-0" />
+          <span>{error}</span>
         </div>
+      )}
 
-        {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5 overflow-y-auto flex-1">
-          {error && (
-            <div className="p-3.5 rounded-xl bg-rose-950/80 border border-rose-800/80 text-rose-200 text-xs font-semibold flex items-center gap-2">
-              <AlertTriangle size={16} className="text-rose-400 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {/* Cita Reference Selector */}
-          <div>
-            <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-              <Calendar size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-              Cita Médica de Origen <span className="text-rose-400">*</span>
-            </label>
-            {preselectedCita ? (
-              <div className="p-3 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 flex items-center justify-between text-xs">
-                <div className="font-mono font-bold text-[#0077D4] dark:text-[#00C2E0]">{preselectedCita.numero_cita}</div>
-                <div className="text-[#0840A8] dark:text-white font-semibold">
-                  Paciente: {preselectedCita.paciente ? `${preselectedCita.paciente.nombre} ${preselectedCita.paciente.apellido}` : preselectedCita.nombre_paciente_unregistered}
-                </div>
-                <div className="text-[#0077D4] dark:text-blue-200/80">
-                  Doctor: Dr. {preselectedCita.doctor?.nombre} {preselectedCita.doctor?.apellido}
-                </div>
+      {/* SINGLE COLUMN FLOW */}
+      <div className="space-y-4">
+        {/* 1. DATOS DE ORIGEN */}
+        <section className={panelClass}>
+          <div className={panelHeaderClass}>
+            <span className="flex items-center gap-1.5">
+              <User size={13} className="text-primary dark:text-secondary" />
+              1. Datos de Origen (Cita / Paciente / Doctor)
+            </span>
+            {!preselectedCita && (
+              <div className="flex border border-slate-300 dark:border-slate-700 rounded-sm overflow-hidden normal-case">
+                <button
+                  type="button"
+                  id="boleta-origen-con-cita"
+                  onClick={() => {
+                    setHasCita(true);
+                    setSelectedPacienteId('');
+                    setSelectedDoctorId('');
+                  }}
+                  className={segmentClass(hasCita)}
+                >
+                  Con cita
+                </button>
+                <button
+                  type="button"
+                  id="boleta-origen-sin-cita"
+                  onClick={() => {
+                    setHasCita(false);
+                    setSelectedCitaId('');
+                  }}
+                  className={`${segmentClass(!hasCita)} border-l border-slate-300 dark:border-slate-700`}
+                >
+                  Sin cita
+                </button>
               </div>
-            ) : (
-              <select
-                value={selectedCitaId}
-                onChange={(e) => setSelectedCitaId(e.target.value ? Number(e.target.value) : '')}
-                required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer"
-              >
-                <option value="" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">-- Seleccionar Cita Médica --</option>
-                {citas.map((c) => {
-                  const pac = c.paciente ? `${c.paciente.nombre} ${c.paciente.apellido}` : c.nombre_paciente_unregistered || 'No especificado';
-                  const doc = c.doctor ? `Dr. ${c.doctor.nombre} ${c.doctor.apellido}` : 'Sin doctor';
-                  return (
-                    <option key={c.id} value={c.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-                      {c.numero_cita} | Paciente: {pac} | Doctor: {doc} ({String(c.fecha).split('T')[0]})
-                    </option>
-                  );
-                })}
-              </select>
             )}
           </div>
 
-          {/* Patient and Doctor Active Preview Card */}
-          {activeCita && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D]/80 border border-[#0840A8]/15 dark:border-[#0077D4]/30 text-xs">
-              <div className="space-y-0.5">
-                <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 flex items-center gap-1">
-                  <User size={11} className="text-[#0077D4] dark:text-[#00C2E0]" /> Paciente
-                </div>
-                <div className="font-bold text-[#0840A8] dark:text-white">
-                  {activeCita.paciente ? `${activeCita.paciente.nombre} ${activeCita.paciente.apellido}` : activeCita.nombre_paciente_unregistered}
-                </div>
+          <div className="p-3 space-y-3">
+            {hasCita && (
+              <div>
+                <label className={labelClass}>
+                  Cita Médica de Origen <span className="text-rose-500">*</span>
+                </label>
+                {preselectedCita ? (
+                  <div className="px-2 py-1.5 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg text-small font-mono font-bold text-primary dark:text-secondary">
+                    {preselectedCita.numero_cita}
+                  </div>
+                ) : (
+                  <select
+                    id="boleta-cita-select"
+                    value={selectedCitaId}
+                    onChange={(e) => setSelectedCitaId(e.target.value ? Number(e.target.value) : '')}
+                    className={`${inputClass} cursor-pointer`}
+                  >
+                    <option value="">-- Seleccionar Cita Médica --</option>
+                    {citas.map((c) => {
+                      const pac = c.paciente
+                        ? `${c.paciente.nombre} ${c.paciente.apellido}`
+                        : c.nombre_paciente_unregistered || 'No especificado';
+                      const doc = c.doctor ? `Dr. ${c.doctor.nombre} ${c.doctor.apellido}` : 'Sin doctor';
+                      return (
+                        <option key={c.id} value={c.id}>
+                          {c.numero_cita} | {pac} | {doc} ({String(c.fecha).split('T')[0]})
+                        </option>
+                      );
+                    })}
+                  </select>
+                )}
               </div>
+            )}
 
-              <div className="space-y-0.5">
-                <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 flex items-center gap-1">
-                  <Stethoscope size={11} className="text-[#0077D4] dark:text-[#00C2E0]" /> Doctor Atendido
+            {hasCita && activeCita && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 border border-slate-200 dark:border-slate-800 rounded-sm divide-y sm:divide-y-0 sm:divide-x divide-slate-200 dark:divide-slate-800 text-small">
+                <div className="px-2.5 py-1.5">
+                  <div className="text-micro font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                    <User size={10} className="text-primary" /> Paciente
+                  </div>
+                  <div className="font-bold text-primary-dark dark:text-white truncate">
+                    {activeCita.paciente
+                      ? `${activeCita.paciente.nombre} ${activeCita.paciente.apellido}`
+                      : activeCita.nombre_paciente_unregistered}
+                  </div>
                 </div>
-                <div className="font-bold text-[#0840A8] dark:text-white">
-                  {activeCita.doctor ? `Dr. ${activeCita.doctor.nombre} ${activeCita.doctor.apellido}` : 'Sin doctor'}
+                <div className="px-2.5 py-1.5">
+                  <div className="text-micro font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                    <Stethoscope size={10} className="text-primary" /> Doctor
+                  </div>
+                  <div className="font-bold text-primary-dark dark:text-white truncate">
+                    {activeCita.doctor
+                      ? `Dr. ${activeCita.doctor.nombre} ${activeCita.doctor.apellido}`
+                      : 'Sin doctor'}
+                  </div>
+                </div>
+                <div className="px-2.5 py-1.5">
+                  <div className="text-micro font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+                    <Building2 size={10} className="text-primary" /> Sucursal
+                  </div>
+                  <div className="font-bold text-primary-dark dark:text-white truncate">
+                    {activeCita.sucursal?.nombre || activeCita.sucursal?.ubicacion || 'Central'}
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="space-y-0.5">
-                <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 flex items-center gap-1">
-                  <Building2 size={11} className="text-[#0077D4] dark:text-[#00C2E0]" /> Sucursal
+            {!hasCita && !preselectedCita && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className={labelClass}>
+                    Paciente <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    id="boleta-paciente-select"
+                    value={selectedPacienteId}
+                    onChange={(e) => setSelectedPacienteId(e.target.value ? Number(e.target.value) : '')}
+                    className={`${inputClass} cursor-pointer`}
+                  >
+                    <option value="">-- Seleccionar Paciente --</option>
+                    {pacientes.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.nombre} {p.apellido} (HC: {p.codigo_paciente})
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div className="font-bold text-[#0840A8] dark:text-white">
-                  {activeCita.sucursal?.nombre || activeCita.sucursal?.ubicacion || 'Central'}
+                <div>
+                  <label className={labelClass}>
+                    Doctor Atendido <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    id="boleta-doctor-select"
+                    value={selectedDoctorId}
+                    onChange={(e) => setSelectedDoctorId(e.target.value ? Number(e.target.value) : '')}
+                    className={`${inputClass} cursor-pointer`}
+                  >
+                    <option value="">-- Seleccionar Doctor --</option>
+                    {doctores.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        Dr. {d.nombre} {d.apellido} - {Array.isArray(d.especialidades) ? d.especialidades.join(', ') : d.especialidades || ''}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
+            )}
+          </div>
+        </section>
+
+        {/* 2. SERVICIOS PRESTADOS */}
+        <section className={panelClass}>
+          <div className={panelHeaderClass}>
+            <span className="flex items-center gap-1.5">
+              <ListChecks size={13} className="text-primary dark:text-secondary" />
+              2. Servicios Prestados ({detallesItems.length})
+            </span>
+          </div>
+
+          <div className="p-3 border-b border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-12 gap-2 items-end">
+            <div className="sm:col-span-5">
+              <label className={labelClass}>
+                Servicio Dental <span className="text-rose-500">*</span>
+              </label>
+              <select
+                id="boleta-servicio-select"
+                value={selectedServicioId}
+                onChange={(e) => {
+                  const servId = e.target.value ? Number(e.target.value) : '';
+                  setSelectedServicioId(servId);
+                  if (servId) {
+                    const serv = servicios.find((s) => s.id === servId);
+                    setCustomPrecio(serv ? Number(serv.precio) : '');
+                  } else {
+                    setCustomPrecio('');
+                  }
+                }}
+                className={`${inputClass} cursor-pointer`}
+              >
+                <option value="">-- Seleccionar Servicio --</option>
+                {servicios.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.codigo_servicio ? `${s.codigo_servicio} · ` : ''}
+                    {s.nombre} (Ref. Bs. {Number(s.precio).toFixed(2)})
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
 
-          {/* ADD SERVICES SECTION */}
-          <div className="p-4 rounded-2xl bg-[#F4F9FF] dark:bg-[#001C3D]/60 border border-[#0840A8]/15 dark:border-[#0077D4]/40 space-y-3">
-            <h4 className="text-xs font-bold text-[#0077D4] dark:text-[#00C2E0] uppercase tracking-wider flex items-center gap-1.5">
-              <Plus size={14} />
-              <span>Agregar Servicios Prestados a la Boleta</span>
-            </h4>
+            <div className="sm:col-span-2">
+              <label className={labelClass}>
+                Precio (Bs.) <span className="text-rose-500">*</span>
+              </label>
+              <input
+                id="boleta-precio-input"
+                type="number"
+                min="0"
+                step="0.1"
+                value={customPrecio}
+                onChange={(e) => setCustomPrecio(e.target.value ? Number(e.target.value) : '')}
+                className={`${inputClass} font-mono text-right`}
+              />
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end">
-              <div className="sm:col-span-4">
-                <label className="block text-[11px] font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                  Servicio Dental <span className="text-rose-400">*</span>
-                </label>
-                <select
-                  value={selectedServicioId}
-                  onChange={(e) => setSelectedServicioId(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full px-2.5 py-2 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0]"
-                >
-                  <option value="" className="bg-white dark:bg-[#002D5E]">-- Seleccionar Servicio --</option>
-                  {servicios.map((s) => (
-                    <option key={s.id} value={s.id} className="bg-white dark:bg-[#002D5E]">
-                      {s.nombre} (Bs. {Number(s.precio).toFixed(2)})
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div className="sm:col-span-2">
+              <label className={labelClass}>Desc. (Bs.)</label>
+              <input
+                id="boleta-descuento-input"
+                type="number"
+                step="0.01"
+                min="0"
+                value={itemDescuento}
+                onChange={(e) => setItemDescuento(Number(e.target.value))}
+                placeholder="0.00"
+                className={`${inputClass} font-mono text-right`}
+              />
+            </div>
 
-              <div className="sm:col-span-3">
-                <label className="block text-[11px] font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                  Pieza FDI (Opcional)
-                </label>
-                <select
-                  value={selectedDienteId}
-                  onChange={(e) => setSelectedDienteId(e.target.value ? Number(e.target.value) : '')}
-                  className="w-full px-2.5 py-2 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0]"
-                >
-                  <option value="" className="bg-white dark:bg-[#002D5E]">-- Ninguna / General --</option>
-                  {dientes.map((d) => (
-                    <option key={d.id} value={d.id} className="bg-white dark:bg-[#002D5E]">
-                      FDI #{d.numero_diente} - {d.nombre}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="sm:col-span-3">
-                <label className="block text-[11px] font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                  Descuento (Bs.)
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={itemDescuento}
-                  onChange={(e) => setItemDescuento(Number(e.target.value))}
-                  placeholder="0.00"
-                  className="w-full px-2.5 py-2 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-mono font-bold text-[#0077D4] dark:text-[#00C2E0] focus:outline-none focus:border-[#00C2E0]"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <button
-                  type="button"
-                  onClick={handleAddItem}
-                  className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#0840A8] hover:to-[#0077D4] text-white text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1"
-                >
-                  <Plus size={14} />
-                  <span>Añadir</span>
-                </button>
-              </div>
+            <div className="sm:col-span-3">
+              <button
+                type="button"
+                id="boleta-add-item"
+                onClick={handleAddItem}
+                className="w-full px-3 py-1.5 rounded-sm bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-bold shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Plus size={13} />
+                <span>Añadir Línea</span>
+              </button>
             </div>
           </div>
 
-          {/* LIST OF ADDED ITEMS */}
-          <div className="border border-[#0840A8]/15 dark:border-[#0077D4]/40 rounded-xl overflow-hidden bg-[#F4F9FF] dark:bg-[#001C3D]">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-[#E5F7FF] dark:bg-[#0840A8]/40 border-b border-[#0840A8]/15 dark:border-[#0840A8]/60 text-[10px] font-extrabold uppercase text-[#0077D4] dark:text-blue-100">
-                  <th className="py-2.5 px-3">SERVICIO</th>
-                  <th className="py-2.5 px-3">PIEZA DENTAL</th>
-                  <th className="py-2.5 px-3 text-right">PRECIO STDA</th>
-                  <th className="py-2.5 px-3 text-right">DESCUENTO</th>
-                  <th className="py-2.5 px-3 text-right">SUBTOTAL</th>
-                  <th className="py-2.5 px-3 text-center">ACCIONES</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-small whitespace-nowrap">
+              <thead className="bg-slate-50 dark:bg-dark-bg text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider">
+                <tr>
+                  <th className="px-3 py-1.5 font-bold w-8">#</th>
+                  <th className="px-3 py-1.5 font-bold">Servicio</th>
+                  <th className="px-3 py-1.5 font-bold text-right w-28">Precio</th>
+                  <th className="px-3 py-1.5 font-bold text-right w-28">Descuento</th>
+                  <th className="px-3 py-1.5 font-bold text-right w-28">Subtotal</th>
+                  <th className="px-3 py-1.5 font-bold text-right w-12"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#0840A8]/15 dark:divide-[#0840A8]/30">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200 font-medium">
                 {detallesItems.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-[#0077D4] dark:text-blue-200/60 font-medium">
+                    <td colSpan={6} className="py-8 text-center text-slate-500 font-semibold">
                       No has agregado ningún servicio a esta boleta.
                     </td>
                   </tr>
@@ -403,29 +531,40 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
                     const lineSubtotal = Math.max(0, (item.precio_unitario || 0) - item.descuento);
 
                     return (
-                      <tr key={idx} className="hover:bg-[#0840A8]/20 transition-colors">
-                        <td className="py-2.5 px-3 font-semibold text-[#0840A8] dark:text-white">
-                          {serv?.nombre || item.descripcion}
+                      <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-dark-bg/50 transition-colors">
+                        <td className="px-3 py-1.5 font-mono text-slate-400">{idx + 1}</td>
+                        <td className="px-3 py-1.5">
+                          <span className="font-bold text-primary-dark dark:text-white">
+                            {serv?.nombre || item.descripcion}
+                          </span>
+                          {serv?.codigo_servicio && (
+                            <span className="ml-1.5 font-mono text-tiny text-primary dark:text-secondary">
+                              {serv.codigo_servicio}
+                            </span>
+                          )}
+                          {dien && (
+                            <span className="ml-1.5 text-tiny px-1 py-0.5 rounded-sm border border-slate-200 dark:border-slate-700 font-mono text-slate-600 dark:text-slate-300">
+                              Pieza {dien.numero_diente}
+                            </span>
+                          )}
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-[#0077D4] dark:text-blue-200">
-                          {dien ? `FDI #${dien.numero_diente} (${dien.nombre})` : 'General / Sin pieza'}
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-[#0840A8] dark:text-white">
+                        <td className="px-3 py-1.5 text-right font-mono">
                           Bs. {(item.precio_unitario || 0).toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-amber-600 dark:text-amber-300">
-                          {item.descuento > 0 ? `- Bs. ${item.descuento.toFixed(2)}` : '0.00'}
+                        <td className="px-3 py-1.5 text-right font-mono text-amber-700 dark:text-amber-400">
+                          {item.descuento > 0 ? `- ${item.descuento.toFixed(2)}` : '0.00'}
                         </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-[#0077D4] dark:text-[#00C2E0]">
+                        <td className="px-3 py-1.5 text-right font-mono font-bold text-primary dark:text-secondary">
                           Bs. {lineSubtotal.toFixed(2)}
                         </td>
-                        <td className="py-2.5 px-3 text-center">
+                        <td className="px-3 py-1.5 text-right">
                           <button
                             type="button"
                             onClick={() => handleRemoveItem(idx)}
-                            className="p-1 rounded text-rose-400 hover:text-rose-200 hover:bg-rose-500/20 cursor-pointer"
+                            title="Quitar línea"
+                            className="p-1 rounded bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 transition-colors cursor-pointer"
                           >
-                            <Trash2 size={13} />
+                            <Trash2 size={12} />
                           </button>
                         </td>
                       </tr>
@@ -433,208 +572,269 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
                   })
                 )}
               </tbody>
+              {detallesItems.length > 0 && (
+                <tfoot className="bg-slate-50 dark:bg-dark-bg border-t-2 border-slate-200 dark:border-slate-700">
+                  <tr>
+                    <td colSpan={2} className="px-3 py-1.5 font-bold uppercase tracking-wider text-slate-500">
+                      Totales
+                    </td>
+                    <td className="px-3 py-1.5 text-right font-mono font-bold text-primary-dark dark:text-white">
+                      Bs. {subtotal.toFixed(2)}
+                    </td>
+                    <td className="px-3 py-1.5 text-right font-mono font-bold text-amber-700 dark:text-amber-400">
+                      - {totalDescuentos.toFixed(2)}
+                    </td>
+                    <td className="px-3 py-1.5 text-right font-mono font-bold text-primary dark:text-secondary">
+                      Bs. {montoTotal.toFixed(2)}
+                    </td>
+                    <td />
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
+        </section>
 
-          {/* TOTALS SUMMARY BANNER */}
-          <div className="p-4 rounded-xl bg-gradient-to-r from-[#001C3D] via-[#0840A8]/40 to-[#001C3D] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="space-y-1 text-xs">
-              <div className="text-[#0077D4] dark:text-blue-200/70 font-semibold">Resumen de Importes</div>
-              <div className="flex flex-wrap items-center gap-4 text-[#0077D4] dark:text-blue-100">
-                <span>Subtotal: <strong className="font-mono text-[#0840A8] dark:text-white">Bs. {subtotal.toFixed(2)}</strong></span>
-                <span>Descuentos: <strong className="font-mono text-amber-600 dark:text-amber-300">Bs. {totalDescuentos.toFixed(2)}</strong></span>
-                <span>Base Comisión: <strong className="font-mono text-emerald-300">Bs. {Math.max(0, montoTotal - (Number(costoLaboratorio) || 0)).toFixed(2)}</strong></span>
+        {/* 3. LABORATORIO DENTAL Y COMISIÓN DOCTOR */}
+        <section className={panelClass}>
+          <div className={panelHeaderClass}>
+            <span className="flex items-center gap-1.5">
+              <FlaskConical size={13} className="text-primary dark:text-secondary" />
+              3. Laboratorio Dental y Comisión Doctor
+            </span>
+          </div>
+          <div className="p-3 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+            <div>
+              <label className={labelClass}>Costo Lab. (Bs.)</label>
+              <input
+                id="boleta-costo-lab"
+                type="number"
+                step="0.01"
+                min="0"
+                value={costoLaboratorio}
+                onChange={(e) => setCostoLaboratorio(Number(e.target.value))}
+                placeholder="0.00"
+                className={`${inputClass} font-mono text-right`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>% Comisión Dr.</label>
+              <input
+                id="boleta-pct-comision"
+                type="number"
+                step="1"
+                min="0"
+                max="100"
+                value={porcentajeComisionDr}
+                onChange={(e) => setPorcentajeComisionDr(Number(e.target.value))}
+                placeholder="40"
+                className={`${inputClass} font-mono text-right`}
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Base Comisión</label>
+              <div className="px-2.5 py-1.5 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg font-mono text-small font-semibold text-primary-dark dark:text-white text-right">
+                Bs. {baseComision.toFixed(2)}
               </div>
             </div>
-
-            <div className="text-right">
-              <div className="text-[10px] text-[#0077D4] dark:text-blue-200/80 uppercase font-bold tracking-wider">MONTO TOTAL BOLETA</div>
-              <div className="text-2xl font-black text-[#0077D4] dark:text-[#00C2E0] font-mono">
-                Bs. {montoTotal.toFixed(2)}
+            <div>
+              <label className={labelClass}>Monto Comisión DR</label>
+              <div className="px-2.5 py-1.5 rounded-sm border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 font-mono text-small font-bold text-emerald-700 dark:text-emerald-400 text-right">
+                Bs. {montoComisionDr.toFixed(2)}
               </div>
             </div>
           </div>
+        </section>
 
-          {/* DR COMMISSION & LAB COSTS SECTION */}
-          <div className="p-4 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D]/80 border border-[#0840A8]/15 dark:border-[#0077D4]/40 space-y-3">
-            <h4 className="text-xs font-bold text-[#0077D4] dark:text-[#00C2E0] uppercase tracking-wider flex items-center justify-between">
-              <span>Laboratorio Dental y Comisión Doctor</span>
-              <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                Fórmula: (Total - Laboratorio) × %Comisión
-              </span>
-            </h4>
+        {/* 4. CONDICIONES DE PAGO Y RESUMEN FINAL */}
+        <section className={panelClass}>
+          <div className={panelHeaderClass}>
+            <span className="flex items-center gap-1.5">
+              <CreditCard size={13} className="text-primary dark:text-secondary" />
+              4. Condiciones de Pago & Resumen Importe Final
+            </span>
+          </div>
 
+          <div className="p-3 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                  Costo Laboratorio (Bs.)
+                <label className={labelClass}>
+                  Tipo de Pago <span className="text-rose-500">*</span>
                 </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={costoLaboratorio}
-                  onChange={(e) => setCostoLaboratorio(Number(e.target.value))}
-                  placeholder="0.00"
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-mono font-bold focus:outline-none focus:border-[#00C2E0]"
-                />
+                <div className="flex border border-slate-300 dark:border-slate-700 rounded-sm overflow-hidden">
+                  <button
+                    type="button"
+                    id="boleta-tipo-contado"
+                    onClick={() => setTipoPaga('Contado')}
+                    className={segmentClass(tipoPaga === 'Contado')}
+                  >
+                    Contado
+                  </button>
+                  <button
+                    type="button"
+                    id="boleta-tipo-credito"
+                    onClick={() => setTipoPaga('Credito')}
+                    className={`${segmentClass(tipoPaga === 'Credito')} border-l border-slate-300 dark:border-slate-700`}
+                  >
+                    Crédito / Cuotas
+                  </button>
+                </div>
               </div>
+
+              {tipoPaga === 'Credito' ? (
+                <div>
+                  <label className={labelClass}>
+                    Nº Cuotas <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    id="boleta-cantidad-cuotas"
+                    type="number"
+                    min="2"
+                    max="36"
+                    value={cantidadCuotas}
+                    onChange={(e) => setCantidadCuotas(Number(e.target.value))}
+                    required
+                    className={`${inputClass} font-mono text-right`}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className={labelClass}>Método de Pago</label>
+                  <select
+                    id="boleta-metodo-pago"
+                    value={metodoPago}
+                    onChange={(e) => setMetodoPago(e.target.value)}
+                    className={`${inputClass} cursor-pointer`}
+                  >
+                    <option value="EFEC">Efectivo</option>
+                    <option value="QR">QR / Pago Móvil</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                  </select>
+                </div>
+              )}
 
               <div>
-                <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                  % Comisión Doctor
-                </label>
-                <input
-                  type="number"
-                  step="1"
-                  min="0"
-                  max="100"
-                  value={porcentajeComisionDr}
-                  onChange={(e) => setPorcentajeComisionDr(Number(e.target.value))}
-                  placeholder="40"
-                  className="w-full px-3 py-2 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-mono font-bold focus:outline-none focus:border-[#00C2E0]"
-                />
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-[#E5F7FF] dark:bg-[#0840A8]/30 border border-[#0840A8]/15 dark:border-[#00C2E0]/30 flex flex-col justify-center">
-                <span className="text-[10px] text-[#0077D4] dark:text-blue-200 uppercase font-bold">Monto Comisión DR</span>
-                <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 font-mono">
-                  Bs. {montoComisionDr.toFixed(2)}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* PAYMENT OPTIONS GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                <CreditCard size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Tipo de Pago <span className="text-rose-400">*</span>
-              </label>
-              <select
-                value={tipoPaga}
-                onChange={(e) => setTipoPaga(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] cursor-pointer"
-              >
-                <option value="Contado" className="bg-white dark:bg-[#002D5E]">Al Contado (1 Cuota / Auto Completado)</option>
-                <option value="Credito" className="bg-white dark:bg-[#002D5E]">Al Crédito / En Cuotas</option>
-              </select>
-            </div>
-
-            {tipoPaga === 'Credito' ? (
-              <div>
-                <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                  <Percent size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                  Cantidad de Cuotas <span className="text-rose-400">*</span>
-                </label>
-                <input
-                  type="number"
-                  min="2"
-                  max="36"
-                  value={cantidadCuotas}
-                  onChange={(e) => setCantidadCuotas(Number(e.target.value))}
-                  required
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-mono font-bold focus:outline-none focus:border-[#00C2E0]"
-                />
-              </div>
-            ) : (
-              <div>
-                <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                  <DollarSign size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                  Método de Pago
-                </label>
+                <label className={labelClass}>Estado Inicial</label>
                 <select
-                  value={metodoPago}
-                  onChange={(e) => setMetodoPago(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] cursor-pointer"
+                  id="boleta-estado-inicial"
+                  value={tipoPaga === 'Contado' ? 'completado' : estado}
+                  disabled={tipoPaga === 'Contado'}
+                  onChange={(e) => setEstado(e.target.value as BoletaEstado)}
+                  className={`${inputClass} cursor-pointer`}
                 >
-                  <option value="EFEC" className="bg-white dark:bg-[#002D5E]">Efectivo (EFEC)</option>
-                  <option value="QR" className="bg-white dark:bg-[#002D5E]">QR / Pago Móvil</option>
-                  <option value="Transferencia" className="bg-white dark:bg-[#002D5E]">Transferencia Bancaria</option>
-                  <option value="Tarjeta" className="bg-white dark:bg-[#002D5E]">Tarjeta de Crédito / Débito</option>
+                  <option value="completado">Completado</option>
+                  <option value="pendiente">Pendiente</option>
                 </select>
               </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                Estado Inicial
-              </label>
-              <select
-                value={tipoPaga === 'Contado' ? 'completado' : estado}
-                disabled={tipoPaga === 'Contado'}
-                onChange={(e) => setEstado(e.target.value as BoletaEstado)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] cursor-pointer disabled:opacity-60"
-              >
-                <option value="completado" className="bg-white dark:bg-[#002D5E]">Completado (Pago 100%)</option>
-                <option value="pendiente" className="bg-white dark:bg-[#002D5E]">Pendiente de Cuotas</option>
-              </select>
             </div>
-          </div>
 
-          {/* REGISTRO DE PRIMER ABONO (CUOTA 1) */}
-          {tipoPaga === 'Credito' && (
-            <div className="p-4 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D]/80 border border-[#0840A8]/15 dark:border-[#00C2E0]/30 space-y-3">
-              <h4 className="text-xs font-bold text-[#0077D4] dark:text-[#00C2E0] uppercase tracking-wider">
-                Registro del Primer Abono (Cuota 1)
-              </h4>
-
-              <div className="p-3 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            {/* FIRST INSTALLMENT IF CREDITO */}
+            {tipoPaga === 'Credito' && (
+              <div className="pt-2 border-t border-slate-200 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                <div className="text-tiny font-bold uppercase tracking-wider text-primary dark:text-secondary flex items-center gap-1">
+                  <DollarSign size={11} /> Registro Primer Abono (Cuota 1)
+                </div>
+                <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                      Monto Primer Abono (Bs.)
-                    </label>
+                    <label className={labelClass}>Monto Primer Abono (Bs.)</label>
                     <input
+                      id="boleta-monto-cuota1"
                       type="number"
                       step="0.01"
                       min="0"
                       value={montoCuenta1}
                       onChange={(e) => setMontoCuenta1(Number(e.target.value))}
                       placeholder="0.00"
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white font-mono font-bold"
+                      className={`${inputClass} font-mono text-right`}
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-                      Método de Pago (QR / EFEC)
-                    </label>
+                    <label className={labelClass}>Método Abono</label>
                     <select
+                      id="boleta-metodo-cuota1"
                       value={metodoPagoCuenta1}
                       onChange={(e) => setMetodoPagoCuenta1(e.target.value)}
-                      className="w-full px-2.5 py-1.5 rounded-lg bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white font-mono"
+                      className={`${inputClass} cursor-pointer`}
                     >
-                      <option value="QR">QR Transferencia</option>
-                      <option value="EFEC">EFECTIVO</option>
-                      <option value="Tarjeta">Tarjeta Débito/Crédito</option>
-                      <option value="Transferencia">Transferencia Bancaria</option>
+                      <option value="QR">QR</option>
+                      <option value="EFEC">Efectivo</option>
+                      <option value="Tarjeta">Tarjeta</option>
+                      <option value="Transferencia">Transferencia</option>
                     </select>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Footer Buttons */}
-          <div className="pt-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white border border-white/10 text-xs font-semibold cursor-pointer transition-all"
-            >
-              Cancelar
-            </button>
+            {/* TOTALS BANNER */}
+            <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-dark-bg p-3 rounded-sm">
+              <div className="flex flex-wrap items-center gap-4 text-small">
+                <div>
+                  <span className="text-slate-500 font-medium">Subtotal:</span>{' '}
+                  <span className="font-mono font-bold text-primary-dark dark:text-white">Bs. {subtotal.toFixed(2)}</span>
+                </div>
+                <div>
+                  <span className="text-slate-500 font-medium">Descuentos:</span>{' '}
+                  <span className="font-mono font-bold text-amber-700 dark:text-amber-400">- Bs. {totalDescuentos.toFixed(2)}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-tiny font-bold uppercase tracking-wider text-slate-500">Monto Total:</span>
+                <span className="font-mono font-extrabold text-base text-primary dark:text-secondary">
+                  Bs. {montoTotal.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* ACTIONS */}
+          <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-end gap-2">
+            {(onClose || onCancel) && (
+              <button
+                type="button"
+                onClick={onClose || onCancel}
+                className="px-3 py-1.5 rounded bg-white dark:bg-dark-surface border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-small font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+            )}
             <button
               type="submit"
+              id="boleta-submit"
               disabled={isSubmitting || detallesItems.length === 0}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#0840A8] hover:to-[#0077D4] text-white text-xs font-bold shadow-md shadow-[#0077D4]/30 disabled:opacity-40 cursor-pointer transition-all flex items-center gap-1.5"
+              className="px-4 py-1.5 rounded bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-bold shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
             >
-              <CheckCircle2 size={15} />
-              <span>{isSubmitting ? 'Generando Boleta...' : 'Emitir Boleta de Servicios'}</span>
+              <CheckCircle2 size={13} />
+              <span>{isSubmitting ? 'Generando...' : 'Emitir Boleta'}</span>
             </button>
           </div>
-        </form>
+        </section>
+      </div>
+    </form>
+  );
+
+  if (!isModal) return formContent;
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+      <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[92vh]">
+        {/* Modal Header */}
+        <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2 text-primary-dark dark:text-white text-xs font-bold uppercase tracking-wider">
+            <Receipt size={14} className="text-primary dark:text-secondary" />
+            <span>Emitir Boleta de Servicios Prestados</span>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors cursor-pointer"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        {formContent}
       </div>
     </div>
   );

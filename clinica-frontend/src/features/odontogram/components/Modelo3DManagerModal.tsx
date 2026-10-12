@@ -166,19 +166,19 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-[#F4F9FF] dark:bg-[#001C3D]/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-4xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 rounded-2xl shadow-2xl shadow-[#001C3D] overflow-hidden text-[#0840A8] dark:text-white flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[9999] bg-light-surface dark:bg-dark-bg/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative w-full max-w-4xl bg-white dark:bg-dark-surface border border-primary-dark/15 dark:border-secondary/30 rounded-2xl shadow-2xl shadow-[#001C3D] overflow-hidden text-primary-dark dark:text-white flex flex-col max-h-[90vh]">
         {/* MODAL HEADER */}
-        <div className="flex items-center justify-between p-5 border-b border-[#0840A8]/15 dark:border-[#00C2E0]/20 bg-[#F4F9FF] dark:bg-[#001C3D]/60">
+        <div className="flex items-center justify-between p-5 border-b border-primary-dark/15 dark:border-secondary/20 bg-light-surface dark:bg-dark-bg/60">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] shadow-md shadow-[#0077D4]/40">
-              <Layers size={20} className="text-[#0840A8] dark:text-white" />
+            <div className="p-2 rounded-xl bg-gradient-to-r from-primary to-secondary shadow-md shadow-[#0077D4]/40">
+              <Layers size={20} className="text-primary-dark dark:text-white" />
             </div>
             <div>
-              <h3 className="text-lg font-black tracking-tight text-[#0840A8] dark:text-white flex items-center gap-2">
+              <h3 className="text-lg font-black tracking-tight text-primary-dark dark:text-white flex items-center gap-2">
                 Gestor de Modelos 3D (.GLB)
               </h3>
-              <p className="text-xs text-[#0077D4] dark:text-blue-200/70">
+              <p className="text-xs text-primary dark:text-blue-200/70">
                 Sube y administra tus escaneos odontológicos tridimensionales personalizados.
               </p>
             </div>
@@ -186,7 +186,7 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0077D4] dark:text-blue-200 hover:text-[#0840A8] dark:text-white transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-primary dark:text-blue-200 hover:text-primary-dark dark:text-white transition-all cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -195,8 +195,8 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
         {/* MODAL BODY */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1 custom-scrollbar">
           {/* UPLOAD SECTION FORM */}
-          <form onSubmit={handleUploadSubmit} className="space-y-4 bg-[#F4F9FF] dark:bg-[#001C3D]/70 p-5 rounded-xl border border-[#0840A8]/15 dark:border-[#00C2E0]/20">
-            <div className="flex items-center gap-2 text-xs font-extrabold text-[#0077D4] dark:text-[#00C2E0] uppercase tracking-wide">
+          <form onSubmit={handleUploadSubmit} className="space-y-4 bg-light-surface dark:bg-dark-bg/70 p-5 rounded-xl border border-primary-dark/15 dark:border-secondary/20">
+            <div className="flex items-center gap-2 text-xs font-extrabold text-primary dark:text-secondary uppercase tracking-wide">
               <Sparkles size={14} />
               <span>Subir Nuevo Modelo Tridimensional (.GLB)</span>
             </div>
@@ -208,10 +208,10 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
               onDrop={handleDrop}
               className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-all flex flex-col items-center justify-center cursor-pointer ${
                 isDragging
-                  ? 'border-[#00C2E0] bg-[#00C2E0]/10 scale-[0.99]'
+                  ? 'border-secondary bg-[#00C2E0]/10 scale-[0.99]'
                   : selectedFile
                   ? 'border-emerald-400/50 bg-emerald-500/10'
-                  : 'border-[#0840A8]/15 dark:border-[#00C2E0]/40 hover:border-[#00C2E0] bg-white dark:bg-[#002D5E]/40'
+                  : 'border-primary-dark/15 dark:border-secondary/40 hover:border-secondary bg-white dark:bg-dark-surface/40'
               }`}
             >
               <input
@@ -234,14 +234,14 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
                 </div>
               ) : (
                 <div className="flex flex-col items-center space-y-2">
-                  <div className="p-3 rounded-full bg-[#0077D4]/20 text-[#0077D4] dark:text-[#00C2E0]">
+                  <div className="p-3 rounded-full bg-[#0077D4]/20 text-primary dark:text-secondary">
                     <UploadCloud size={32} />
                   </div>
-                  <p className="text-sm font-bold text-[#0840A8] dark:text-white">
-                    Arrastra tu archivo <code className="text-[#0077D4] dark:text-[#00C2E0] font-mono">.glb</code> aquí o haz clic para examinar
+                  <p className="text-sm font-bold text-primary-dark dark:text-white">
+                    Arrastra tu archivo <code className="text-primary dark:text-secondary font-mono">.glb</code> aquí o haz clic para examinar
                   </p>
-                  <p className="text-xs text-[#0077D4] dark:text-blue-200/60">
-                    Solo formato 3D binario <span className="text-[#0077D4] dark:text-[#00C2E0] font-semibold">.GLB</span> (Máximo 100 MB)
+                  <p className="text-xs text-primary dark:text-blue-200/60">
+                    Solo formato 3D binario <span className="text-primary dark:text-secondary font-semibold">.GLB</span> (Máximo 100 MB)
                   </p>
                 </div>
               )}
@@ -250,7 +250,7 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
             {/* FORM INPUTS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-[#0077D4] dark:text-blue-100 mb-1">Nombre del Modelo *</label>
+                <label className="block text-xs font-bold text-primary dark:text-blue-100 mb-1">Nombre del Modelo *</label>
                 <input
                   type="text"
                   required
@@ -258,19 +258,19 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
                   value={nombre}
                   onChange={(e) => setNombre(e.target.value)}
                   disabled={isUploading}
-                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 text-[#0840A8] dark:text-white text-xs placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0]"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-dark-surface border border-primary-dark/15 dark:border-secondary/30 text-primary-dark dark:text-white text-xs placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#0077D4] dark:text-blue-100 mb-1">Descripción / Notas (Opcional)</label>
+                <label className="block text-xs font-bold text-primary dark:text-blue-100 mb-1">Descripción / Notas (Opcional)</label>
                 <input
                   type="text"
                   placeholder="Ej: Escaneo post-tratamiento ortodoncia"
                   value={descripcion}
                   onChange={(e) => setDescripcion(e.target.value)}
                   disabled={isUploading}
-                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 text-[#0840A8] dark:text-white text-xs placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0]"
+                  className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-dark-surface border border-primary-dark/15 dark:border-secondary/30 text-primary-dark dark:text-white text-xs placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary"
                 />
               </div>
             </div>
@@ -282,9 +282,9 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
                   <span>Subiendo al servidor Laravel...</span>
                   <span>{uploadProgress}%</span>
                 </div>
-                <div className="w-full h-2 bg-white dark:bg-[#002D5E] rounded-full overflow-hidden border border-[#0840A8]/15 dark:border-[#00C2E0]/30">
+                <div className="w-full h-2 bg-white dark:bg-dark-surface rounded-full overflow-hidden border border-primary-dark/15 dark:border-secondary/30">
                   <div
-                    className="h-full bg-gradient-to-r from-[#0077D4] to-[#00C2E0] transition-all duration-200 rounded-full"
+                    className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-200 rounded-full"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
@@ -296,7 +296,7 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
               <button
                 type="submit"
                 disabled={isUploading || !selectedFile}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#0840A8] hover:to-[#0077D4] disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-[#0077D4]/30 transition-all flex items-center gap-2 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-[#0840A8] hover:to-[#0077D4] disabled:opacity-50 text-white text-xs font-bold shadow-md shadow-[#0077D4]/30 transition-all flex items-center gap-2 cursor-pointer"
               >
                 {isUploading ? <Loader2 size={16} className="animate-spin" /> : <UploadCloud size={16} />}
                 <span>{isUploading ? 'Guardando en Servidor...' : 'Subir Modelo 3D'}</span>
@@ -307,22 +307,22 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
           {/* CATALOG LIST OF UPLOADED MODELS */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-extrabold text-[#0077D4] dark:text-blue-100 uppercase tracking-wide flex items-center gap-2">
-                <HardDrive size={15} className="text-[#0077D4] dark:text-[#00C2E0]" />
+              <h4 className="text-xs font-extrabold text-primary dark:text-blue-100 uppercase tracking-wide flex items-center gap-2">
+                <HardDrive size={15} className="text-primary dark:text-secondary" />
                 <span>Mis Modelos Almacenados ({modelos.length})</span>
               </h4>
             </div>
 
             {isLoading ? (
-              <div className="py-8 text-center text-[#0077D4] dark:text-blue-200/70 text-xs flex items-center justify-center gap-2">
-                <Loader2 size={18} className="animate-spin text-[#0077D4] dark:text-[#00C2E0]" />
+              <div className="py-8 text-center text-primary dark:text-blue-200/70 text-xs flex items-center justify-center gap-2">
+                <Loader2 size={18} className="animate-spin text-primary dark:text-secondary" />
                 <span>Cargando modelos desde Laravel...</span>
               </div>
             ) : modelos.length === 0 ? (
-              <div className="p-6 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D]/40 border border-[#0840A8]/15 dark:border-[#00C2E0]/20 text-center space-y-1">
+              <div className="p-6 rounded-xl bg-light-surface dark:bg-dark-bg/40 border border-primary-dark/15 dark:border-secondary/20 text-center space-y-1">
                 <FileCode className="mx-auto text-blue-300/40" size={32} />
-                <p className="text-xs font-bold text-[#0840A8] dark:text-white">No tienes modelos 3D personalizados subidos</p>
-                <p className="text-[11px] text-[#0077D4] dark:text-blue-200/60">
+                <p className="text-xs font-bold text-primary-dark dark:text-white">No tienes modelos 3D personalizados subidos</p>
+                <p className="text-small text-primary dark:text-blue-200/60">
                   Usa el formulario superior para subir tus escaneos tridimensionales en formato .GLB.
                 </p>
               </div>
@@ -336,33 +336,33 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
                       onClick={() => onSelectModel(m.url, m.nombre)}
                       className={`p-4 rounded-xl border transition-all cursor-pointer flex flex-col justify-between space-y-3 relative group ${
                         isSelected
-                          ? 'bg-[#0077D4]/20 border-[#00C2E0] shadow-md shadow-[#00C2E0]/20'
-                          : 'bg-[#F4F9FF] dark:bg-[#001C3D]/60 border-[#0840A8]/15 dark:border-[#00C2E0]/20 hover:border-[#0840A8]/15 dark:border-[#00C2E0]/50 hover:bg-[#F4F9FF] dark:hover:bg-[#001C3D]'
+                          ? 'bg-[#0077D4]/20 border-secondary shadow-md shadow-[#00C2E0]/20'
+                          : 'bg-light-surface dark:bg-dark-bg/60 border-primary-dark/15 dark:border-secondary/20 hover:border-primary-dark/15 dark:border-secondary/50 hover:bg-light-surface dark:hover:bg-dark-bg'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-[#0840A8] dark:text-white tracking-wide">{m.nombre}</span>
+                            <span className="text-xs font-bold text-primary-dark dark:text-white tracking-wide">{m.nombre}</span>
                             {isSelected && (
-                              <span className="px-2 py-0.5 rounded-md bg-[#00C2E0] text-[#001C3D] text-[10px] font-black uppercase tracking-wider">
+                              <span className="px-2 py-0.5 rounded-md bg-[#00C2E0] text-[#001C3D] text-tiny font-black uppercase tracking-wider">
                                 Activo en Visor
                               </span>
                             )}
                           </div>
-                          {m.descripcion && <p className="text-[11px] text-[#0077D4] dark:text-blue-200/70">{m.descripcion}</p>}
+                          {m.descripcion && <p className="text-small text-primary dark:text-blue-200/70">{m.descripcion}</p>}
                         </div>
 
                         <button
                           onClick={(e) => handleDelete(m.id, e)}
                           title="Eliminar modelo 3D"
-                          className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-300 hover:text-[#0840A8] dark:text-white transition-all cursor-pointer"
+                          className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500 text-rose-300 hover:text-primary-dark dark:text-white transition-all cursor-pointer"
                         >
                           <Trash2 size={14} />
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-[#0077D4] dark:text-blue-200/60 font-mono">
+                      <div className="flex items-center justify-between pt-2 border-t border-white/5 text-tiny text-primary dark:text-blue-200/60 font-mono">
                         <span>{formatBytes(m.tamanio_bytes)}</span>
                         <span>{m.created_at ? new Date(m.created_at).toLocaleDateString() : 'Subido'}</span>
                       </div>
@@ -375,10 +375,10 @@ export const Modelo3DManagerModal: React.FC<Modelo3DManagerModalProps> = ({
         </div>
 
         {/* MODAL FOOTER */}
-        <div className="p-4 border-t border-[#0840A8]/15 dark:border-[#00C2E0]/20 bg-[#F4F9FF] dark:bg-[#001C3D]/80 flex justify-end">
+        <div className="p-4 border-t border-primary-dark/15 dark:border-secondary/20 bg-light-surface dark:bg-dark-bg/80 flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white text-xs font-bold transition-all cursor-pointer"
+            className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-primary-dark dark:text-white text-xs font-bold transition-all cursor-pointer"
           >
             Cerrar
           </button>

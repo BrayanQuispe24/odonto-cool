@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ARTICLES } from '../data/landingData';
+import { getPublicConsejosApi } from '../../consejos/services/consejoService';
 
 interface ArticlesSectionProps {
   onOpenModal: () => void;
@@ -8,8 +9,31 @@ interface ArticlesSectionProps {
 export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
   onOpenModal,
 }) => {
+  const [consejos, setConsejos] = useState<any[]>([...ARTICLES]);
+
+  useEffect(() => {
+    const loadConsejos = async () => {
+      try {
+        const data = await getPublicConsejosApi();
+        if (data && data.length > 0) {
+          const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace('/api', '');
+          const mappedArticles = data.map((c, idx) => ({
+            id: c.id.toString(),
+            tag: c.categoria || 'Dental',
+            title: c.titulo,
+            description: c.descripcion,
+            image: c.imagen_url ? `${apiBaseUrl}${c.imagen_url}` : '/assets/images/dental_reception.png',
+          }));
+          setConsejos(mappedArticles);
+        }
+      } catch (e) {
+        console.error('Error al cargar consejos', e);
+      }
+    };
+    loadConsejos();
+  }, []);
   return (
-    <section id="historias" className="py-16 sm:py-24 bg-[#001C3D] text-white border-b border-[#00C2E0]/15 relative">
+    <section id="historias" className="py-16 sm:py-24 bg-dark-bg text-white border-b border-secondary/15 relative">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="reveal text-center max-w-[720px] mx-auto mb-8 sm:mb-12">
@@ -23,10 +47,10 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
 
         {/* Stories Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-          {ARTICLES.map((article, idx) => (
+          {consejos.map((article, idx) => (
             <article
               key={article.id}
-              className={`reveal stagger-${idx + 1} group bg-[#002D5E] rounded-2xl sm:rounded-3xl overflow-hidden border border-[#0077D4]/30 shadow-sm hover:-translate-y-1.5 hover:shadow-xl hover:border-[#0077D4] transition-all duration-300 flex flex-col`}
+              className={`reveal stagger-${idx + 1} group bg-dark-surface rounded-2xl sm:rounded-3xl overflow-hidden border border-primary/30 shadow-sm hover:-translate-y-1.5 hover:shadow-xl hover:border-primary transition-all duration-300 flex flex-col`}
             >
               <div className="h-[180px] sm:h-[200px] overflow-hidden">
                 <img
@@ -37,7 +61,7 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
               </div>
 
               <div className="p-5 sm:p-6 flex flex-col flex-grow">
-                <span className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-[#00C2E0] mb-2">
+                <span className="text-small sm:text-xs font-extrabold uppercase tracking-wider text-secondary mb-2">
                   {article.tag}
                 </span>
                 <h3 className="font-display text-base sm:text-lg font-extrabold text-white mb-2 sm:mb-3 leading-snug">
@@ -46,12 +70,6 @@ export const ArticlesSection: React.FC<ArticlesSectionProps> = ({
                 <p className="text-xs sm:text-sm font-medium text-slate-200 mb-4 sm:mb-5 leading-relaxed">
                   {article.description}
                 </p>
-                <button
-                  onClick={onOpenModal}
-                  className="mt-auto text-xs sm:text-sm font-bold text-[#00C2E0] hover:underline inline-flex items-center gap-1.5 cursor-pointer"
-                >
-                  Leer artículo ➔
-                </button>
               </div>
             </article>
           ))}

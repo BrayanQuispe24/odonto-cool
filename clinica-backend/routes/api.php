@@ -23,6 +23,12 @@ Route::post('/login', [AuthController::class, 'login']);
 // Public or CORS-enabled file stream for 3D GLB models
 Route::get('/modelos-3d/{id}/file', [Modelo3DController::class, 'getFile']);
 
+// Public endpoint for landing page to list active services
+Route::get('/public/servicios', [ServicioController::class, 'publicIndex']);
+
+// Public endpoint for landing page to list active consejos/articulos
+Route::get('/public/consejos', [\App\Http\Controllers\ConsejoController::class, 'index']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/register', [AuthController::class, 'register']);
@@ -58,6 +64,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('modelos-3d', Modelo3DController::class)->only(['index', 'store', 'destroy']);
 
     Route::apiResource('expedientes', ExpedienteController::class);
+
+    // Consejos (Articles/Tips)
+    Route::post('/consejos', [\App\Http\Controllers\ConsejoController::class, 'store']);
+    Route::put('/consejos/{id}', [\App\Http\Controllers\ConsejoController::class, 'update']);
+    Route::delete('/consejos/{id}', [\App\Http\Controllers\ConsejoController::class, 'destroy']);
 
     // Módulo de Backups (Solo Administradores)
     Route::middleware([\App\Http\Middleware\EnsureIsAdmin::class])->group(function () {

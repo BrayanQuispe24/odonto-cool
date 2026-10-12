@@ -12,6 +12,7 @@ export interface User {
   rol_id?: number;
   rol?: UserRole;
   name?: string;
+  sucursal_id?: number;
 }
 
 interface AuthState {

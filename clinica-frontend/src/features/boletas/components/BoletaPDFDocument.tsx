@@ -21,8 +21,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    borderBottomWidth: 2,
-    borderBottomColor: '#002D5E',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
     borderBottomStyle: 'solid',
     paddingBottom: 10,
     marginBottom: 16,
@@ -35,12 +35,12 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 18,
     fontFamily: 'Helvetica-Bold',
-    color: '#002D5E',
+    color: '#1E293B',
     letterSpacing: 0.5,
   },
   brandSubtitle: {
     fontSize: 8,
-    color: '#475569',
+    color: '#64748B',
     marginTop: 3,
     textTransform: 'uppercase',
   },
@@ -52,12 +52,12 @@ const styles = StyleSheet.create({
   boletaNumber: {
     fontSize: 14,
     fontFamily: 'Helvetica-Bold',
-    color: '#002D5E',
+    color: '#0077D4',
     textAlign: 'right',
   },
   boletaDate: {
     fontSize: 8.5,
-    color: '#334155',
+    color: '#64748B',
     marginTop: 3,
     textAlign: 'right',
   },
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justify: 'space-between',
     backgroundColor: '#F8FAFC',
-    borderColor: '#94A3B8',
+    borderColor: '#E2E8F0',
     borderWidth: 1,
     borderRadius: 0,
     padding: 10,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   metaLabel: {
     fontSize: 7,
     fontFamily: 'Helvetica-Bold',
-    color: '#002D5E',
+    color: '#64748B',
     textTransform: 'uppercase',
     marginBottom: 3,
     letterSpacing: 0.3,
@@ -88,24 +88,26 @@ const styles = StyleSheet.create({
   metaValue: {
     fontSize: 9.5,
     fontFamily: 'Helvetica-Bold',
-    color: '#0F172A',
+    color: '#1E293B',
   },
   metaSubText: {
     fontSize: 8,
-    color: '#334155',
+    color: '#64748B',
     marginTop: 2,
   },
 
   // Table styles (Strict grid rectangular)
   tableContainer: {
     borderWidth: 1,
-    borderColor: '#94A3B8',
+    borderColor: '#E2E8F0',
     borderRadius: 0,
     marginBottom: 16,
   },
   tableHeader: {
     flexDirection: 'row',
-    backgroundColor: '#002D5E',
+    backgroundColor: '#F8FAFC',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
     paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 0,
@@ -113,7 +115,7 @@ const styles = StyleSheet.create({
   tableHeaderCell: {
     fontSize: 8,
     fontFamily: 'Helvetica-Bold',
-    color: '#FFFFFF',
+    color: '#475569',
     textTransform: 'uppercase',
     letterSpacing: 0.3,
   },
@@ -130,11 +132,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
   },
   colIndex: { width: '5%' },
-  colDesc: { width: '40%' },
-  colPieza: { width: '20%' },
-  colPrecio: { width: '12%', textAlign: 'right' },
+  colDesc: { width: '50%' },
+  colPrecio: { width: '17%', textAlign: 'right' },
   colDescMonto: { width: '11%', textAlign: 'right' },
-  colTotal: { width: '12%', textAlign: 'right' },
+  colTotal: { width: '17%', textAlign: 'right' },
 
   // Totals section (Rectangular cards)
   summaryContainer: {
@@ -149,44 +150,45 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     padding: 10,
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: '#E2E8F0',
   },
   infoTitle: {
     fontSize: 8.5,
     fontFamily: 'Helvetica-Bold',
-    color: '#002D5E',
+    color: '#1E293B',
     marginBottom: 6,
     textTransform: 'uppercase',
     borderBottomWidth: 1,
-    borderBottomColor: '#CBD5E1',
+    borderBottomColor: '#E2E8F0',
     paddingBottom: 3,
   },
   infoText: {
     fontSize: 8,
-    color: '#334155',
+    color: '#475569',
     marginBottom: 3,
   },
   totalsCard: {
     width: '49%',
-    backgroundColor: '#002D5E',
+    backgroundColor: '#F8FAFC',
     borderRadius: 0,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     padding: 10,
-    color: '#FFFFFF',
     textAlign: 'right',
     justifyContent: 'center',
   },
   subtotalRow: {
     fontSize: 8.5,
-    color: '#94A3B8',
+    color: '#64748B',
     marginBottom: 3,
   },
   totalBig: {
     fontSize: 16,
     fontFamily: 'Helvetica-Bold',
-    color: '#FFFFFF',
+    color: '#0077D4',
     marginTop: 4,
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: '#E2E8F0',
     paddingTop: 4,
   },
 
@@ -247,9 +249,11 @@ interface BoletaPDFDocumentProps {
 }
 
 export const BoletaPDFDocument: React.FC<BoletaPDFDocumentProps> = ({ boleta }) => {
-  const pac = boleta.cita?.paciente;
-  const pacName = pac
-    ? `${pac.nombre} ${pac.apellido}`
+  const pac = boleta.paciente || boleta.cita?.paciente;
+  const pacName = boleta.paciente
+    ? `${boleta.paciente.nombre} ${boleta.paciente.apellido}`
+    : boleta.cita?.paciente
+    ? `${boleta.cita.paciente.nombre} ${boleta.cita.paciente.apellido}`
     : boleta.cita?.nombre_paciente_unregistered || 'Paciente General';
   const hc = pac?.codigo_paciente || 'N/A';
 
@@ -322,14 +326,13 @@ export const BoletaPDFDocument: React.FC<BoletaPDFDocumentProps> = ({ boleta }) 
           <View style={styles.tableHeader}>
             <Text style={[styles.tableHeaderCell, styles.colIndex]}>#</Text>
             <Text style={[styles.tableHeaderCell, styles.colDesc]}>Servicio Prestado</Text>
-            <Text style={[styles.tableHeaderCell, styles.colPieza]}>Pieza Dental</Text>
             <Text style={[styles.tableHeaderCell, styles.colPrecio]}>Precio</Text>
             <Text style={[styles.tableHeaderCell, styles.colDescMonto]}>Desc.</Text>
             <Text style={[styles.tableHeaderCell, styles.colTotal]}>Neto</Text>
           </View>
 
           {(boleta.detalles || []).map((det, idx) => {
-            const p = Number(det.servicio?.precio || 0);
+            const p = Number(det.precio_unitario ?? det.servicio?.precio ?? 0);
             const d = Number(det.descuento || 0);
             const lineNet = Math.max(0, p - d);
             const isEven = idx % 2 === 1;
@@ -339,9 +342,6 @@ export const BoletaPDFDocument: React.FC<BoletaPDFDocumentProps> = ({ boleta }) 
                 <Text style={styles.colIndex}>{idx + 1}</Text>
                 <Text style={styles.colDesc}>
                   {det.servicio?.nombre || det.descripcion || 'Tratamiento Odontológico'}
-                </Text>
-                <Text style={styles.colPieza}>
-                  {det.diente ? `FDI #${det.diente.numero_diente} (${det.diente.nombre})` : 'General'}
                 </Text>
                 <Text style={styles.colPrecio}>Bs. {p.toFixed(2)}</Text>
                 <Text style={styles.colDescMonto}>Bs. {d.toFixed(2)}</Text>

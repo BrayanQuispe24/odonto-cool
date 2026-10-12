@@ -68,13 +68,13 @@ export const DienteTable: React.FC<DienteTableProps> = ({
   const endRecord = Math.min(safeCurrentPage * pageSize, filteredDientes.length);
 
   return (
-    <div className="bg-white dark:bg-[#002D5E] rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-xl shadow-sm dark:shadow-[#001C3D]/50 overflow-hidden transition-all duration-300">
+    <div className="bg-white dark:bg-dark-surface rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col min-h-[60vh]">
       {/* TOOLBAR */}
-      <div className="p-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
         {/* SEARCH INPUT */}
         <div className="relative flex-1 max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#0077D4] dark:text-[#00C2E0]">
-            <Search size={15} />
+          <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+            <Search size={13} />
           </div>
           <input
             type="text"
@@ -84,32 +84,32 @@ export const DienteTable: React.FC<DienteTableProps> = ({
               setCurrentPage(1);
             }}
             placeholder="Buscar por número FDI, nombre anatómico o cuadrante..."
-            className="w-full pl-9 pr-8 py-2 rounded-xl text-xs font-medium border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+            className="w-full pl-8 pr-8 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-[#0077D4] dark:text-blue-200/70 hover:text-[#0840A8] dark:text-white cursor-pointer"
+              className="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           )}
         </div>
 
         {/* QUADRANT FILTER */}
-        <div className="flex items-center gap-2">
-          <Filter size={14} className="text-[#0077D4] dark:text-[#00C2E0]" />
+        <div className="flex items-center gap-1.5">
+          <Filter size={12} className="text-slate-400" />
           <select
             value={selectedCuadrante}
             onChange={(e) => {
               setSelectedCuadrante(e.target.value);
               setCurrentPage(1);
             }}
-            className="py-2 px-3 rounded-xl text-xs font-medium border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer min-w-[200px]"
+            className="py-1.5 px-2 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer min-w-[180px]"
           >
-            <option value="all" className="bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white">Todos los cuadrantes</option>
+            <option value="all">Todos los cuadrantes</option>
             {CUADRANTES_DENTALES.map((cuad) => (
-              <option key={cuad} value={cuad} className="bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white">
+              <option key={cuad} value={cuad}>
                 {cuad}
               </option>
             ))}
@@ -117,22 +117,22 @@ export const DienteTable: React.FC<DienteTableProps> = ({
         </div>
       </div>
 
-      {/* DESKTOP TABLE VIEW */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-[#E5F7FF] dark:bg-[#0840A8]/40 border-b border-[#0840A8]/15 dark:border-[#0840A8]/60 text-[11px] font-extrabold uppercase tracking-wider text-[#0077D4] dark:text-blue-100 select-none">
-              <th className="py-3.5 px-4">Nº FDI</th>
-              <th className="py-3.5 px-4">NOMBRE ANATÓMICO</th>
-              <th className="py-3.5 px-4">CUADRANTE</th>
-              <th className="py-3.5 px-4">ESTADO</th>
-              <th className="py-3.5 px-4 text-right">ACCIONES</th>
+      {/* TABLE */}
+      <div className="flex-1 overflow-x-auto bg-white dark:bg-dark-surface">
+        <table className="w-full text-left text-small whitespace-nowrap">
+          <thead className="bg-slate-50 dark:bg-dark-bg text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider">
+            <tr>
+              <th className="px-4 py-2 font-bold w-20">Nº FDI</th>
+              <th className="px-4 py-2 font-bold">Nombre Anatómico</th>
+              <th className="px-4 py-2 font-bold w-32">Cuadrante</th>
+              <th className="px-4 py-2 font-bold w-24">Estado</th>
+              <th className="px-4 py-2 font-bold text-right w-24">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#0840A8]/15 dark:divide-[#0840A8]/30 text-xs text-[#0840A8] dark:text-blue-50 font-medium">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200 font-medium">
             {paginatedDientes.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-12 text-center text-[#0077D4] dark:text-blue-200/70 font-medium">
+                <td colSpan={5} className="py-12 text-center text-slate-500 font-semibold">
                   No se encontraron piezas dentales registradas.
                 </td>
               </tr>
@@ -141,23 +141,23 @@ export const DienteTable: React.FC<DienteTableProps> = ({
                 return (
                   <tr
                     key={d.id}
-                    className="bg-white dark:bg-[#002D5E] even:bg-slate-50/50 dark:even:bg-[#002247]/60 hover:bg-[#E5F7FF] dark:hover:bg-[#0840A8]/30 transition-colors duration-200"
+                    className="hover:bg-slate-50 dark:hover:bg-dark-bg/50 transition-colors"
                   >
                     {/* Nº FDI BADGE */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-br from-[#0077D4] to-[#00C2E0] text-white font-mono font-extrabold text-sm shadow-md shadow-[#0077D4]/30">
+                    <td className="px-4 py-2">
+                      <span className="font-mono font-bold text-primary dark:text-secondary">
                         {d.numero_diente}
                       </span>
                     </td>
 
                     {/* NOMBRE Y DESCRIPCIÓN */}
-                    <td className="py-3.5 px-4 max-w-xs">
+                    <td className="px-4 py-2">
                       <div>
-                        <div className="font-bold text-[#0840A8] dark:text-white text-xs">
+                        <div className="font-bold text-primary-dark dark:text-white">
                           {d.nombre}
                         </div>
                         {d.descripcion && (
-                          <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 line-clamp-1 mt-0.5">
+                          <div className="text-tiny text-slate-500 truncate max-w-xs mt-0.5">
                             {d.descripcion}
                           </div>
                         )}
@@ -165,54 +165,54 @@ export const DienteTable: React.FC<DienteTableProps> = ({
                     </td>
 
                     {/* CUADRANTE */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0077D4] dark:text-blue-100 border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                        <Layers size={11} className="text-[#0077D4] dark:text-[#00C2E0]" />
+                    <td className="px-4 py-2">
+                      <span className="inline-flex items-center gap-1 font-semibold text-slate-600 dark:text-slate-300">
+                        <Layers size={10} className="text-slate-400" />
                         {d.cuadrante || 'Sin cuadrante'}
                       </span>
                     </td>
 
                     {/* ESTADO */}
-                    <td className="py-3.5 px-4">
+                    <td className="px-4 py-2">
                       {d.estado ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950/80 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/40">
-                          <CheckCircle2 size={11} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                          Activo
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-tiny font-bold bg-cyan-50 dark:bg-cyan-900/30 text-primary dark:text-secondary border border-cyan-200 dark:border-cyan-800">
+                          <CheckCircle2 size={10} />
+                          ACTIVO
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50">
-                          <XCircle size={11} />
-                          Inactivo
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-tiny font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                          <XCircle size={10} />
+                          INACTIVO
                         </span>
                       )}
                     </td>
 
-                    {/* ACCIONES (VER ACCESIBLE PARA TODOS, EDITAR/ELIMINAR PARA ADMIN) */}
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                    {/* ACCIONES */}
+                    <td className="px-4 py-2 text-right">
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setViewDiente(d)}
-                          title="Ver detalle del diente"
-                          className="p-1.5 rounded-lg bg-[#00C2E0]/15 hover:bg-[#00C2E0]/30 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 transition-colors cursor-pointer"
+                          title="Ver detalle"
+                          className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-dark-bg dark:hover:bg-slate-800 text-primary dark:text-secondary transition-colors"
                         >
-                          <Eye size={14} />
+                          <Eye size={13} />
                         </button>
 
                         {isAdmin && (
                           <>
                             <button
                               onClick={() => onEdit(d)}
-                              title="Editar pieza dental"
-                              className="p-1.5 rounded-lg bg-[#0077D4]/30 hover:bg-[#0077D4]/50 text-[#0077D4] dark:text-blue-100 border border-[#0840A8]/15 dark:border-[#0077D4]/50 transition-colors cursor-pointer"
+                              title="Editar"
+                              className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-dark-bg dark:hover:bg-slate-800 text-primary dark:text-secondary transition-colors"
                             >
-                              <Edit2 size={14} />
+                              <Edit2 size={13} />
                             </button>
                             <button
                               onClick={() => onDelete(d)}
-                              title="Eliminar pieza dental"
-                              className="p-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 transition-colors cursor-pointer"
+                              title="Eliminar"
+                              className="p-1 rounded bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 transition-colors"
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={13} />
                             </button>
                           </>
                         )}
@@ -227,130 +227,122 @@ export const DienteTable: React.FC<DienteTableProps> = ({
       </div>
 
       {/* FOOTER PAGINATION */}
-      <div className="p-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-[#0077D4] dark:text-blue-200/80">
+      <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between text-small text-slate-500 dark:text-slate-400 shrink-0">
         <div>
           Mostrando <strong>{filteredDientes.length === 0 ? 0 : startRecord}</strong> -{' '}
-          <strong>{endRecord}</strong> de <strong>{filteredDientes.length}</strong> piezas dentales
+          <strong>{endRecord}</strong> de <strong>{filteredDientes.length}</strong>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={safeCurrentPage === 1}
-            className="p-1.5 rounded-lg border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white disabled:opacity-40 cursor-pointer"
+            className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            <ChevronLeft size={15} />
+            <ChevronLeft size={13} />
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setCurrentPage(p)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                safeCurrentPage === p
-                  ? 'bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white shadow-md shadow-[#0077D4]/30'
-                  : 'bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0077D4] dark:text-blue-100 hover:text-white'
-              }`}
-            >
-              {p}
-            </button>
-          ))}
+          
+          <span className="px-2 font-semibold">
+            Página {safeCurrentPage} de {totalPages}
+          </span>
+
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={safeCurrentPage === totalPages}
-            className="p-1.5 rounded-lg border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white disabled:opacity-40 cursor-pointer"
+            className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            <ChevronRight size={15} />
+            <ChevronRight size={13} />
           </button>
         </div>
       </div>
 
       {/* DETAIL MODAL FOR VER DIENTE */}
       {viewDiente && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden text-[#0840A8] dark:text-white flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-md overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="p-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-[#E5F7FF] dark:bg-[#0840A8]/30 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[#0077D4] dark:text-[#00C2E0] text-sm font-bold">
-                <Activity size={18} />
-                <span>Detalle Anatómico de Pieza Dental (FDI)</span>
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 text-primary-dark dark:text-white text-xs font-bold uppercase tracking-wider">
+                <Activity size={14} className="text-primary" />
+                <span>Detalle de Pieza Dental</span>
               </div>
               <button
                 onClick={() => setViewDiente(null)}
-                className="p-1.5 rounded-lg text-[#0077D4] dark:text-blue-100 hover:text-[#0840A8] dark:text-white hover:bg-white/10 cursor-pointer"
+                className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between gap-2 border-b border-[#0840A8]/15 dark:border-[#0840A8]/40 pb-3">
+            <div className="p-4 space-y-4 text-slate-700 dark:text-slate-200 bg-white dark:bg-dark-surface">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-3">
-                  <span className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#0077D4] to-[#00C2E0] text-white font-mono font-extrabold text-base flex items-center justify-center shadow-lg shadow-[#0077D4]/40">
+                  <span className="w-8 h-8 rounded bg-slate-100 dark:bg-slate-800 text-primary dark:text-secondary font-mono font-bold text-sm flex items-center justify-center border border-slate-200 dark:border-slate-700">
                     {viewDiente.numero_diente}
                   </span>
                   <div>
-                    <span className="text-[10px] font-mono text-[#0077D4] dark:text-[#00C2E0] uppercase font-bold block">
-                      Código FDI Nº {viewDiente.numero_diente}
+                    <span className="text-micro font-mono text-slate-500 uppercase font-bold block mb-0.5">
+                      FDI Nº {viewDiente.numero_diente}
                     </span>
-                    <h3 className="text-base font-extrabold text-[#0840A8] dark:text-white">
+                    <h3 className="text-sm font-bold text-primary-dark dark:text-white">
                       {viewDiente.nombre}
                     </h3>
                   </div>
                 </div>
                 <div>
                   {viewDiente.estado ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/90 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/50">
-                      <CheckCircle2 size={13} />
-                      Activo
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-micro font-bold bg-cyan-50 dark:bg-cyan-900/30 text-primary dark:text-secondary border border-cyan-200 dark:border-cyan-800">
+                      <CheckCircle2 size={10} />
+                      ACTIVO
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50">
-                      <XCircle size={13} />
-                      Inactivo
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-micro font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                      <XCircle size={10} />
+                      INACTIVO
                     </span>
                   )}
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                  <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 font-semibold flex items-center gap-1">
-                    <Layers size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                    Cuadrante Anatómico
+                <div className="p-3 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg">
+                  <div className="text-micro text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Layers size={10} className="text-primary" />
+                    Cuadrante
                   </div>
-                  <div className="text-xs font-bold text-[#0840A8] dark:text-white mt-1">
+                  <div className="text-small font-bold text-primary-dark dark:text-white mt-1">
                     {viewDiente.cuadrante || 'No asignado'}
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                  <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 font-semibold flex items-center gap-1">
-                    <Sparkles size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                    Tipo de Dentición
+                <div className="p-3 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg">
+                  <div className="text-micro text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Sparkles size={10} className="text-primary" />
+                    Dentición
                   </div>
-                  <div className="text-xs font-bold text-[#0840A8] dark:text-white capitalize mt-1">
-                    {viewDiente.tipo_denticion === 'deciduo' ? 'Deciduo (Infantil)' : 'Permanente (Adulto)'}
+                  <div className="text-small font-bold text-primary-dark dark:text-white capitalize mt-1">
+                    {viewDiente.tipo_denticion === 'deciduo' ? 'Deciduo' : 'Permanente'}
                   </div>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 font-semibold flex items-center gap-1 mb-1">
-                  <FileText size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                  Descripción Anatómica & Posición
+              <div className="p-3 rounded-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-dark-surface">
+                <div className="text-micro text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
+                  <FileText size={10} className="text-primary" />
+                  Descripción Anatómica
                 </div>
-                <p className="text-xs text-[#0077D4] dark:text-blue-100/90 leading-relaxed font-medium">
+                <p className="text-small text-slate-600 dark:text-slate-300 leading-relaxed">
                   {viewDiente.descripcion || 'Sin descripción anatómica registrada para esta pieza dental.'}
                 </p>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex items-center justify-end">
+            <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-end">
               <button
                 onClick={() => setViewDiente(null)}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white text-xs font-bold shadow-md cursor-pointer hover:opacity-90"
+                className="px-4 py-1.5 rounded bg-white dark:bg-dark-surface border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-small font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 Cerrar
               </button>

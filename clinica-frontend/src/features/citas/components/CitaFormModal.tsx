@@ -46,7 +46,6 @@ export const CitaFormModal: React.FC<CitaFormModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Helper to reset all form fields to clean default state
   const resetFormState = () => {
     const today = new Date().toISOString().split('T')[0];
     setFecha(today);
@@ -73,7 +72,6 @@ export const CitaFormModal: React.FC<CitaFormModalProps> = ({
           setPacientes(pList);
           setSucursales(sList);
 
-          // If editing an existing cita
           if (cita) {
             setDoctorId(cita.doctor_id);
             setSucursalId(cita.sucursal_id);
@@ -92,7 +90,6 @@ export const CitaFormModal: React.FC<CitaFormModalProps> = ({
               setNombreUnregistered(cita.nombre_paciente_unregistered || '');
             }
           } else {
-            // New Cita: Reset all fields to clean blank initial state
             resetFormState();
           }
         })
@@ -100,7 +97,6 @@ export const CitaFormModal: React.FC<CitaFormModalProps> = ({
     }
   }, [isOpen, cita]);
 
-  // Live availability verification
   const verifyAvailability = useCallback(async () => {
     if (!doctorId || !sucursalId || !fecha) {
       setDisponibilidad(null);
@@ -177,7 +173,6 @@ export const CitaFormModal: React.FC<CitaFormModalProps> = ({
         hora_fin: horaFin,
         estado,
       });
-      resetFormState();
       onClose();
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Error al guardar la cita médica.');
@@ -192,285 +187,292 @@ export const CitaFormModal: React.FC<CitaFormModalProps> = ({
     (disponibilidad !== null && !disponibilidad.disponible);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 rounded-2xl shadow-2xl shadow-[#001C3D]/80 w-full max-w-lg overflow-hidden text-[#0840A8] dark:text-white flex flex-col max-h-[92vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+      <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[92vh]">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-between bg-gradient-to-r from-[#0840A8] to-[#0077D4]">
-          <h3 className="text-base font-bold flex items-center gap-2 text-[#0840A8] dark:text-white">
-            <Calendar className="text-[#0077D4] dark:text-[#00C2E0]" size={18} />
-            <span>{cita ? 'Editar Cita Médica' : 'Registrar Nueva Cita Médica'}</span>
-          </h3>
+        <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between shrink-0">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-primary-dark dark:text-white flex items-center gap-2">
+            <Calendar size={16} className="text-primary" />
+            {cita ? 'Editar Cita Médica' : 'Registrar Nueva Cita'}
+          </h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#0077D4] dark:text-blue-100/80 hover:text-[#0840A8] dark:text-white hover:bg-white/10 cursor-pointer transition-colors"
+            className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
-        {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
-          {!isDoctorRole && !cita && (
-            <div className="p-3.5 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-200 text-xs font-semibold flex items-center gap-2">
-              <AlertTriangle size={18} className="text-amber-400 shrink-0" />
-              <span>
-                Restricción de Seguridad: Solo los usuarios con rol <strong>Doctor</strong> están autorizados para registrar nuevas citas médicas.
-              </span>
-            </div>
-          )}
-
-          {error && (
-            <div className="p-3.5 rounded-xl bg-rose-950/80 border border-rose-800/80 text-rose-200 text-xs font-semibold">
-              {error}
-            </div>
-          )}
-
-          {/* Paciente Selector or Input */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-semibold text-[#0077D4] dark:text-blue-100 flex items-center gap-1">
-                <User size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Paciente <span className="text-rose-400">*</span>
-              </label>
-              <label className="flex items-center gap-1.5 text-xs text-[#0077D4] dark:text-[#00C2E0] font-medium cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={isUnregisteredPatient}
-                  onChange={(e) => {
-                    setIsUnregisteredPatient(e.target.checked);
-                    setPacienteId('');
-                    setNombreUnregistered('');
-                  }}
-                  className="rounded border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0077D4] dark:text-[#00C2E0] focus:ring-[#00C2E0] cursor-pointer"
-                />
-                <span>El paciente no está registrado</span>
-              </label>
-            </div>
-
-            {isUnregisteredPatient ? (
-              <input
-                type="text"
-                value={nombreUnregistered}
-                onChange={(e) => setNombreUnregistered(e.target.value)}
-                required={isUnregisteredPatient}
-                placeholder="Escriba el nombre completo del paciente no registrado..."
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
-              />
-            ) : (
-              <select
-                value={pacienteId}
-                onChange={(e) => setPacienteId(e.target.value ? Number(e.target.value) : '')}
-                required={!isUnregisteredPatient}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer"
-              >
-                <option value="" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">-- Seleccionar Paciente Registrado --</option>
-                {pacientes.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-                    {p.nombre} {p.apellido} ({p.codigo_paciente})
-                  </option>
-                ))}
-              </select>
+        {/* Modal Body */}
+        <div className="p-4 overflow-y-auto flex-1 bg-white dark:bg-dark-surface">
+          <form id="cita-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {!isDoctorRole && !cita && (
+              <div className="p-2.5 rounded-sm bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-small font-semibold flex items-center gap-2 shadow-sm">
+                <AlertTriangle size={14} className="shrink-0" />
+                <span>Solo usuarios con rol Doctor están autorizados para registrar nuevas citas.</span>
+              </div>
             )}
-          </div>
 
-          {/* Doctor Selector & Sucursal Selector */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                <Stethoscope size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Doctor Asignado <span className="text-rose-400">*</span>
-              </label>
-              <select
-                value={doctorId}
-                onChange={(e) => setDoctorId(e.target.value ? Number(e.target.value) : '')}
-                required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer"
-              >
-                <option value="" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">-- Seleccionar Doctor --</option>
-                {doctores.map((d) => (
-                  <option key={d.id} value={d.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-                    Dr. {d.nombre} {d.apellido}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {error && (
+              <div className="p-2.5 rounded-sm bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-small font-semibold shadow-sm">
+                {error}
+              </div>
+            )}
 
-            <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                <Building2 size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Sucursal Registro <span className="text-rose-400">*</span>
-              </label>
-              <select
-                value={sucursalId}
-                onChange={(e) => setSucursalId(e.target.value ? Number(e.target.value) : '')}
-                required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer"
-              >
-                <option value="" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">-- Seleccionar Sucursal --</option>
-                {sucursales.map((s) => (
-                  <option key={s.id} value={s.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-                    {s.nombre || s.ubicacion} ({s.codigo_sucursal})
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Fecha, Hora Inicio, Hora Fin */}
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                <Calendar size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Fecha <span className="text-rose-400">*</span>
-              </label>
-              <input
-                type="date"
-                value={fecha}
-                onChange={(e) => setFecha(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                <Clock size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Hora Inicio <span className="text-rose-400">*</span>
-              </label>
-              <input
-                type="time"
-                value={horaInicio}
-                onChange={(e) => setHoraInicio(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                <Clock size={13} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                Hora Fin <span className="text-rose-400">*</span>
-              </label>
-              <input
-                type="time"
-                value={horaFin}
-                onChange={(e) => setHoraFin(e.target.value)}
-                required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
-              />
-            </div>
-          </div>
-
-          {/* VISUAL AVAILABILITY BANNER & SLOTS LIST */}
-          {disponibilidad && (
-            <div className="space-y-2">
-              {/* Status Banner */}
-              {disponibilidad.disponible ? (
-                <div className="p-3 rounded-xl bg-cyan-950/80 border border-[#0840A8]/15 dark:border-[#00C2E0]/40 text-[#0077D4] dark:text-[#00C2E0] text-xs font-semibold flex items-center gap-2">
-                  <CheckCircle2 size={16} className="shrink-0 text-[#0077D4] dark:text-[#00C2E0]" />
-                  <div>
-                    <div>Horario Disponible para la Cita</div>
-                    <div className="text-[10px] text-[#0077D4] dark:text-blue-200/80 font-normal">
-                      Atención sucursal: {disponibilidad.horario_sucursal}
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* COLUMN 1: General Info */}
+              <div className="space-y-3">
+                {/* Paciente */}
+                <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                    <label className="text-small font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
+                      <User size={11} className="text-primary" />
+                      Paciente <span className="text-rose-500">*</span>
+                    </label>
+                    <label className="flex items-center gap-1.5 text-tiny text-slate-600 dark:text-slate-400 font-semibold cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={isUnregisteredPatient}
+                        onChange={(e) => {
+                          setIsUnregisteredPatient(e.target.checked);
+                          setPacienteId('');
+                          setNombreUnregistered('');
+                        }}
+                        className="rounded border-slate-300 text-primary focus:ring-primary"
+                      />
+                      <span>No registrado</span>
+                    </label>
                   </div>
+
+                  {isUnregisteredPatient ? (
+                    <input
+                      type="text"
+                      value={nombreUnregistered}
+                      onChange={(e) => setNombreUnregistered(e.target.value)}
+                      required={isUnregisteredPatient}
+                      placeholder="Nombre completo del paciente..."
+                      className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    />
+                  ) : (
+                    <select
+                      value={pacienteId}
+                      onChange={(e) => setPacienteId(e.target.value ? Number(e.target.value) : '')}
+                      required={!isUnregisteredPatient}
+                      className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="">-- Seleccionar Paciente --</option>
+                      {pacientes.map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.nombre} {p.apellido} ({p.codigo_paciente})
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
-              ) : disponibilidad.fuera_horario_sucursal ? (
-                <div className="p-3 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-200 text-xs font-semibold flex items-center gap-2">
-                  <AlertTriangle size={16} className="shrink-0 text-amber-400" />
-                  <div>
-                    <div>{disponibilidad.mensaje}</div>
-                    <div className="text-[10px] text-amber-600 dark:text-amber-300/80 font-normal">
-                      Recuerde que el horario oficial de esta sucursal es {disponibilidad.horario_sucursal}.
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="p-3 rounded-xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-semibold flex items-center gap-2">
-                  <XCircle size={16} className="shrink-0 text-rose-400" />
-                  <div>
-                    <div>Conflicto de Horario</div>
-                    <div className="text-[10px] text-rose-300/80 font-normal">
-                      {disponibilidad.mensaje}
-                    </div>
-                  </div>
-                </div>
-              )}
 
-              {/* Occupied Slots Badges */}
-              {disponibilidad.citas_ocupadas && disponibilidad.citas_ocupadas.length > 0 && (
-                <div className="p-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/30 space-y-1.5">
-                  <div className="text-[11px] font-bold text-[#0077D4] dark:text-blue-200 flex items-center justify-between">
-                    <span>Citas ya agendadas del Doctor en esta fecha:</span>
-                    <span className="text-[10px] text-blue-300 font-mono">({disponibilidad.citas_ocupadas.length} reservadas)</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {disponibilidad.citas_ocupadas.map((c) => (
-                      <span
-                        key={c.id}
-                        className="px-2 py-0.5 rounded-md bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[10px] font-mono font-medium flex items-center gap-1"
-                      >
-                        <Clock size={10} />
-                        {c.hora_inicio} - {c.hora_fin} ({c.paciente})
-                      </span>
+                {/* Doctor */}
+                <div>
+                  <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                    <Stethoscope size={11} className="text-primary" />
+                    Doctor Asignado <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={doctorId}
+                    onChange={(e) => setDoctorId(e.target.value ? Number(e.target.value) : '')}
+                    required
+                    className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="">-- Seleccionar Doctor --</option>
+                    {doctores.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        Dr. {d.nombre} {d.apellido}
+                      </option>
                     ))}
+                  </select>
+                </div>
+
+                {/* Sucursal */}
+                <div>
+                  <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                    <Building2 size={11} className="text-primary" />
+                    Sucursal <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={sucursalId}
+                    onChange={(e) => setSucursalId(e.target.value ? Number(e.target.value) : '')}
+                    required
+                    disabled={isDoctorRole}
+                    className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-60"
+                  >
+                    <option value="">-- Seleccionar Sucursal --</option>
+                    {sucursales.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.nombre || s.ubicacion}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* COLUMN 2: Fecha y Estado */}
+              <div className="space-y-3">
+                {/* Fecha */}
+                <div>
+                  <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                    <Calendar size={11} className="text-primary" />
+                    Fecha de la Cita <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={fecha}
+                    onChange={(e) => setFecha(e.target.value)}
+                    required
+                    className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                  />
+                </div>
+
+                {/* Horarios */}
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                      <Clock size={11} className="text-primary" />
+                      Hora Inicio <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      value={horaInicio}
+                      onChange={(e) => setHoraInicio(e.target.value)}
+                      required
+                      className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-1">
+                      <Clock size={11} className="text-primary" />
+                      Hora Fin <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="time"
+                      value={horaFin}
+                      onChange={(e) => setHoraFin(e.target.value)}
+                      required
+                      className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                    />
                   </div>
                 </div>
-              )}
-            </div>
-          )}
 
-          {checkingAvailability && (
-            <div className="text-[11px] text-[#0077D4] dark:text-[#00C2E0] font-medium flex items-center gap-1.5">
-              <Info size={13} className="animate-spin" />
-              <span>Verificando disponibilidad de horario...</span>
+                {/* Estado */}
+                <div>
+                  <label className="block text-small font-bold text-slate-700 dark:text-slate-300 mb-1">
+                    Estado de la Cita
+                  </label>
+                  <select
+                    value={estado}
+                    onChange={(e) => setEstado(e.target.value as CitaEstado)}
+                    disabled={!isDoctorRole}
+                    className="w-full px-2.5 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-bg text-primary-dark dark:text-white text-small font-medium focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary disabled:opacity-60"
+                  >
+                    <option value="confirmada">Confirmada (Aprobada)</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="finalizada">Finalizada</option>
+                    <option value="cancelada">Cancelada</option>
+                  </select>
+                  {!isDoctorRole && (
+                    <p className="text-micro text-amber-600 dark:text-amber-400 mt-1">
+                      * Solo doctores pueden cambiar el estado.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-          )}
 
-          {/* Estado Selector */}
-          <div>
-            <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
-              Estado de la Cita (Por defecto Aprobada)
-            </label>
-            <select
-              value={estado}
-              onChange={(e) => setEstado(e.target.value as CitaEstado)}
-              disabled={!isDoctorRole}
-              className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer disabled:opacity-60"
-            >
-              <option value="confirmada" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Confirmada (Aprobada)</option>
-              <option value="pendiente" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Pendiente</option>
-              <option value="finalizada" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Finalizada</option>
-              <option value="cancelada" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Cancelada</option>
-            </select>
-            {!isDoctorRole && (
-              <p className="text-[10px] text-amber-600 dark:text-amber-300/80 mt-1">
-                * Solo los usuarios con rol Doctor pueden aprobar o cancelar el estado de las citas.
-              </p>
+            {/* Live Availability verification output */}
+            {disponibilidad && (
+              <div className="space-y-1.5 mt-2">
+                {disponibilidad.disponible ? (
+                  <div className="p-2.5 rounded-sm bg-cyan-50 dark:bg-cyan-900/30 border border-cyan-200 dark:border-cyan-800 text-primary dark:text-secondary text-small font-semibold flex items-center gap-2 shadow-sm">
+                    <CheckCircle2 size={14} className="shrink-0" />
+                    <div>
+                      <div>Horario Disponible para la Cita</div>
+                      <div className="text-micro font-normal opacity-80">
+                        Atención sucursal: {disponibilidad.horario_sucursal}
+                      </div>
+                    </div>
+                  </div>
+                ) : disponibilidad.fuera_horario_sucursal ? (
+                  <div className="p-2.5 rounded-sm bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 text-small font-semibold flex items-center gap-2 shadow-sm">
+                    <AlertTriangle size={14} className="shrink-0" />
+                    <div>
+                      <div>{disponibilidad.mensaje}</div>
+                      <div className="text-micro font-normal opacity-80">
+                        Horario de sucursal: {disponibilidad.horario_sucursal}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-2.5 rounded-sm bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-small font-semibold flex items-center gap-2 shadow-sm">
+                    <XCircle size={14} className="shrink-0" />
+                    <div>
+                      <div>Conflicto de Horario</div>
+                      <div className="text-micro font-normal opacity-80">
+                        {disponibilidad.mensaje}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {disponibilidad.citas_ocupadas && disponibilidad.citas_ocupadas.length > 0 && (
+                  <div className="p-2.5 rounded-sm bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-800 space-y-1.5">
+                    <div className="text-tiny font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                      <span>Citas agendadas en la fecha:</span>
+                      <span className="font-mono">({disponibilidad.citas_ocupadas.length})</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {disponibilidad.citas_ocupadas.map((c) => (
+                        <span
+                          key={c.id}
+                          className="px-1.5 py-0.5 rounded-sm bg-rose-50 border border-rose-200 text-rose-700 dark:bg-rose-900/30 dark:border-rose-800 dark:text-rose-400 text-micro font-mono font-bold flex items-center gap-1"
+                        >
+                          <Clock size={9} />
+                          {c.hora_inicio} - {c.hora_fin} ({c.paciente})
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
-          </div>
 
-          {/* Buttons Footer */}
-          <div className="pt-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white border border-white/10 text-xs font-semibold cursor-pointer transition-all"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={isFormDisabled}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#0840A8] hover:to-[#0077D4] text-white text-xs font-bold shadow-md shadow-[#0077D4]/30 disabled:opacity-40 cursor-pointer transition-all flex items-center gap-1.5"
-            >
-              <CheckCircle2 size={15} />
-              <span>{isSubmitting ? 'Guardando...' : cita ? 'Guardar Cambios' : 'Registrar Cita (Aprobada)'}</span>
-            </button>
-          </div>
-        </form>
+            {checkingAvailability && (
+              <div className="text-tiny text-primary dark:text-secondary font-medium flex items-center gap-1 mt-1">
+                <Info size={11} className="animate-spin" />
+                <span>Verificando disponibilidad...</span>
+              </div>
+            )}
+          </form>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-end gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-1.5 rounded bg-white dark:bg-dark-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold border border-slate-300 dark:border-slate-700 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            form="cita-form"
+            type="submit"
+            disabled={isFormDisabled}
+            className="px-6 py-1.5 rounded bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-bold shadow-sm disabled:opacity-50 transition-colors flex items-center justify-center gap-1.5"
+          >
+            <CheckCircle2 size={13} />
+            <span>{isSubmitting ? 'Guardando...' : cita ? 'Guardar Cambios' : 'Registrar Cita'}</span>
+          </button>
+        </div>
       </div>
     </div>
   );
 };
-

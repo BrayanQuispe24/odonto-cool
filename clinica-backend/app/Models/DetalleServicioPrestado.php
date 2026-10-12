@@ -17,12 +17,14 @@ class DetalleServicioPrestado extends Model
         'servicio_id',
         'diente_id',
         'descripcion',
+        'precio_unitario',
         'descuento',
     ];
 
     protected function casts(): array
     {
         return [
+            'precio_unitario' => 'decimal:2',
             'descuento' => 'decimal:2',
         ];
     }

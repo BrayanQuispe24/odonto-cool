@@ -6,12 +6,16 @@ import api from '../../../services/api';
 import type { Paciente } from '../../patients/types/patient';
 import { toast } from 'sonner';
 
-export const ExpedienteUploadForm: React.FC = () => {
+interface ExpedienteUploadFormProps {
+  preselectedPatientId?: number;
+}
+
+export const ExpedienteUploadForm: React.FC<ExpedienteUploadFormProps> = ({ preselectedPatientId }) => {
   const [pacientes, setPacientes] = useState<Paciente[]>([]);
   const [sucursales, setSucursales] = useState<any[]>([]);
   const [selectedSucursalId, setSelectedSucursalId] = useState<string>('');
   
-  const [pacienteId, setPacienteId] = useState<string>('');
+  const [pacienteId, setPacienteId] = useState<string>(preselectedPatientId ? String(preselectedPatientId) : '');
   const [titulo, setTitulo] = useState('');
   const [tipoDocumento, setTipoDocumento] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -20,6 +24,8 @@ export const ExpedienteUploadForm: React.FC = () => {
   const { uploadExpediente, isLoading } = useExpedienteStore();
 
   useEffect(() => {
+    if (preselectedPatientId) return; // Skip fetching if we already have the patient
+
     // Fetch both pacientes and sucursales
     Promise.all([
       api.get('/pacientes'),
@@ -73,11 +79,11 @@ export const ExpedienteUploadForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#002D5E] rounded-2xl shadow-xl shadow-sm dark:shadow-[#001C3D]/50 border border-[#0840A8]/15 dark:border-[#00C2E0]/30 overflow-hidden flex flex-col h-full">
+    <div className="bg-white dark:bg-dark-surface rounded-2xl shadow-xl shadow-sm dark:shadow-[#001C3D]/50 border border-primary-dark/15 dark:border-secondary/30 overflow-hidden flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center p-5 border-b border-[#0840A8]/15 dark:border-[#00C2E0]/30 bg-white dark:bg-[#002D5E]">
-        <h2 className="text-lg font-extrabold text-[#0840A8] dark:text-white flex items-center gap-2">
-          <Upload className="text-[#0077D4] dark:text-[#00C2E0]" size={20} />
+      <div className="flex items-center p-5 border-b border-primary-dark/15 dark:border-secondary/30 bg-white dark:bg-dark-surface">
+        <h2 className="text-lg font-extrabold text-primary-dark dark:text-white flex items-center gap-2">
+          <Upload className="text-primary dark:text-secondary" size={20} />
           Subir Nuevo Expediente
         </h2>
       </div>
@@ -85,10 +91,10 @@ export const ExpedienteUploadForm: React.FC = () => {
         {/* Form Body */}
         <div className="p-6 overflow-y-auto">
           <form id="expediente-form" onSubmit={handleSubmit} className="space-y-5">
-            {/* Filtro Sucursal */}
-            {sucursales.length > 0 && (
+            {/* Filtro Sucursal (Oculto si preselectedPatientId existe) */}
+            {!preselectedPatientId && sucursales.length > 0 && (
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[#0840A8] dark:text-blue-100">
+                <label className="text-sm font-bold text-primary-dark dark:text-blue-100">
                   Filtrar por Sucursal
                 </label>
                 <select
@@ -97,7 +103,7 @@ export const ExpedienteUploadForm: React.FC = () => {
                     setSelectedSucursalId(e.target.value);
                     setPacienteId(''); // Reset patient when branch changes
                   }}
-                  className="w-full p-2.5 rounded-xl border border-[#0840A8]/20 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white focus:ring-2 focus:ring-[#00C2E0]/50 outline-none transition-all"
+                  className="w-full p-2.5 rounded-xl border border-primary-dark/20 dark:border-primary/40 bg-light-surface dark:bg-dark-bg text-primary-dark dark:text-white focus:ring-2 focus:ring-secondary/50 outline-none transition-all"
                 >
                   <option value="">Todas las sucursales...</option>
                   {sucursales.map((s) => (
@@ -109,29 +115,31 @@ export const ExpedienteUploadForm: React.FC = () => {
               </div>
             )}
 
-            {/* Paciente */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[#0840A8] dark:text-blue-100">
-                Paciente <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={pacienteId}
-                onChange={(e) => setPacienteId(e.target.value)}
-                className="w-full p-2.5 rounded-xl border border-[#0840A8]/20 dark:border-[#0077D4]/40 bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white focus:ring-2 focus:ring-[#00C2E0]/50 outline-none transition-all"
-                required
-              >
-                <option value="">Selecciona un paciente...</option>
-                {pacientesFiltrados.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.nombre} {p.apellido} {p.codigo_paciente ? `(${p.codigo_paciente})` : ''}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Paciente (Oculto si preselectedPatientId existe) */}
+            {!preselectedPatientId && (
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-primary-dark dark:text-blue-100">
+                  Paciente <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={pacienteId}
+                  onChange={(e) => setPacienteId(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-primary-dark/20 dark:border-primary/40 bg-white dark:bg-dark-surface text-primary-dark dark:text-white focus:ring-2 focus:ring-secondary/50 outline-none transition-all"
+                  required
+                >
+                  <option value="">Selecciona un paciente...</option>
+                  {pacientesFiltrados.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nombre} {p.apellido} {p.codigo_paciente ? `(${p.codigo_paciente})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             {/* Título */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[#0840A8] dark:text-blue-100">
+              <label className="text-sm font-bold text-primary-dark dark:text-blue-100">
                 Título del Documento <span className="text-red-500">*</span>
               </label>
               <input
@@ -139,14 +147,14 @@ export const ExpedienteUploadForm: React.FC = () => {
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
                 placeholder="Ej. Resultados de Sangre"
-                className="w-full p-2.5 rounded-xl border border-[#0840A8]/20 dark:border-[#0077D4]/40 bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white placeholder:text-[#0840A8]/40 dark:placeholder:text-blue-200/40 focus:ring-2 focus:ring-[#00C2E0]/50 outline-none transition-all"
+                className="w-full p-2.5 rounded-xl border border-primary-dark/20 dark:border-primary/40 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder:text-primary-dark/40 dark:placeholder:text-blue-200/40 focus:ring-2 focus:ring-secondary/50 outline-none transition-all"
                 required
               />
             </div>
 
             {/* Tipo Documento */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[#0840A8] dark:text-blue-100">
+              <label className="text-sm font-bold text-primary-dark dark:text-blue-100">
                 Tipo de Documento <span className="text-red-500">*</span>
               </label>
               <input
@@ -154,17 +162,17 @@ export const ExpedienteUploadForm: React.FC = () => {
                 value={tipoDocumento}
                 onChange={(e) => setTipoDocumento(e.target.value)}
                 placeholder="Ej. Análisis, Radiografía, Receta, etc."
-                className="w-full p-2.5 rounded-xl border border-[#0840A8]/20 dark:border-[#0077D4]/40 bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white placeholder:text-[#0840A8]/40 dark:placeholder:text-blue-200/40 focus:ring-2 focus:ring-[#00C2E0]/50 outline-none transition-all"
+                className="w-full p-2.5 rounded-xl border border-primary-dark/20 dark:border-primary/40 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder:text-primary-dark/40 dark:placeholder:text-blue-200/40 focus:ring-2 focus:ring-secondary/50 outline-none transition-all"
                 required
               />
             </div>
 
             {/* File Input */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[#0840A8] dark:text-blue-100">
+              <label className="text-sm font-bold text-primary-dark dark:text-blue-100">
                 Archivo PDF <span className="text-red-500">*</span>
               </label>
-              <div className="relative border-2 border-dashed border-[#0840A8]/30 dark:border-[#00C2E0]/40 rounded-xl p-6 flex flex-col items-center justify-center bg-white dark:bg-[#002D5E]/50 hover:bg-[#E5F7FF] dark:hover:bg-[#002D5E] transition-colors group">
+              <div className="relative border-2 border-dashed border-primary-dark/30 dark:border-secondary/40 rounded-xl p-6 flex flex-col items-center justify-center bg-white dark:bg-dark-surface/50 hover:bg-light-accent dark:hover:bg-dark-surface transition-colors group">
                 <input
                   type="file"
                   accept="application/pdf"
@@ -172,8 +180,8 @@ export const ExpedienteUploadForm: React.FC = () => {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   required
                 />
-                <FileText className="text-[#0077D4] dark:text-[#00C2E0] mb-2 group-hover:scale-110 transition-transform" size={32} />
-                <p className="text-sm font-medium text-[#0840A8] dark:text-blue-100 text-center">
+                <FileText className="text-primary dark:text-secondary mb-2 group-hover:scale-110 transition-transform" size={32} />
+                <p className="text-sm font-medium text-primary-dark dark:text-blue-100 text-center">
                   {file ? (
                     <span className="text-emerald-600 dark:text-emerald-400 font-bold">{file.name}</span>
                   ) : (
@@ -185,7 +193,7 @@ export const ExpedienteUploadForm: React.FC = () => {
 
             {/* Descripción */}
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[#0840A8] dark:text-blue-100">
+              <label className="text-sm font-bold text-primary-dark dark:text-blue-100">
                 Descripción (Opcional)
               </label>
               <textarea
@@ -193,14 +201,14 @@ export const ExpedienteUploadForm: React.FC = () => {
                 onChange={(e) => setDescripcion(e.target.value)}
                 placeholder="Añade notas o detalles adicionales sobre este documento..."
                 rows={3}
-                className="w-full p-2.5 rounded-xl border border-[#0840A8]/20 dark:border-[#0077D4]/40 bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white placeholder:text-[#0840A8]/40 dark:placeholder:text-blue-200/40 focus:ring-2 focus:ring-[#00C2E0]/50 outline-none transition-all resize-none"
+                className="w-full p-2.5 rounded-xl border border-primary-dark/20 dark:border-primary/40 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder:text-primary-dark/40 dark:placeholder:text-blue-200/40 focus:ring-2 focus:ring-secondary/50 outline-none transition-all resize-none"
               />
             </div>
           </form>
         </div>
 
         {/* Footer */}
-        <div className="p-5 border-t border-[#0840A8]/15 dark:border-[#00C2E0]/30 bg-white dark:bg-[#002D5E] flex justify-end">
+        <div className="p-5 border-t border-primary-dark/15 dark:border-secondary/30 bg-white dark:bg-dark-surface flex justify-end">
           <Button type="submit" form="expediente-form" variant="teal" disabled={isLoading || !file || !pacienteId || !titulo || !tipoDocumento} className="w-full">
             {isLoading ? 'Subiendo...' : 'Subir Documento'}
           </Button>

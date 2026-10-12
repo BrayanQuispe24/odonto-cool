@@ -19,6 +19,20 @@
   --color-ocean-deep: #0840A8;
   --color-bg-primary: #F4F9FF;
   --color-bg-dark-card: #002D5E;
+  
+  /* Standardized Semantic Colors */
+  --color-primary: #0077D4;
+  --color-primary-dark: #0840A8;
+  --color-secondary: #00C2E0;
+  --color-dark-surface: #002D5E;
+  --color-dark-bg: #001C3D;
+  --color-light-surface: #F4F9FF;
+  --color-light-accent: #E5F7FF;
+
+  /* Font Sizes (px to rem based on 16px root) */
+  --text-micro: 0.5625rem; /* ~9px */
+  --text-tiny: 0.625rem;   /* ~10px */
+  --text-small: 0.6875rem; /* ~11px */
 
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
@@ -59,13 +73,13 @@
 
 /* Dynamic Font Size Scaling */
 html[data-font-size="sm"] {
-  font-size: 14px;
-}
-html[data-font-size="md"] {
   font-size: 16px;
 }
-html[data-font-size="lg"] {
+html[data-font-size="md"] {
   font-size: 18px;
+}
+html[data-font-size="lg"] {
+  font-size: 22px;
 }
 
 /* Global resets & smoothness */

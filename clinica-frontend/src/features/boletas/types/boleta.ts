@@ -2,6 +2,7 @@ import type { Cita } from '../../citas/types/cita';
 import type { Doctor } from '../../doctors/types/doctor';
 import type { Servicio } from '../../services/types/servicio';
 import type { Diente } from '../../dientes/types/diente';
+import type { Paciente } from '../../patients/types/patient';
 
 export interface DetalleServicioPrestado {
   id?: number;
@@ -9,6 +10,7 @@ export interface DetalleServicioPrestado {
   servicio_id: number;
   diente_id?: number | null;
   descripcion?: string | null;
+  precio_unitario?: number | null;
   descuento: number;
   servicio?: Servicio;
   diente?: Diente;
@@ -31,7 +33,8 @@ export type BoletaEstado = 'completado' | 'pendiente' | 'anulada' | 'emitida' | 
 
 export interface BoletaServicioPrestado {
   id: number;
-  cita_id: number;
+  cita_id?: number | null;
+  paciente_id?: number | null;
   doctor_id?: number | null;
   fecha_emision: string;
   numero_boleta: string;
@@ -50,6 +53,7 @@ export interface BoletaServicioPrestado {
   updated_at?: string;
   cita?: Cita;
   doctor?: Doctor;
+  paciente?: Paciente;
   detalles?: DetalleServicioPrestado[];
   cuotas?: Cuota[];
 }
@@ -63,7 +67,8 @@ export interface DetalleServicioItem {
 }
 
 export interface BoletaFormData {
-  cita_id: number;
+  cita_id?: number | null;
+  paciente_id?: number | null;
   doctor_id?: number | null;
   fecha_emision: string;
   numero_boleta?: string;

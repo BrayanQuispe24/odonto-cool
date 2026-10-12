@@ -9,7 +9,7 @@ export interface DashboardLayoutProps {
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   return (
-    <div className="h-screen w-screen bg-[#F4F9FF] dark:bg-[#001C3D] font-sans flex text-[#0840A8] dark:text-white transition-colors duration-300 overflow-hidden">
+    <div className="h-screen w-screen bg-light-surface dark:bg-dark-bg font-sans flex text-primary-dark dark:text-white transition-colors duration-300 overflow-hidden">
       {/* RETRACTABLE SIDEBAR */}
       <DashboardSidebar />
 

@@ -19,9 +19,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '../../../components/ui/Button';
-import { SucursalFormModal } from '../components/SucursalFormModal';
+import { SucursalFormPanel } from '../components/SucursalFormPanel';
 import { AssignDoctorModal } from '../components/AssignDoctorModal';
-import { SucursalDetailsModal } from '../components/SucursalDetailsModal';
+import { SucursalDetailsPanel } from '../components/SucursalDetailsPanel';
 import type { Sucursal, SucursalFormData } from '../types/sucursal';
 import {
   getSucursalesApi,
@@ -39,10 +39,11 @@ export const SucursalesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Navigation state
+  const [mainTab, setMainTab] = useState<'list' | 'form' | 'detail'>('list');
+  
   // Modals
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedSucursal, setSelectedSucursal] = useState<Sucursal | null>(null);
   const [sucursalToDelete, setSucursalToDelete] = useState<Sucursal | null>(null);
 
@@ -66,6 +67,7 @@ export const SucursalesPage: React.FC = () => {
   const handleCreateSucursal = async (data: SucursalFormData) => {
     const newSucursal = await createSucursalApi(data);
     toast.success(`Sucursal ${newSucursal.nombre} registrada correctamente.`);
+    setMainTab('list');
     await fetchSucursales();
   };
 
@@ -73,6 +75,7 @@ export const SucursalesPage: React.FC = () => {
     if (!selectedSucursal) return;
     const updated = await updateSucursalApi(selectedSucursal.id, data);
     toast.success(`Sucursal ${updated.nombre} actualizada correctamente.`);
+    setMainTab('list');
     await fetchSucursales();
   };
 
@@ -106,67 +109,78 @@ export const SucursalesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* PAGE HEADER BANNER */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#002D5E] p-6 rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-xs">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-[#0840A8] dark:text-white flex items-center gap-2">
-            <Building2 className="text-[#0077D4] dark:text-[#00C2E0]" size={26} />
-            Gestión Multi-Tenant de Sucursales
-          </h1>
-          <p className="text-xs font-medium text-[#002D5E] dark:text-slate-200 mt-1">
-            Administra las sedes clínicas, asignación de médicos especialistas y segmentación tenant de pacientes.
-          </p>
-        </div>
-
-        {isAdmin && (
-          <Button
-            variant="teal"
-            onClick={() => {
-              setSelectedSucursal(null);
-              setIsFormModalOpen(true);
-            }}
-            className="shrink-0"
-          >
-            <Plus size={16} />
-            <span>Registrar Sucursal</span>
-          </Button>
-        )}
-      </div>
+      {/* PAGE HEADER BANNER REMOVED AS PER USER REQUEST */}
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800/60 text-rose-700 dark:text-rose-200 text-xs font-semibold flex items-center gap-2">
+        <div className="p-4 rounded-sm bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800/80 text-rose-700 dark:text-rose-200 text-xs font-semibold flex items-center gap-2">
           <AlertCircle size={16} />
           <span>{error}</span>
         </div>
       )}
 
-      {/* SEARCH BAR & STATS */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-[#002D5E] p-4 rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30">
-        <div className="relative w-full sm:w-80">
+      {/* Main Tab Navigation */}
+      {mainTab !== 'detail' && (
+        <div className="flex border-b border-slate-200 dark:border-slate-800 mb-6">
+          <button
+            onClick={() => setMainTab('list')}
+            className={`px-4 py-2 text-small font-semibold border-b-2 transition-all cursor-pointer ${
+              mainTab === 'list'
+                ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-secondary'
+            }`}
+          >
+            Listado de Sucursales
+          </button>
+          {isAdmin && (
+            <button
+              onClick={() => {
+                setSelectedSucursal(null);
+                setMainTab('form');
+              }}
+              className={`px-4 py-2 text-small font-semibold border-b-2 transition-all cursor-pointer ${
+                mainTab === 'form'
+                  ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
+                  : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-secondary'
+              }`}
+            >
+              Registrar Nueva Sucursal
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* LIST TAB */}
+      {mainTab === 'list' && (
+        <div className="w-full animate-fade-in space-y-4">
+          {/* SEARCH BAR, STATS & ACTIONS */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-dark-surface p-4 rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="relative w-full md:w-80 shrink-0">
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Buscar por nombre, código o ubicación..."
-            className="w-full pl-9 pr-3 py-2 rounded-xl text-xs border border-[#0840A8]/15 dark:border-[#0840A8]/20 dark:border-[#00C2E0]/40 bg-white dark:bg-[#001C3D] text-[#0840A8] dark:text-white placeholder-[#0077D4]/60 dark:placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-[#0077D4]/50"
+            className="w-full pl-9 pr-3 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
           />
-          <Search size={15} className="absolute left-3 top-2.5 text-[#0077D4] dark:text-[#00C2E0]" />
+          <Search size={15} className="absolute left-3 top-2 text-slate-400" />
         </div>
 
-        <div className="text-xs font-bold text-[#0077D4] dark:text-[#00C2E0]">
-          Total Sucursales Registradas: <span className="text-[#0840A8] dark:text-white">{sucursales.length}</span>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-auto justify-end">
+          <div className="text-small font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            Total Sucursales: <span className="text-primary-dark dark:text-white">{sucursales.length}</span>
+          </div>
         </div>
       </div>
 
       {/* SUCURSALES GRID */}
       {loading ? (
-        <div className="p-12 text-center text-[#0077D4] dark:text-[#00C2E0] text-sm font-medium">
+        <div className="p-12 text-center text-primary dark:text-secondary text-sm font-medium">
           Cargando sedes y sucursales clínicas...
         </div>
       ) : filteredSucursales.length === 0 ? (
-        <div className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 rounded-2xl p-12 text-center text-[#0840A8] dark:text-white">
-          <p className="text-sm font-medium">No se encontraron sucursales activas.</p>
-          <p className="text-xs text-[#0077D4] dark:text-[#00C2E0] mt-1">
+        <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-sm p-12 text-center text-primary-dark dark:text-white">
+          <p className="text-small font-bold">No se encontraron sucursales activas.</p>
+          <p className="text-small text-slate-500 dark:text-slate-400 mt-1">
             Registra una nueva sucursal clínica para comenzar la gestión por sedes.
           </p>
         </div>
@@ -175,31 +189,31 @@ export const SucursalesPage: React.FC = () => {
           {filteredSucursales.map((sucursal) => (
             <div
               key={sucursal.id}
-              className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 rounded-2xl p-6 shadow-xs flex flex-col justify-between hover:shadow-md transition-all space-y-4"
+              className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-sm flex flex-col justify-between hover:border-[#0077D4] transition-colors p-5 space-y-4"
             >
               <div>
                 {/* Header Strip */}
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div>
-                    <span className="text-[10px] font-mono font-extrabold px-2 py-0.5 rounded-md bg-[#E5F7FF] dark:bg-[#0840A8]/60 text-[#0840A8] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/30">
+                    <span className="text-micro font-mono font-bold px-2 py-0.5 rounded-sm bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 uppercase">
                       {sucursal.codigo_sucursal}
                     </span>
                     <h3
                       onClick={() => {
                         setSelectedSucursal(sucursal);
-                        setIsDetailsModalOpen(true);
+                        setMainTab('detail');
                       }}
-                      className="text-lg font-extrabold text-[#0840A8] dark:text-white mt-1.5 leading-snug hover:text-[#0077D4] dark:hover:text-[#0077D4] dark:text-[#00C2E0] cursor-pointer transition-colors"
+                      className="text-base font-bold text-primary-dark dark:text-white mt-2 leading-snug hover:text-[#0077D4] cursor-pointer transition-colors"
                     >
                       {sucursal.nombre}
                     </h3>
                   </div>
 
                   <span
-                    className={`inline-flex items-center gap-1 text-[11px] font-extrabold px-2.5 py-1 rounded-full ${
+                    className={`inline-flex items-center gap-1 text-micro font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm border ${
                       sucursal.estado
-                        ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
-                        : 'bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30'
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800'
+                        : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800'
                     }`}
                   >
                     {sucursal.estado ? <CheckCircle2 size={12} /> : <XCircle size={12} />}
@@ -208,48 +222,48 @@ export const SucursalesPage: React.FC = () => {
                 </div>
 
                 {/* Details */}
-                <div className="space-y-2 text-xs text-[#002D5E] dark:text-slate-200">
+                <div className="space-y-2 text-small text-slate-600 dark:text-slate-300">
                   <div className="flex items-start gap-2">
-                    <MapPin size={14} className="text-[#0077D4] dark:text-[#00C2E0] shrink-0 mt-0.5" />
+                    <MapPin size={14} className="text-slate-400 shrink-0 mt-0.5" />
                     <span className="leading-tight">{sucursal.ubicacion}</span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Phone size={14} className="text-[#0077D4] dark:text-[#00C2E0] shrink-0" />
+                    <Phone size={14} className="text-slate-400 shrink-0" />
                     <span>{sucursal.telefono || 'Sin teléfono asignado'}</span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Clock size={14} className="text-[#0077D4] dark:text-[#00C2E0] shrink-0" />
+                    <Clock size={14} className="text-slate-400 shrink-0" />
                     <span>{sucursal.horario_atencion || 'Horario continuo'}</span>
                   </div>
                 </div>
 
                 {/* Counters Bar */}
-                <div className="grid grid-cols-3 gap-2 mt-4 p-3 rounded-xl bg-[#F4F9FF]/80 dark:bg-[#001C3D]/60 border border-[#0840A8]/15 dark:border-[#0840A8]/10 dark:border-[#00C2E0]/20 text-center">
+                <div className="grid grid-cols-3 gap-2 mt-4 p-3 rounded-sm bg-slate-50 dark:bg-dark-bg border border-slate-200 dark:border-slate-800 text-center">
                   <div>
-                    <div className="text-base font-extrabold text-[#0840A8] dark:text-white">
+                    <div className="text-base font-bold text-primary-dark dark:text-white">
                       {sucursal.doctores_count ?? 0}
                     </div>
-                    <div className="text-[10px] font-bold text-[#0077D4] dark:text-[#00C2E0] flex items-center justify-center gap-1">
+                    <div className="text-micro font-bold uppercase tracking-wider text-slate-500 flex items-center justify-center gap-1">
                       <UserCheck size={10} /> Doctores
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-base font-extrabold text-[#0840A8] dark:text-white">
+                    <div className="text-base font-bold text-primary-dark dark:text-white">
                       {sucursal.pacientes_count ?? 0}
                     </div>
-                    <div className="text-[10px] font-bold text-[#0077D4] dark:text-[#00C2E0] flex items-center justify-center gap-1">
+                    <div className="text-micro font-bold uppercase tracking-wider text-slate-500 flex items-center justify-center gap-1">
                       <Users size={10} /> Pacientes
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-base font-extrabold text-[#0840A8] dark:text-white">
+                    <div className="text-base font-bold text-primary-dark dark:text-white">
                       {sucursal.users_count ?? 0}
                     </div>
-                    <div className="text-[10px] font-bold text-[#0077D4] dark:text-[#00C2E0] flex items-center justify-center gap-1">
+                    <div className="text-micro font-bold uppercase tracking-wider text-slate-500 flex items-center justify-center gap-1">
                       <ShieldCheck size={10} /> Usuarios
                     </div>
                   </div>
@@ -257,17 +271,17 @@ export const SucursalesPage: React.FC = () => {
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between gap-2 pt-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/10 dark:border-[#00C2E0]/20 mt-4">
+              <div className="flex items-center justify-between gap-2 pt-4 border-t border-slate-200 dark:border-slate-800 mt-4">
                 {isAdmin && (
                   <button
                     onClick={() => {
                       setSelectedSucursal(sucursal);
                       setIsAssignModalOpen(true);
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-[#E5F7FF] dark:bg-[#0840A8]/40 text-[#0077D4] dark:text-[#00C2E0] text-xs font-bold flex items-center gap-1 hover:bg-[#0077D4] hover:text-white transition-all cursor-pointer"
+                    className="px-3 py-1.5 rounded-sm bg-white dark:bg-dark-surface border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
                   >
-                    <UserPlus size={13} />
-                    <span>Asignar Doctor</span>
+                    <UserPlus size={14} className="text-slate-500" />
+                    <span>Asignar Dr.</span>
                   </button>
                 )}
 
@@ -275,12 +289,12 @@ export const SucursalesPage: React.FC = () => {
                   <button
                     onClick={() => {
                       setSelectedSucursal(sucursal);
-                      setIsDetailsModalOpen(true);
+                      setMainTab('detail');
                     }}
-                    className="p-1.5 rounded-lg text-slate-500 hover:text-[#0077D4] dark:text-slate-300 dark:hover:text-[#0077D4] dark:text-[#00C2E0] hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                    className="p-1.5 rounded-sm text-slate-500 hover:text-[#0077D4] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                     title="Ver Detalle & Doctores"
                   >
-                    <Eye size={15} />
+                    <Eye size={16} />
                   </button>
 
                   {isAdmin && (
@@ -288,19 +302,19 @@ export const SucursalesPage: React.FC = () => {
                       <button
                         onClick={() => {
                           setSelectedSucursal(sucursal);
-                          setIsFormModalOpen(true);
+                          setMainTab('form');
                         }}
-                        className="p-1.5 rounded-lg text-slate-500 hover:text-[#0077D4] dark:text-slate-300 dark:hover:text-[#0077D4] dark:text-[#00C2E0] hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-sm text-slate-500 hover:text-[#0077D4] hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         title="Editar Sucursal"
                       >
-                        <Edit2 size={15} />
+                        <Edit2 size={16} />
                       </button>
                       <button
                         onClick={() => setSucursalToDelete(sucursal)}
-                        className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                        className="p-1.5 rounded-sm text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors cursor-pointer"
                         title="Eliminar Sucursal"
                       >
-                        <Trash2 size={15} />
+                        <Trash2 size={16} />
                       </button>
                     </>
                   )}
@@ -310,22 +324,30 @@ export const SucursalesPage: React.FC = () => {
           ))}
         </div>
       )}
+      </div>
+      )}
 
-      {/* DETAILS MODAL */}
-      <SucursalDetailsModal
-        isOpen={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-        sucursal={selectedSucursal}
-        onOpenAssignModal={() => setIsAssignModalOpen(true)}
-      />
+      {/* FORM TAB */}
+      {mainTab === 'form' && (
+        <div className="w-full lg:w-3/5 mx-auto animate-fade-in">
+          <SucursalFormPanel
+            onSubmit={selectedSucursal ? handleUpdateSucursal : handleCreateSucursal}
+            onCancel={() => setMainTab('list')}
+            sucursalToEdit={selectedSucursal}
+          />
+        </div>
+      )}
 
-      {/* FORM MODAL */}
-      <SucursalFormModal
-        isOpen={isFormModalOpen}
-        onClose={() => setIsFormModalOpen(false)}
-        onSubmit={selectedSucursal ? handleUpdateSucursal : handleCreateSucursal}
-        sucursalToEdit={selectedSucursal}
-      />
+      {/* DETAIL TAB */}
+      {mainTab === 'detail' && (
+        <div className="w-full lg:w-4/5 mx-auto animate-fade-in">
+          <SucursalDetailsPanel
+            sucursal={selectedSucursal}
+            onClose={() => setMainTab('list')}
+            onOpenAssignModal={() => setIsAssignModalOpen(true)}
+          />
+        </div>
+      )}
 
       {/* ASSIGN DOCTOR MODAL */}
       <AssignDoctorModal
@@ -337,30 +359,44 @@ export const SucursalesPage: React.FC = () => {
 
       {/* DELETE CONFIRMATION MODAL */}
       {sucursalToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-[#0D353F] border border-rose-500/40 rounded-2xl shadow-2xl w-full max-w-md p-6 text-[#0840A8] dark:text-white space-y-4">
-            <div className="flex items-center gap-3 text-rose-400">
-              <div className="p-2 rounded-xl bg-rose-500/20 border border-rose-500/30">
-                <Trash2 size={24} />
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-md overflow-hidden">
+            <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+              <div className="p-2 rounded-sm bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400">
+                <Trash2 size={20} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#0840A8] dark:text-white">Eliminar Sucursal</h3>
-                <p className="text-xs text-slate-300">Esta acción no se puede deshacer.</p>
+                <h3 className="text-small font-bold uppercase tracking-wider text-primary-dark dark:text-white">
+                  Eliminar Sucursal
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Esta acción no se puede deshacer.
+                </p>
               </div>
             </div>
 
-            <p className="text-xs text-[#002D5E] dark:text-slate-200">
-              ¿Estás seguro de que deseas eliminar la sucursal{' '}
-              <strong className="text-[#0840A8] dark:text-white">{sucursalToDelete.nombre}</strong> ({sucursalToDelete.codigo_sucursal})?
-            </p>
+            <div className="p-5">
+              <p className="text-small text-slate-700 dark:text-slate-300">
+                ¿Estás seguro de que deseas eliminar la sucursal{' '}
+                <strong className="text-primary-dark dark:text-white font-bold">{sucursalToDelete.nombre}</strong> ({sucursalToDelete.codigo_sucursal})?
+              </p>
+            </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <Button variant="secondary" onClick={() => setSucursalToDelete(null)}>
+            <div className="p-4 bg-slate-50 dark:bg-dark-bg border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setSucursalToDelete(null)}
+                className="px-4 py-1.5 rounded-sm bg-white dark:bg-dark-surface border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold transition-colors cursor-pointer shadow-sm"
+              >
                 Cancelar
-              </Button>
-              <Button variant="danger" onClick={handleDeleteSucursal}>
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteSucursal}
+                className="px-4 py-1.5 rounded-sm bg-rose-600 hover:bg-rose-700 text-white text-small font-semibold transition-colors cursor-pointer shadow-sm"
+              >
                 Sí, Eliminar
-              </Button>
+              </button>
             </div>
           </div>
         </div>

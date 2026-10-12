@@ -31,19 +31,19 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
       {isOpen && (
         <div
           onClick={onClose}
-          className="fixed inset-0 bg-[#002D5E]/80 backdrop-blur-xs z-[1001] lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-dark-surface/80 backdrop-blur-xs z-[1001] lg:hidden transition-opacity duration-300"
         />
       )}
 
       {/* Slide-over drawer */}
       <div
-        className={`fixed top-0 right-0 w-[85%] max-w-[320px] h-full bg-[#0840A8] text-white z-[1002] p-6 pt-20 flex flex-col justify-between shadow-[-10px_0_30px_rgba(0,0,0,0.4)] border-l border-[#00C2E0]/20 transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 right-0 w-[85%] max-w-[320px] h-full bg-[#0840A8] text-white z-[1002] p-6 pt-20 flex flex-col justify-between shadow-[-10px_0_30px_rgba(0,0,0,0.4)] border-l border-secondary/20 transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
         {/* Header with Logo */}
-        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#00C2E0]/20">
-          <div className="p-1 bg-white/10 rounded-xl border border-[#00C2E0]/30">
+        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-secondary/20">
+          <div className="p-1 bg-white/10 rounded-xl border border-secondary/30">
             <img 
               src="/assets/images/image.png" 
               alt="ODONTO COOL Logo" 
@@ -69,7 +69,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className="text-[#00C2E0] text-base sm:text-lg font-semibold hover:text-white transition-colors py-1 border-b border-[#00C2E0]/15"
+              className="text-secondary text-base sm:text-lg font-semibold hover:text-white transition-colors py-1 border-b border-secondary/15"
             >
               {link.label}
             </a>
@@ -81,13 +81,12 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           {isAuthenticated ? (
             <>
               <Link to="/dashboard" onClick={onClose}>
-                <Button variant="light" size="md" className="w-full justify-center">
+                <Button variant="secondary" className="w-full justify-center">
                   Dashboard 👤
                 </Button>
               </Link>
               <Button
                 variant="dark"
-                size="md"
                 className="w-full justify-center"
                 onClick={() => {
                   logout();
@@ -99,16 +98,14 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             </>
           ) : (
             <Link to="/login" onClick={onClose}>
-              <Button variant="light" size="md" className="w-full justify-center">
+              <Button variant="secondary" className="w-full justify-center">
                 Iniciar Sesión 🔑
               </Button>
             </Link>
           )}
 
           <Button
-            variant="teal"
-            size="md"
-            className="w-full justify-center py-3.5"
+            className="w-full justify-center"
             onClick={() => {
               onClose();
               onOpenModal();

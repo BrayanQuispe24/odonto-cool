@@ -17,21 +17,21 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center gap-2 rounded-xl font-bold transition-all duration-200 relative select-none cursor-pointer text-center whitespace-nowrap active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-main/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 shadow-xs';
+    'inline-flex items-center justify-center gap-2 rounded-sm font-bold transition-all duration-200 relative select-none cursor-pointer text-center whitespace-nowrap active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-main/50 focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 shadow-xs';
 
   const sizeStyles = {
-    sm: 'px-4 py-2 text-xs sm:text-sm font-extrabold',
-    md: 'px-5 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold tracking-wide',
-    lg: 'px-7 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-extrabold tracking-wide',
+    sm: 'px-3 py-1 text-xs font-semibold',
+    md: 'px-4 py-1.5 text-sm font-semibold',
+    lg: 'px-6 py-2 text-base font-semibold',
   }[size];
 
   const variantStyles = {
-    teal: 'bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#00C2E0] hover:to-[#0077D4] text-white shadow-md shadow-[#002D5E]/20 border border-[#0840A8]/15 dark:border-[#00C2E0]/40 hover:shadow-lg hover:shadow-[#00C2E0]/30 transition-all duration-300',
-    danger: 'bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-700 hover:to-rose-800 text-white shadow-md shadow-rose-950/30 border border-rose-500/40 hover:shadow-lg hover:shadow-rose-950/40',
-    secondary: 'bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-teal-100 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-300/80 dark:border-[#00C2E0]/30',
-    dark: 'bg-[#0840A8] text-white border border-[#0840A8]/15 dark:border-[#00C2E0]/30 hover:bg-white dark:hover:bg-[#002D5E] shadow-md shadow-[#002D5E]/30',
-    light: 'bg-white text-[#0840A8] border border-slate-200/80 shadow-xs hover:bg-[#F4F9FF] dark:bg-[#002D5E] dark:text-white dark:border-[#00C2E0]/30 dark:hover:bg-[#0840A8]',
-    mint: 'bg-[#E5F7FF] text-[#0840A8] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 hover:bg-white dark:bg-[#0840A8]/70 dark:text-white dark:border-[#00C2E0]/40 dark:hover:bg-[#0840A8]',
+    teal: 'bg-[#0077D4] hover:bg-[#0840A8] text-white shadow-sm border border-[#0077D4] dark:border-secondary/40 transition-colors duration-300',
+    danger: 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm border border-rose-600 transition-colors duration-300',
+    secondary: 'bg-slate-100 dark:bg-white/10 text-slate-800 dark:text-teal-100 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-300/80 dark:border-secondary/30',
+    dark: 'bg-[#0840A8] text-white border border-[#0840A8] dark:border-secondary/30 hover:bg-[#0077D4] shadow-sm',
+    light: 'bg-white text-primary-dark border border-slate-200/80 shadow-xs hover:bg-light-surface dark:bg-dark-surface dark:text-white dark:border-secondary/30 dark:hover:bg-[#0840A8]',
+    mint: 'bg-light-accent text-primary-dark border border-primary-dark/15 dark:border-secondary/40 hover:bg-white dark:bg-[#0840A8]/70 dark:text-white dark:border-secondary/40 dark:hover:bg-[#0840A8]',
   }[variant];
 
   return (

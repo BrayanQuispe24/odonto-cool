@@ -3,14 +3,14 @@ import React from 'react';
 export const FloatingWhatsApp: React.FC = () => {
   return (
     <a
-      href="https://wa.me/593991234567"
+      href="https://wa.me/59178494110"
       target="_blank"
       rel="noopener noreferrer"
       className="group fixed bottom-7 right-7 w-[60px] h-[60px] rounded-full bg-[#25D366] text-white shadow-[0_10px_28px_rgba(37,211,102,0.4)] flex items-center justify-center z-[1500] hover:scale-110 hover:shadow-[0_14px_36px_rgba(37,211,102,0.6)] transition-all duration-300"
       aria-label="Contactar por WhatsApp"
     >
       <span className="absolute top-[2px] right-[2px] w-[14px] h-[14px] bg-[#10B981] border-2 border-white rounded-full" />
-      <span className="absolute right-[72px] bg-[#0840A8] text-white border border-[#00C2E0]/30 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap shadow-md opacity-0 pointer-events-none translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+      <span className="absolute right-[72px] bg-[#0840A8] text-white border border-secondary/30 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap shadow-md opacity-0 pointer-events-none translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
         💬 ¿Consultas? Habla con un especialista
       </span>
       <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">

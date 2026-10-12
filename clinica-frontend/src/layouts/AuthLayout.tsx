@@ -15,7 +15,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
       {/* Header Link */}
       <header className="max-w-[1200px] w-full mx-auto flex items-center justify-between py-2 z-10">
         <Link to="/" className="flex items-center gap-3 font-display text-xl sm:text-2xl font-extrabold text-white">
-          <div className="p-1 rounded-xl bg-white/15 border border-[#00C2E0]/30 backdrop-blur-xs">
+          <div className="p-1 rounded-xl bg-white/15 border border-secondary/30 backdrop-blur-xs">
             <img 
               src="/assets/images/image.png" 
               alt="ODONTO COOL Logo" 
@@ -27,7 +27,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
         <Link
           to="/"
-          className="text-xs sm:text-sm font-bold text-[#00C2E0] hover:text-white transition-colors flex items-center gap-1.5"
+          className="text-xs sm:text-sm font-bold text-secondary hover:text-white transition-colors flex items-center gap-1.5"
         >
           ← Volver al Inicio
         </Link>
@@ -35,7 +35,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
       {/* Book-Style Main Card Container */}
       <main className="w-full max-w-[1000px] mx-auto my-auto py-4 sm:py-6 z-10">
-        <div className="bg-[#002D5E] rounded-2xl sm:rounded-3xl shadow-[0_32px_64px_rgba(0,0,0,0.4)] overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[540px] border border-[#00C2E0]/25 relative">
+        <div className="bg-dark-surface rounded-2xl sm:rounded-3xl shadow-[0_32px_64px_rgba(0,0,0,0.4)] overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[540px] border border-secondary/25 relative">
           
           {/* Left Column: Dental Record Book Illustration & Wave Banner */}
           <div className="lg:col-span-5 bg-gradient-to-br from-[#0840A8] to-[#0077D4] text-white p-6 sm:p-10 relative flex flex-col justify-between overflow-hidden">
@@ -48,7 +48,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
             {/* Top Text / Badge */}
             <div className="relative z-10">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-bold bg-white/15 text-[#00C2E0] border border-[#00C2E0]/30">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md text-xs font-bold bg-white/15 text-secondary border border-secondary/30">
                 ✦ Historial Clínico Digital
               </span>
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white mt-3 leading-tight">
@@ -78,7 +78,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           </div>
 
           {/* Right Column: Form Side */}
-          <div className="lg:col-span-7 p-6 sm:p-10 md:p-12 flex flex-col justify-center bg-[#002D5E] relative">
+          <div className="lg:col-span-7 p-6 sm:p-10 md:p-12 flex flex-col justify-center bg-dark-surface relative">
             {/* Header Icons Avatar Bubble */}
             <div className="flex justify-center mb-3">
               <div className="relative flex items-center justify-center">
@@ -95,7 +95,7 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
               <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 Inicio de Sesión
               </h2>
-              <p className="text-xs sm:text-sm text-[#00C2E0] mt-1 font-semibold">
+              <p className="text-xs sm:text-sm text-secondary mt-1 font-semibold">
                 Ingresa tus datos para acceder a tu cuenta
               </p>
             </div>

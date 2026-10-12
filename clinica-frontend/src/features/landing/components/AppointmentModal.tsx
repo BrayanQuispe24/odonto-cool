@@ -39,16 +39,16 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   return (
     <div
       onClick={handleResetAndClose}
-      className="fixed inset-0 bg-[#002D5E]/80 backdrop-blur-sm z-[2000] flex items-center justify-center p-3 sm:p-6 transition-all duration-300 overflow-y-auto"
+      className="fixed inset-0 bg-dark-surface/80 backdrop-blur-sm z-[2000] flex items-center justify-center p-3 sm:p-6 transition-all duration-300 overflow-y-auto"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-[#002D5E] w-full max-w-[580px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_32px_64px_rgba(8,64,168,0.3)] border border-[#00C2E0]/20 relative animate-in fade-in zoom-in-95 duration-300 my-auto"
+        className="bg-dark-surface w-full max-w-[580px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_32px_64px_rgba(8,64,168,0.3)] border border-secondary/20 relative animate-in fade-in zoom-in-95 duration-300 my-auto"
       >
         {/* Header */}
-        <div className="bg-[#0840A8] text-white p-5 sm:p-7 px-6 sm:px-8 flex items-center justify-between border-b border-[#00C2E0]/20">
+        <div className="bg-[#0840A8] text-white p-5 sm:p-7 px-6 sm:px-8 flex items-center justify-between border-b border-secondary/20">
           <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-white/10 rounded-xl border border-[#00C2E0]/30 shrink-0">
+            <div className="p-1.5 bg-white/10 rounded-xl border border-secondary/30 shrink-0">
               <img 
                 src="/assets/images/image.png" 
                 alt="ODONTO COOL Logo" 
@@ -59,7 +59,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
               <div className="text-lg sm:text-xl font-extrabold text-white">
                 Agendar Cita Diagnóstica
               </div>
-              <div className="text-xs text-[#00C2E0] mt-0.5 font-medium">
+              <div className="text-xs text-secondary mt-0.5 font-medium">
                 ODONTO COOL • Valoración Clínica + Radiografía
               </div>
             </div>
@@ -77,7 +77,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         <div className="p-5 sm:p-8">
           {isSubmitted ? (
             <div className="text-center py-6 sm:py-10 px-2 sm:px-4">
-              <div className="w-14 h-14 sm:w-[70px] sm:h-[70px] bg-[#0077D4]/15 text-[#00C2E0] rounded-full flex items-center justify-center text-2xl sm:text-3xl mx-auto mb-4 sm:mb-5">
+              <div className="w-14 h-14 sm:w-[70px] sm:h-[70px] bg-[#0077D4]/15 text-secondary rounded-full flex items-center justify-center text-2xl sm:text-3xl mx-auto mb-4 sm:mb-5">
                 ✓
               </div>
               <h3 className="font-display text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3">
@@ -94,14 +94,14 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 sm:gap-5">
               {/* Specialty */}
               <div>
-                <label className="block text-[11px] sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
+                <label className="block text-small sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
                   Especialidad de Interés
                 </label>
                 <select
                   value={specialty}
                   onChange={(e) => setSpecialty(e.target.value)}
                   required
-                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-[#0840A8]/20 dark:border-[#00C2E0]/30 bg-[#F4F9FF] dark:bg-[#0840A8]/30 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-[#0077D4] focus:ring-2 focus:ring-[#0077D4]/20 transition-all cursor-pointer"
+                  className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-primary-dark/20 dark:border-secondary/30 bg-light-surface dark:bg-[#0840A8]/30 text-xs sm:text-sm font-medium text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
                 >
                   <option value="" className="text-slate-900 bg-white">Selecciona el motivo de tu consulta...</option>
                   <option value="ortodoncia" className="text-slate-900 bg-white">Ortodoncia Invisible (Invisalign®)</option>
@@ -114,7 +114,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
 
               {/* Date Chips */}
               <div>
-                <label className="block text-[11px] sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
+                <label className="block text-small sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
                   Selecciona el Día Conveniente
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -125,10 +125,10 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                         type="button"
                         key={chip}
                         onClick={() => setSelectedDate(chip)}
-                        className={`py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-[11px] sm:text-xs font-bold border text-center transition-all cursor-pointer truncate ${
+                        className={`py-2 sm:py-2.5 px-2 sm:px-3 rounded-xl text-small sm:text-xs font-bold border text-center transition-all cursor-pointer truncate ${
                           isActive
-                            ? 'bg-[#0077D4] text-white border-[#0077D4]'
-                            : 'bg-[#F4F9FF] dark:bg-[#0840A8]/30 text-[#0840A8] dark:text-slate-200 border-[#0840A8]/15 hover:border-[#0077D4]'
+                            ? 'bg-[#0077D4] text-white border-primary'
+                            : 'bg-light-surface dark:bg-[#0840A8]/30 text-primary-dark dark:text-slate-200 border-primary-dark/15 hover:border-primary'
                         }`}
                       >
                         {chip}
@@ -141,7 +141,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
               {/* Name & Phone */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-[11px] sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
+                  <label className="block text-small sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
                     Nombre y Apellido
                   </label>
                   <input
@@ -150,11 +150,11 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-[#0840A8]/20 dark:border-[#00C2E0]/30 bg-[#F4F9FF] dark:bg-[#0840A8]/30 text-xs sm:text-sm text-white focus:outline-none focus:border-[#0077D4] focus:ring-2 focus:ring-[#0077D4]/20 transition-all"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-primary-dark/20 dark:border-secondary/30 bg-light-surface dark:bg-[#0840A8]/30 text-xs sm:text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
+                  <label className="block text-small sm:text-xs font-bold text-white mb-1.5 sm:mb-2 uppercase tracking-wide">
                     Teléfono / WhatsApp
                   </label>
                   <input
@@ -163,7 +163,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
-                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-[#0840A8]/20 dark:border-[#00C2E0]/30 bg-[#F4F9FF] dark:bg-[#0840A8]/30 text-xs sm:text-sm text-white focus:outline-none focus:border-[#0077D4] focus:ring-2 focus:ring-[#0077D4]/20 transition-all"
+                    className="w-full px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl border border-primary-dark/20 dark:border-secondary/30 bg-light-surface dark:bg-[#0840A8]/30 text-xs sm:text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                   />
                 </div>
               </div>

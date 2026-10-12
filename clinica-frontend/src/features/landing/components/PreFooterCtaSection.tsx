@@ -10,13 +10,10 @@ export const PreFooterCtaSection: React.FC<PreFooterCtaSectionProps> = ({
   onOpenModal,
 }) => {
   return (
-    <section id="cta-prefooter" className="py-12 sm:py-20 bg-[#001433] text-white border-b border-[#00C2E0]/15 relative">
+    <section id="cta-prefooter" className="py-12 sm:py-20 bg-[#001433] text-white border-b border-secondary/15 relative">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
-        <div className="reveal bg-gradient-to-br from-[#002D5E] via-[#0840A8] to-[#0077D4] rounded-2xl sm:rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 items-center text-white border border-[#00C2E0]/25 shadow-xl">
+        <div className="reveal bg-[#0840A8] rounded-2xl sm:rounded-3xl overflow-hidden grid grid-cols-1 lg:grid-cols-2 items-center text-white border border-[#062F7D] shadow-xl">
           <div className="reveal-left p-6 sm:p-10 md:p-14">
-            <Badge variant="mint" className="mb-4 sm:mb-5">
-              🎁 Promoción de Bienvenida
-            </Badge>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-[3rem] font-extrabold text-white mb-3 sm:mb-4 leading-tight">
               Tu consulta diagnóstica + Evaluación Digital con 50% OFF
             </h2>

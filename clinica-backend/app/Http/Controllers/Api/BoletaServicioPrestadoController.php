@@ -37,7 +37,8 @@ class BoletaServicioPrestadoController extends Controller
     public function store(Request $request, StoreBoletaAction $action): JsonResponse
     {
         $request->validate([
-            'cita_id' => 'required|integer|exists:citas,id',
+            'cita_id' => 'nullable|integer|exists:citas,id',
+            'paciente_id' => 'nullable|integer|exists:pacientes,id',
             'doctor_id' => 'nullable|integer|exists:doctores,id',
             'monto_total' => 'required|numeric|min:0',
             'tipo_paga' => 'nullable|string',
@@ -52,6 +53,7 @@ class BoletaServicioPrestadoController extends Controller
             'detalles.*.servicio_id' => 'required|integer|exists:servicios,id',
             'detalles.*.diente_id' => 'nullable|integer|exists:dientes,id',
             'detalles.*.descripcion' => 'nullable|string',
+            'detalles.*.precio_unitario' => 'nullable|numeric|min:0',
             'detalles.*.descuento' => 'nullable|numeric|min:0',
             'cuotas' => 'nullable|array',
         ]);

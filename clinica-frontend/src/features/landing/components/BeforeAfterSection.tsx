@@ -77,9 +77,6 @@ export const BeforeAfterSection: React.FC<BeforeAfterSectionProps> = ({
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="reveal text-center max-w-[720px] mx-auto mb-8 sm:mb-10">
-          <Badge variant="mint" className="mx-auto mb-3 sm:mb-4">
-            ✦ Resultados Reales
-          </Badge>
           <h2 className="font-display text-2xl sm:text-4xl lg:text-[3.2rem] font-extrabold text-white mt-2 sm:mt-3 mb-3 sm:mb-4 tracking-tight leading-tight">
             Casos Clínicos Antes y Después
           </h2>
@@ -89,7 +86,7 @@ export const BeforeAfterSection: React.FC<BeforeAfterSectionProps> = ({
         </div>
 
         {/* Before / After Drag Slider Widget */}
-        <div className="reveal bg-[#002D5E] rounded-2xl sm:rounded-3xl p-4 sm:p-8 md:p-10 border border-[#00C2E0]/20 shadow-xl">
+        <div className="reveal bg-dark-surface rounded-2xl sm:rounded-3xl p-4 sm:p-8 md:p-10 border border-secondary/20 shadow-xl">
           <div
             ref={containerRef}
             onMouseDown={handleMouseDown}
@@ -97,10 +94,10 @@ export const BeforeAfterSection: React.FC<BeforeAfterSectionProps> = ({
             className="relative w-full h-[220px] sm:h-[320px] md:h-[380px] rounded-xl sm:rounded-2xl overflow-hidden select-none touch-none cursor-ew-resize shadow-2xl"
           >
             {/* Labels */}
-            <span className="absolute top-3 sm:top-4 left-3 sm:left-4 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold z-[5] tracking-wider uppercase bg-black/65 text-white backdrop-blur-md">
+            <span className="absolute top-3 sm:top-4 left-3 sm:left-4 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-tiny sm:text-xs font-bold z-[5] tracking-wider uppercase bg-black/65 text-white backdrop-blur-md">
               Antes (Inicial)
             </span>
-            <span className="absolute top-3 sm:top-4 right-3 sm:right-4 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-bold z-[5] tracking-wider uppercase bg-[#0077D4] text-white">
+            <span className="absolute top-3 sm:top-4 right-3 sm:right-4 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-tiny sm:text-xs font-bold z-[5] tracking-wider uppercase bg-[#0077D4] text-white">
               Después (ODONTO COOL)
             </span>
 
@@ -131,14 +128,14 @@ export const BeforeAfterSection: React.FC<BeforeAfterSectionProps> = ({
               className="absolute top-0 bottom-0 z-10 w-1 bg-white -translate-x-1/2 flex items-center justify-center pointer-events-none"
               style={{ left: `${sliderPos}%` }}
             >
-              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white text-[#0840A8] shadow-[0_4px_16px_rgba(0,0,0,0.4)] flex items-center justify-center font-bold text-sm sm:text-lg">
+              <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white text-primary-dark shadow-[0_4px_16px_rgba(0,0,0,0.4)] flex items-center justify-center font-bold text-sm sm:text-lg">
                 ↔
               </div>
             </div>
           </div>
 
           <div className="mt-5 sm:mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="text-[#00C2E0] font-semibold text-xs sm:text-sm md:text-base text-center sm:text-left">
+            <div className="text-secondary font-semibold text-xs sm:text-sm md:text-base text-center sm:text-left">
               ✨ Casos reales de diseño de carillas cerámicas biocompatibles y alineadores Invisalign®.
             </div>
             <Button variant="teal" size="md" onClick={onOpenModal} className="w-full sm:w-auto">
@@ -152,9 +149,9 @@ export const BeforeAfterSection: React.FC<BeforeAfterSectionProps> = ({
           {PILL_BULLETS.map((bullet, idx) => (
             <div
               key={idx}
-              className={`reveal stagger-${idx + 1} bg-[#002D5E] rounded-full px-5 sm:px-6 py-3 sm:py-3.5 flex items-center gap-3 shadow-sm border border-[#0077D4]/30 hover:-translate-y-1 hover:border-[#00C2E0] hover:shadow-md transition-all duration-300`}
+              className={`reveal stagger-${idx + 1} bg-dark-surface rounded-full px-5 sm:px-6 py-3 sm:py-3.5 flex items-center gap-3 shadow-sm border border-primary/30 hover:-translate-y-1 hover:border-secondary hover:shadow-md transition-all duration-300`}
             >
-              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#0077D4]/15 dark:bg-[#00C2E0]/20 text-[#00C2E0] flex items-center justify-center text-xs font-bold shrink-0">
+              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-[#0077D4]/15 dark:bg-[#00C2E0]/20 text-secondary flex items-center justify-center text-xs font-bold shrink-0">
                 ✓
               </div>
               <span className="text-xs sm:text-sm font-bold text-white">

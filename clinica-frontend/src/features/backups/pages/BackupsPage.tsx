@@ -102,8 +102,8 @@ export const BackupsPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-[70vh] text-center p-8">
         <ShieldAlert size={64} className="text-rose-500 mb-4 animate-pulse" />
-        <h2 className="text-2xl font-black text-[#0840A8] dark:text-white mb-2">Acceso Denegado</h2>
-        <p className="text-[#0077D4] dark:text-blue-200/80 max-w-md">
+        <h2 className="text-2xl font-black text-primary-dark dark:text-white mb-2">Acceso Denegado</h2>
+        <p className="text-primary dark:text-blue-200/80 max-w-md">
           Este módulo de sistema está estrictamente reservado para usuarios con rol de Administrador.
         </p>
       </div>
@@ -113,22 +113,16 @@ export const BackupsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-8">
       {/* HEADER SECTION */}
-      <div className="bg-white dark:bg-[#002D5E] p-6 rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-xl shadow-[#0077D4]/5 dark:shadow-[#001C3D]/50 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#00C2E0]/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none blur-3xl"></div>
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0840A8] to-[#0077D4] flex items-center justify-center shadow-lg shadow-[#0077D4]/40 text-white">
-              <Database size={28} />
-            </div>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-black text-[#0840A8] dark:text-white tracking-tight flex items-center gap-2">
-                Respaldos de Sistema
-              </h1>
-              <p className="text-sm font-medium text-[#0077D4] dark:text-[#00C2E0]/80 mt-1">
-                Genera, descarga y restaura copias de seguridad de tu base de datos clínica.
-              </p>
-            </div>
+      <div className="flex flex-col gap-4 bg-white dark:bg-dark-surface p-5 rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-primary-dark dark:text-white flex items-center gap-2">
+              <Database className="text-primary dark:text-secondary" size={22} />
+              Respaldos de Sistema
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Genera, descarga y restaura copias de seguridad de tu base de datos clínica.
+            </p>
           </div>
           
           <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -142,31 +136,26 @@ export const BackupsPage: React.FC = () => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="group relative px-6 py-3 rounded-xl overflow-hidden font-bold text-sm text-[#0077D4] dark:text-[#00C2E0] bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 hover:bg-[#E5F7FF] dark:hover:bg-[#0840A8]/30 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+              className="px-4 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-small font-semibold shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
-              <div className="relative flex items-center justify-center gap-2">
-                {isUploading ? (
-                  <div className="animate-spin w-5 h-5 border-2 border-[#0077D4]/30 border-t-[#0077D4] rounded-full" />
-                ) : (
-                  <UploadCloud size={18} className="group-hover:-translate-y-1 transition-transform duration-300" />
-                )}
-                {isUploading ? 'Subiendo...' : 'Subir Respaldo'}
-              </div>
+              {isUploading ? (
+                <div className="animate-spin w-4 h-4 border-2 border-slate-300 border-t-slate-600 rounded-full" />
+              ) : (
+                <UploadCloud size={16} />
+              )}
+              {isUploading ? 'Subiendo...' : 'Subir Respaldo'}
             </button>
             <button
               onClick={handleCreateBackup}
               disabled={isCreating}
-              className="group relative px-6 py-3 rounded-xl overflow-hidden font-bold text-sm text-white shadow-lg shadow-[#0077D4]/30 hover:shadow-xl hover:shadow-[#00C2E0]/40 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+              className="px-4 py-1.5 rounded-sm bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-semibold shadow-sm transition-colors cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0077D4] to-[#00C2E0] transition-transform duration-300 group-hover:scale-105"></div>
-              <div className="relative flex items-center justify-center gap-2">
-                {isCreating ? (
-                  <div className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-                ) : (
-                  <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
-                )}
-                {isCreating ? 'Generando...' : 'Crear Respaldo'}
-              </div>
+              {isCreating ? (
+                <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+              ) : (
+                <Plus size={16} />
+              )}
+              {isCreating ? 'Generando...' : 'Crear Respaldo'}
             </button>
           </div>
         </div>
@@ -178,8 +167,8 @@ export const BackupsPage: React.FC = () => {
         </div>
       ) : loading ? (
         <div className="py-20 text-center">
-          <div className="animate-spin w-10 h-10 border-4 border-[#00C2E0]/30 border-t-[#00C2E0] rounded-full mx-auto mb-4"></div>
-          <p className="text-[#0077D4] dark:text-blue-200/80 font-semibold animate-pulse">Cargando respaldos...</p>
+          <div className="animate-spin w-10 h-10 border-4 border-secondary/30 border-t-[#00C2E0] rounded-full mx-auto mb-4"></div>
+          <p className="text-primary dark:text-blue-200/80 font-semibold animate-pulse">Cargando respaldos...</p>
         </div>
       ) : (
         <BackupTable 
@@ -191,36 +180,43 @@ export const BackupsPage: React.FC = () => {
 
       {/* Delete Modal */}
       {backupToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#002D5E] border border-rose-200 dark:border-rose-900/50 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden text-[#0840A8] dark:text-white">
-            <div className="p-6 text-center">
-              <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center mx-auto mb-4 text-rose-600 dark:text-rose-400">
-                <AlertTriangle size={32} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-sm overflow-hidden">
+            <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center gap-3">
+              <div className="p-2 rounded-sm bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400">
+                <AlertTriangle size={20} />
               </div>
-              <h3 className="text-lg font-black text-[#0840A8] dark:text-white mb-2">
-                ¿Eliminar Respaldo?
-              </h3>
-              <p className="text-sm text-[#0077D4] dark:text-blue-200/80 font-medium mb-1">
+              <div>
+                <h3 className="text-small font-bold uppercase tracking-wider text-primary-dark dark:text-white">
+                  ¿Eliminar Respaldo?
+                </h3>
+              </div>
+            </div>
+
+            <div className="p-5">
+              <p className="text-small text-slate-700 dark:text-slate-300 mb-3">
                 Estás a punto de eliminar permanentemente el archivo:
               </p>
-              <p className="text-xs font-mono bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-300 p-2 rounded-lg break-all">
+              <p className="text-xs font-mono bg-slate-50 dark:bg-dark-bg text-slate-800 dark:text-slate-200 p-2 border border-slate-200 dark:border-slate-700 rounded-sm break-all font-bold">
                 {backupToDelete.filename}
               </p>
-              
-              <div className="mt-6 flex gap-3">
-                <button
-                  onClick={() => setBackupToDelete(null)}
-                  className="flex-1 px-4 py-2 rounded-xl text-sm font-bold bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0077D4] dark:text-blue-100 border border-[#0840A8]/15 dark:border-[#0077D4]/40 hover:bg-[#E5F7FF] dark:hover:bg-[#0840A8]/30 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleDeleteBackup}
-                  className="flex-1 px-4 py-2 rounded-xl text-sm font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-md shadow-rose-600/20 transition-colors"
-                >
-                  Eliminar
-                </button>
-              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-dark-bg border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setBackupToDelete(null)}
+                className="px-4 py-1.5 rounded-sm bg-white dark:bg-dark-surface border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold transition-colors cursor-pointer shadow-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteBackup}
+                className="px-4 py-1.5 rounded-sm bg-rose-600 hover:bg-rose-700 text-white text-small font-semibold transition-colors cursor-pointer shadow-sm"
+              >
+                Eliminar
+              </button>
             </div>
           </div>
         </div>
@@ -228,62 +224,67 @@ export const BackupsPage: React.FC = () => {
 
       {/* Restore Modal */}
       {backupToRestore && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-          <div className="bg-white dark:bg-[#002D5E] border-2 border-rose-500 rounded-2xl shadow-[0_0_50px_-12px_rgba(244,63,94,0.5)] w-full max-w-lg overflow-hidden flex flex-col">
-            <div className="bg-rose-600 p-5 flex items-center justify-center gap-3 text-white">
-              <AlertOctagon size={28} className="animate-pulse" />
-              <h3 className="text-xl font-black uppercase tracking-widest">Advertencia Crítica</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white dark:bg-dark-surface border border-rose-500 rounded-sm shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+            <div className="p-5 border-b border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20 flex items-center gap-3">
+              <div className="p-2 rounded-sm bg-rose-100 text-rose-600 dark:bg-rose-900/50 dark:text-rose-400">
+                <AlertOctagon size={20} />
+              </div>
+              <div>
+                <h3 className="text-small font-bold uppercase tracking-wider text-rose-700 dark:text-rose-300">
+                  Advertencia Crítica de Restauración
+                </h3>
+              </div>
             </div>
             
             <div className="p-6">
-              <p className="text-sm text-[#0840A8] dark:text-blue-100 font-bold mb-4 text-center">
+              <p className="text-small text-slate-800 dark:text-slate-200 font-bold mb-4">
                 Estás a punto de sobreescribir toda la base de datos con el archivo de respaldo seleccionado.
               </p>
               
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 rounded-xl mb-6">
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 p-4 rounded-sm mb-6">
                 <p className="text-xs text-amber-800 dark:text-amber-400 font-semibold leading-relaxed">
-                  ⚠️ <span className="font-bold">PELIGRO DE PÉRDIDA DE DATOS:</span> Cualquier paciente, cita, boleta o pago registrado después de que se generó este respaldo <span className="underline">SE PERDERÁ PARA SIEMPRE</span>. 
-                  Esta acción desconectará a los usuarios y detendrá temporalmente el sistema.
+                  ⚠️ <span className="font-bold">PELIGRO DE PÉRDIDA DE DATOS:</span> Cualquier paciente, cita, boleta o pago registrado después de que se generó este respaldo se perderá para siempre. Esta acción desconectará a los usuarios.
                 </p>
               </div>
 
-              <div className="mb-6 text-center">
-                <p className="text-xs text-[#0077D4] dark:text-blue-200/70 font-semibold mb-2">Para confirmar la restauración, escribe el nombre del archivo exactamente:</p>
-                <p className="text-xs font-mono bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-[#00C2E0] p-2 rounded-lg break-all border border-[#0840A8]/15 dark:border-[#0077D4]/40 font-bold select-all inline-block mb-3">
+              <div className="mb-2">
+                <label className="block text-tiny font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                  Escribe el nombre del archivo para confirmar:
+                </label>
+                <div className="text-xs font-mono bg-slate-50 dark:bg-dark-bg text-slate-600 dark:text-slate-400 p-2 border border-slate-200 dark:border-slate-700 rounded-sm break-all font-bold select-all mb-2">
                   {backupToRestore.filename}
-                </p>
+                </div>
                 <input 
                   type="text" 
                   value={confirmRestoreName}
                   onChange={(e) => setConfirmRestoreName(e.target.value)}
-                  placeholder="Pega el nombre del archivo aquí..."
-                  className="w-full text-center px-4 py-3 rounded-xl text-sm font-mono border-2 border-rose-200 focus:border-rose-500 bg-white dark:bg-[#001C3D] text-[#0840A8] dark:text-white outline-none transition-all"
+                  placeholder="Pega el nombre exacto aquí..."
+                  className="w-full px-2.5 py-2 rounded-sm text-small font-medium border border-rose-300 focus:border-rose-500 focus:ring-1 focus:ring-rose-500 bg-white dark:bg-dark-surface text-primary-dark dark:text-white transition-colors outline-none"
                 />
               </div>
+            </div>
 
-              <div className="flex gap-3 mt-auto">
-                <button
-                  onClick={() => {
-                    setBackupToRestore(null);
-                    setConfirmRestoreName('');
-                  }}
-                  className="flex-1 px-4 py-3 rounded-xl text-sm font-bold bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white border border-[#0840A8]/15 dark:border-[#00C2E0]/30 hover:bg-[#E5F7FF] dark:hover:bg-[#0840A8]/30 transition-colors"
-                >
-                  ABORTAR ACCIÓN
-                </button>
-                <button
-                  onClick={handleRestoreBackup}
-                  disabled={confirmRestoreName !== backupToRestore.filename || isRestoring}
-                  className="flex-1 px-4 py-3 rounded-xl text-sm font-black bg-rose-600 hover:bg-rose-700 text-white shadow-lg shadow-rose-600/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isRestoring ? (
-                    <div className="animate-spin w-5 h-5 border-2 border-white/30 border-t-white rounded-full" />
-                  ) : (
-                    <RefreshCcw size={16} />
-                  )}
-                  {isRestoring ? 'RESTAURANDO...' : 'SÍ, RESTAURAR AHORA'}
-                </button>
-              </div>
+            <div className="p-4 bg-slate-50 dark:bg-dark-bg border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setBackupToRestore(null);
+                  setConfirmRestoreName('');
+                }}
+                className="w-full sm:w-auto px-4 py-1.5 rounded-sm bg-white dark:bg-dark-surface border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold transition-colors cursor-pointer shadow-sm"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleRestoreBackup}
+                disabled={confirmRestoreName !== backupToRestore.filename || isRestoring}
+                className="w-full sm:w-auto px-4 py-1.5 rounded-sm bg-rose-600 hover:bg-rose-700 text-white text-small font-semibold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isRestoring && <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />}
+                {isRestoring ? 'Restaurando...' : 'Sí, Restaurar Ahora'}
+              </button>
             </div>
           </div>
         </div>

@@ -16,6 +16,7 @@ class BoletaServicioPrestado extends Model
     protected $fillable = [
         'cita_id',
         'doctor_id',
+        'paciente_id',
         'fecha_emision',
         'numero_boleta',
         'emitido_por',
@@ -46,6 +47,14 @@ class BoletaServicioPrestado extends Model
     public function cita(): BelongsTo
     {
         return $this->belongsTo(Cita::class, 'cita_id');
+    }
+
+    /**
+     * Una boleta pertenece a un paciente (opcional si la cita ya lo tiene, pero ahora es importante si cita_id es null).
+     */
+    public function paciente(): BelongsTo
+    {
+        return $this->belongsTo(Paciente::class, 'paciente_id');
     }
 
     /**

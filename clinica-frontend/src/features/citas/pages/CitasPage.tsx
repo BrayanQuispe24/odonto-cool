@@ -28,6 +28,9 @@ export const CitasPage: React.FC = () => {
   // Selected Cita for Form panel (null = new appointment)
   const [selectedCita, setSelectedCita] = useState<Cita | null>(null);
 
+  // Navigation tab state
+  const [activeTab, setActiveTab] = useState<'list' | 'form'>('list');
+
   // Details modal state
   const [citaToView, setCitaToView] = useState<Cita | null>(null);
 
@@ -62,18 +65,12 @@ export const CitasPage: React.FC = () => {
       return;
     }
     setSelectedCita(null);
-    const panel = document.getElementById('cita-form-panel');
-    if (panel) {
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    setActiveTab('form');
   };
 
   const handleSelectCitaEdit = (cita: Cita) => {
     setSelectedCita(cita);
-    const panel = document.getElementById('cita-form-panel');
-    if (panel) {
-      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    setActiveTab('form');
   };
 
   const handleOpenDeleteModal = (cita: Cita) => {
@@ -90,6 +87,7 @@ export const CitasPage: React.FC = () => {
       const newCita = await createCitaApi(formData);
       toast.success(`Cita médica ${newCita.numero_cita} registrada exitosamente`);
     }
+    setActiveTab('list');
     await fetchCitas();
   };
 
@@ -134,36 +132,38 @@ export const CitasPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* HEADER SECTION */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white dark:bg-[#002D5E] p-6 rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-lg shadow-sm dark:shadow-[#001C3D]/50">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-[#0840A8] dark:text-white flex items-center gap-2">
-            <Calendar className="text-[#0077D4] dark:text-[#00C2E0]" size={26} />
-            Gestión de Citas Médicas
-          </h1>
-          <p className="text-xs text-[#0077D4] dark:text-blue-200/80 mt-1">
-            Agenda odontológica multisucursal, asignación de doctores y seguimiento del estado de atención.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          {isDoctorRole && (
-            <button
-              onClick={handleNewCitaClick}
-              className="px-5 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-[#0077D4]/30 cursor-pointer transition-all flex items-center gap-2 shrink-0 bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#0840A8] hover:to-[#0077D4] text-white"
-            >
-              <Plus size={16} />
-              <span>Nueva Cita</span>
-            </button>
-          )}
-        </div>
+    <div className="space-y-4">
+      {/* TABS NAVIGATION */}
+      <div className="flex border-b border-slate-200 dark:border-slate-800 mb-4 bg-slate-50 dark:bg-dark-bg px-2 pt-2">
+        <button
+          onClick={() => setActiveTab('list')}
+          className={`px-4 py-2 text-small font-bold uppercase tracking-wider border-b-2 transition-all ${
+            activeTab === 'list'
+              ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
+              : 'border-transparent text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-secondary'
+          }`}
+        >
+          Listado de Citas
+        </button>
+        
+        {isDoctorRole && (
+          <button
+            onClick={handleNewCitaClick}
+            className={`px-4 py-2 text-small font-bold uppercase tracking-wider border-b-2 transition-all ${
+              activeTab === 'form'
+                ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
+                : 'border-transparent text-slate-500 hover:text-primary dark:text-slate-400 dark:hover:text-secondary'
+            }`}
+          >
+            {selectedCita ? 'Editar Cita' : 'Registrar Nueva Cita'}
+          </button>
+        )}
       </div>
 
       {/* ROLE NOTICE IF NOT DOCTOR */}
       {!isDoctorRole && (
-        <div className="p-3.5 rounded-xl bg-[#E5F7FF] dark:bg-[#0840A8]/30 border border-[#0840A8]/15 dark:border-[#00C2E0]/40 text-[#0077D4] dark:text-blue-100 text-xs font-semibold flex items-center gap-2.5">
-          <ShieldAlert size={18} className="text-[#0077D4] dark:text-[#00C2E0] shrink-0" />
+        <div className="p-3 rounded-sm bg-slate-100 dark:bg-dark-bg border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold flex items-center gap-2">
+          <ShieldAlert size={16} className="text-primary" />
           <span>
             <strong>Información de Seguridad:</strong> La creación de citas requiere inicio de sesión con una cuenta que tenga el rol <strong>Doctor</strong>. (Tu rol actual: {user?.rol?.nombre || 'Usuario'}).
           </span>
@@ -172,21 +172,20 @@ export const CitasPage: React.FC = () => {
 
       {/* ERROR MESSAGE */}
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/80 border border-rose-800/80 text-rose-200 text-xs font-semibold flex items-center gap-2">
-          <AlertCircle size={16} />
+        <div className="p-3 rounded-sm bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-small font-semibold flex items-center gap-2">
+          <AlertCircle size={14} />
           <span>{error}</span>
         </div>
       )}
 
-      {/* MAIN CONTENT GRID: LISTING (65%) + FORM (30%-35%) SIDE-BY-SIDE */}
+      {/* MAIN CONTENT: TABS */}
       {loading ? (
-        <div className="p-12 text-center text-[#0077D4] dark:text-blue-200/80 text-sm font-medium">
+        <div className="p-12 text-center text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
           Cargando agenda de citas médicas...
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Appointment List Table (~65%) */}
-          <div className="lg:col-span-8 xl:col-span-8">
+        <div className="w-full">
+          {activeTab === 'list' ? (
             <CitaTable
               citas={citas}
               onEdit={handleSelectCitaEdit}
@@ -194,29 +193,31 @@ export const CitasPage: React.FC = () => {
               onViewDetails={(cita) => setCitaToView(cita)}
               onOpenBoleta={handleOpenBoleta}
             />
-          </div>
-
-          {/* Appointment Form Panel Side-by-Side (~30-35%) */}
-          <div className="lg:col-span-4 xl:col-span-4">
-            {(!isDoctorRole && !selectedCita) ? (
-              <div className="bg-white dark:bg-[#002D5E] rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-xl shadow-sm dark:shadow-[#001C3D]/50 p-8 text-center text-[#0840A8] dark:text-white flex flex-col items-center justify-center sticky top-6 h-[400px]">
-                <ShieldAlert size={48} className="text-[#0077D4] dark:text-[#00C2E0] mb-4 opacity-50" />
-                <h3 className="text-lg font-bold mb-2">Creación Restringida</h3>
-                <p className="text-sm text-[#0077D4] dark:text-blue-200/70">
-                  Solo los usuarios con rol <strong>Doctor</strong> pueden registrar nuevas citas médicas.
-                </p>
-                <p className="text-xs text-[#0077D4] dark:text-blue-200/50 mt-4">
-                  Selecciona una cita existente de la tabla para ver o editar sus detalles.
-                </p>
-              </div>
-            ) : (
-              <CitaFormPanel
-                onSubmit={handleSubmitCita}
-                cita={selectedCita}
-                onCancelEdit={() => setSelectedCita(null)}
-              />
-            )}
-          </div>
+          ) : (
+            <div className="w-full max-w-4xl mx-auto">
+              {(!isDoctorRole && !selectedCita) ? (
+                <div className="bg-white dark:bg-dark-surface rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm p-8 text-center text-slate-700 dark:text-slate-300 flex flex-col items-center justify-center h-[400px]">
+                  <ShieldAlert size={40} className="text-primary mb-3 opacity-50" />
+                  <h3 className="text-sm font-bold mb-1 uppercase tracking-wider">Creación Restringida</h3>
+                  <p className="text-small text-slate-500 dark:text-slate-400">
+                    Solo los usuarios con rol <strong>Doctor</strong> pueden registrar nuevas citas médicas.
+                  </p>
+                  <p className="text-tiny text-slate-400 dark:text-slate-500 mt-3 uppercase tracking-wider">
+                    Selecciona una cita existente de la tabla para ver o editar sus detalles.
+                  </p>
+                </div>
+              ) : (
+                <CitaFormPanel
+                  onSubmit={handleSubmitCita}
+                  cita={selectedCita}
+                  onCancelEdit={() => {
+                    setSelectedCita(null);
+                    setActiveTab('list');
+                  }}
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -249,40 +250,40 @@ export const CitasPage: React.FC = () => {
 
       {/* DELETE CONFIRMATION MODAL */}
       {isDeleteModalOpen && citaToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#002D5E] border border-rose-500/40 rounded-2xl shadow-2xl shadow-[#001C3D]/80 w-full max-w-md p-6 text-[#0840A8] dark:text-white space-y-4">
-            <div className="flex items-center gap-3 text-rose-400">
-              <div className="p-2.5 rounded-xl bg-rose-500/20 border border-rose-500/30">
-                <Trash2 size={24} />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-sm p-4 text-slate-700 dark:text-slate-200 space-y-4">
+            <div className="flex items-center gap-3 text-rose-600 dark:text-rose-400">
+              <div className="p-2 rounded bg-rose-50 dark:bg-rose-900/30 border border-rose-200 dark:border-rose-800">
+                <Trash2 size={20} />
               </div>
               <div>
-                <h3 className="text-base font-bold text-[#0840A8] dark:text-white">Eliminar Cita Médica</h3>
-                <p className="text-xs text-[#0077D4] dark:text-blue-200/70">Esta acción no se puede deshacer.</p>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-primary-dark dark:text-white">Eliminar Cita</h3>
+                <p className="text-tiny text-slate-500">Esta acción no se puede deshacer.</p>
               </div>
             </div>
 
-            <p className="text-xs text-[#0077D4] dark:text-blue-100">
+            <p className="text-small text-slate-600 dark:text-slate-300">
               ¿Estás seguro de que deseas eliminar la cita{' '}
-              <strong className="text-[#0840A8] dark:text-white font-bold">{citaToDelete.numero_cita}</strong>?
+              <strong className="text-primary-dark dark:text-white font-bold">{citaToDelete.numero_cita}</strong>?
             </p>
 
-            <div className="flex items-center justify-end gap-3 pt-2 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50">
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => {
                   setIsDeleteModalOpen(false);
                   setCitaToDelete(null);
                 }}
-                className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white border border-white/10 text-xs font-semibold cursor-pointer transition-all"
+                className="px-3 py-1.5 rounded bg-white dark:bg-dark-surface hover:bg-slate-50 dark:hover:bg-dark-bg text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 text-small font-semibold transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDelete}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-[#0840A8] dark:text-white text-xs font-bold shadow-md shadow-rose-900/50 cursor-pointer transition-all"
+                className="px-4 py-1.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-small font-bold shadow-sm transition-colors"
               >
-                Sí, Eliminar
+                Eliminar
               </button>
             </div>
           </div>

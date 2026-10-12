@@ -79,13 +79,13 @@ export const ServicioTable: React.FC<ServicioTableProps> = ({
   const endRecord = Math.min(safeCurrentPage * pageSize, filteredServicios.length);
 
   return (
-    <div className="bg-white dark:bg-[#002D5E] rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-xl shadow-sm dark:shadow-[#001C3D]/50 overflow-hidden transition-all duration-300">
+    <div className="bg-white dark:bg-dark-surface rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col min-h-[60vh]">
       {/* TOOLBAR */}
-      <div className="p-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="p-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex flex-col md:flex-row md:items-center justify-between gap-3 shrink-0">
         {/* SEARCH INPUT */}
         <div className="relative flex-1 max-w-md">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#0077D4] dark:text-[#00C2E0]">
-            <Search size={15} />
+          <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+            <Search size={13} />
           </div>
           <input
             type="text"
@@ -95,32 +95,32 @@ export const ServicioTable: React.FC<ServicioTableProps> = ({
               setCurrentPage(1);
             }}
             placeholder="Buscar por código, nombre o categoría..."
-            className="w-full pl-9 pr-8 py-2 rounded-xl text-xs font-medium border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+            className="w-full pl-8 pr-8 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-[#0077D4] dark:text-blue-200/70 hover:text-[#0840A8] dark:text-white cursor-pointer"
+              className="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-pointer"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           )}
         </div>
 
         {/* CATEGORY FILTER */}
-        <div className="flex items-center gap-2">
-          <Filter size={14} className="text-[#0077D4] dark:text-[#00C2E0]" />
+        <div className="flex items-center gap-1.5">
+          <Filter size={12} className="text-slate-400" />
           <select
             value={selectedCategoria}
             onChange={(e) => {
               setSelectedCategoria(e.target.value);
               setCurrentPage(1);
             }}
-            className="py-2 px-3 rounded-xl text-xs font-medium border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all cursor-pointer min-w-[180px]"
+            className="py-1.5 px-2 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary cursor-pointer min-w-[160px]"
           >
-            <option value="all" className="bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white">Todas las categorías</option>
+            <option value="all">Todas las categorías</option>
             {categoriasDisponibles.map((cat) => (
-              <option key={cat} value={cat} className="bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white">
+              <option key={cat} value={cat}>
                 {cat}
               </option>
             ))}
@@ -128,23 +128,23 @@ export const ServicioTable: React.FC<ServicioTableProps> = ({
         </div>
       </div>
 
-      {/* DESKTOP TABLE VIEW */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-[#E5F7FF] dark:bg-[#0840A8]/40 border-b border-[#0840A8]/15 dark:border-[#0840A8]/60 text-[11px] font-extrabold uppercase tracking-wider text-[#0077D4] dark:text-blue-100 select-none">
-              <th className="py-3.5 px-4">CÓDIGO</th>
-              <th className="py-3.5 px-4">SERVICIO / PROCEDIMIENTO</th>
-              <th className="py-3.5 px-4">CATEGORÍA</th>
-              <th className="py-3.5 px-4">PRECIO OFICIAL</th>
-              <th className="py-3.5 px-4">ESTADO</th>
-              <th className="py-3.5 px-4 text-right">ACCIONES</th>
+      {/* TABLE */}
+      <div className="flex-1 overflow-x-auto bg-white dark:bg-dark-surface">
+        <table className="w-full text-left text-small whitespace-nowrap">
+          <thead className="bg-slate-50 dark:bg-dark-bg text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 uppercase tracking-wider">
+            <tr>
+              <th className="px-4 py-2 font-bold w-24">Código</th>
+              <th className="px-4 py-2 font-bold">Servicio / Procedimiento</th>
+              <th className="px-4 py-2 font-bold w-32">Categoría</th>
+              <th className="px-4 py-2 font-bold w-32">Precio</th>
+              <th className="px-4 py-2 font-bold w-24">Estado</th>
+              <th className="px-4 py-2 font-bold text-right w-24">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#0840A8]/15 dark:divide-[#0840A8]/30 text-xs text-[#0840A8] dark:text-blue-50 font-medium">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-200 font-medium">
             {paginatedServicios.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-[#0077D4] dark:text-blue-200/70 font-medium">
+                <td colSpan={6} className="py-12 text-center text-slate-500 font-semibold">
                   No se encontraron servicios ni precios registrados.
                 </td>
               </tr>
@@ -153,23 +153,23 @@ export const ServicioTable: React.FC<ServicioTableProps> = ({
                 return (
                   <tr
                     key={serv.id}
-                    className="bg-white dark:bg-[#002D5E] even:bg-slate-50/50 dark:even:bg-[#002247]/60 hover:bg-[#E5F7FF] dark:hover:bg-[#0840A8]/30 transition-colors duration-200"
+                    className="hover:bg-slate-50 dark:hover:bg-dark-bg/50 transition-colors"
                   >
                     {/* CÓDIGO */}
-                    <td className="py-3.5 px-4">
-                      <span className="font-mono font-bold text-xs text-[#0077D4] dark:text-[#00C2E0]">
+                    <td className="px-4 py-2">
+                      <span className="font-mono font-bold text-primary dark:text-secondary">
                         {serv.codigo_servicio}
                       </span>
                     </td>
 
                     {/* NOMBRE Y DESCRIPCIÓN */}
-                    <td className="py-3.5 px-4 max-w-xs">
+                    <td className="px-4 py-2">
                       <div>
-                        <div className="font-bold text-[#0840A8] dark:text-white text-xs">
+                        <div className="font-bold text-primary-dark dark:text-white">
                           {serv.nombre}
                         </div>
                         {serv.descripcion && (
-                          <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 line-clamp-1 mt-0.5">
+                          <div className="text-tiny text-slate-500 truncate max-w-xs mt-0.5">
                             {serv.descripcion}
                           </div>
                         )}
@@ -177,62 +177,61 @@ export const ServicioTable: React.FC<ServicioTableProps> = ({
                     </td>
 
                     {/* CATEGORÍA */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0077D4] dark:text-blue-100 border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                        <Tag size={11} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                        {serv.categoria}
+                    <td className="px-4 py-2">
+                      <span className="inline-flex items-center gap-1 font-semibold text-slate-600 dark:text-slate-300">
+                        <Tag size={10} className="text-slate-400" />
+                        {serv.categoria || 'General'}
                       </span>
                     </td>
 
-                    {/* PRECIO OFICIAL */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1 text-xs font-extrabold text-[#0077D4] dark:text-[#00C2E0] font-mono bg-[#F4F9FF] dark:bg-[#001C3D]/80 px-2.5 py-1 rounded-lg border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-sm">
-                        <span>Bs.</span>
-                        <span>{Number(serv.precio).toFixed(2)}</span>
+                    {/* PRECIO REFERENCIAL */}
+                    <td className="px-4 py-2">
+                      <span className="inline-flex items-center gap-1 font-mono font-bold text-primary dark:text-secondary">
+                        Bs. {Number(serv.precio).toFixed(2)}
                       </span>
                     </td>
 
                     {/* ESTADO */}
-                    <td className="py-3.5 px-4">
+                    <td className="px-4 py-2">
                       {serv.estado ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950/80 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/40">
-                          <CheckCircle2 size={11} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                          Activo
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-tiny font-bold bg-cyan-50 dark:bg-cyan-900/30 text-primary dark:text-secondary border border-cyan-200 dark:border-cyan-800">
+                          <CheckCircle2 size={10} />
+                          ACTIVO
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50">
-                          <XCircle size={11} />
-                          Inactivo
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-tiny font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                          <XCircle size={10} />
+                          INACTIVO
                         </span>
                       )}
                     </td>
 
-                    {/* ACCIONES (VER DISPONIBLE PARA TODOS, EDITAR/ELIMINAR SOLO ADMIN) */}
-                    <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
+                    {/* ACCIONES */}
+                    <td className="px-4 py-2 text-right">
+                      <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => setViewServicio(serv)}
-                          title="Ver detalle del servicio"
-                          className="p-1.5 rounded-lg bg-[#00C2E0]/15 hover:bg-[#00C2E0]/30 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 transition-colors cursor-pointer"
+                          title="Ver detalle"
+                          className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-dark-bg dark:hover:bg-slate-800 text-primary dark:text-secondary transition-colors"
                         >
-                          <Eye size={14} />
+                          <Eye size={13} />
                         </button>
 
                         {isAdmin && (
                           <>
                             <button
                               onClick={() => onEdit(serv)}
-                              title="Editar servicio y precio"
-                              className="p-1.5 rounded-lg bg-[#0077D4]/30 hover:bg-[#0077D4]/50 text-[#0077D4] dark:text-blue-100 border border-[#0840A8]/15 dark:border-[#0077D4]/50 transition-colors cursor-pointer"
+                              title="Editar"
+                              className="p-1 rounded bg-slate-100 hover:bg-slate-200 dark:bg-dark-bg dark:hover:bg-slate-800 text-primary dark:text-secondary transition-colors"
                             >
-                              <Edit2 size={14} />
+                              <Edit2 size={13} />
                             </button>
                             <button
                               onClick={() => onDelete(serv)}
-                              title="Eliminar servicio"
-                              className="p-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 transition-colors cursor-pointer"
+                              title="Eliminar"
+                              className="p-1 rounded bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/30 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 transition-colors"
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={13} />
                             </button>
                           </>
                         )}
@@ -247,135 +246,127 @@ export const ServicioTable: React.FC<ServicioTableProps> = ({
       </div>
 
       {/* FOOTER PAGINATION */}
-      <div className="p-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-[#0077D4] dark:text-blue-200/80">
+      <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between text-small text-slate-500 dark:text-slate-400 shrink-0">
         <div>
           Mostrando <strong>{filteredServicios.length === 0 ? 0 : startRecord}</strong> -{' '}
-          <strong>{endRecord}</strong> de <strong>{filteredServicios.length}</strong> servicios
+          <strong>{endRecord}</strong> de <strong>{filteredServicios.length}</strong>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={safeCurrentPage === 1}
-            className="p-1.5 rounded-lg border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white disabled:opacity-40 cursor-pointer"
+            className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            <ChevronLeft size={15} />
+            <ChevronLeft size={13} />
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-            <button
-              key={p}
-              onClick={() => setCurrentPage(p)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                safeCurrentPage === p
-                  ? 'bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white shadow-md shadow-[#0077D4]/30'
-                  : 'bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0077D4] dark:text-blue-100 hover:text-white'
-              }`}
-            >
-              {p}
-            </button>
-          ))}
+          
+          <span className="px-2 font-semibold">
+            Página {safeCurrentPage} de {totalPages}
+          </span>
+
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={safeCurrentPage === totalPages}
-            className="p-1.5 rounded-lg border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white disabled:opacity-40 cursor-pointer"
+            className="p-1 rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface disabled:opacity-40 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
-            <ChevronRight size={15} />
+            <ChevronRight size={13} />
           </button>
         </div>
       </div>
 
       {/* DETAIL MODAL FOR VER SERVICIO */}
       {viewServicio && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden text-[#0840A8] dark:text-white flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-md overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="p-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-[#E5F7FF] dark:bg-[#0840A8]/30 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-[#0077D4] dark:text-[#00C2E0] text-sm font-bold">
-                <Sparkles size={18} />
-                <span>Detalle del Servicio Clínico</span>
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 text-primary-dark dark:text-white text-xs font-bold uppercase tracking-wider">
+                <Sparkles size={14} className="text-primary" />
+                <span>Detalle del Servicio</span>
               </div>
               <button
                 onClick={() => setViewServicio(null)}
-                className="p-1.5 rounded-lg text-[#0077D4] dark:text-blue-100 hover:text-[#0840A8] dark:text-white hover:bg-white/10 cursor-pointer"
+                className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 transition-colors cursor-pointer"
               >
-                <X size={18} />
+                <X size={16} />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 space-y-4">
-              <div className="flex items-center justify-between gap-2 border-b border-[#0840A8]/15 dark:border-[#0840A8]/40 pb-3">
+            <div className="p-4 space-y-4 text-slate-700 dark:text-slate-200 bg-white dark:bg-dark-surface">
+              <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <span className="text-[10px] font-mono text-[#0077D4] dark:text-[#00C2E0] uppercase font-bold block">
+                  <span className="text-tiny font-mono text-primary dark:text-secondary font-bold block mb-0.5">
                     {viewServicio.codigo_servicio}
                   </span>
-                  <h3 className="text-lg font-extrabold text-[#0840A8] dark:text-white mt-0.5">
+                  <h3 className="text-sm font-bold text-primary-dark dark:text-white">
                     {viewServicio.nombre}
                   </h3>
                 </div>
                 <div>
                   {viewServicio.estado ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/90 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/50">
-                      <CheckCircle2 size={13} />
-                      Activo
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-micro font-bold bg-cyan-50 dark:bg-cyan-900/30 text-primary dark:text-secondary border border-cyan-200 dark:border-cyan-800">
+                      <CheckCircle2 size={10} />
+                      ACTIVO
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50">
-                      <XCircle size={13} />
-                      Inactivo
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-micro font-bold bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800">
+                      <XCircle size={10} />
+                      INACTIVO
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <div className="p-3 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                  <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 font-semibold flex items-center gap-1">
-                    <Tag size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg">
+                  <div className="text-micro text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Tag size={10} className="text-primary" />
                     Categoría
                   </div>
-                  <div className="text-xs font-bold text-[#0840A8] dark:text-white mt-1">
+                  <div className="text-small font-bold text-primary-dark dark:text-white mt-1">
                     {viewServicio.categoria || 'General'}
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                  <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 font-semibold flex items-center gap-1">
-                    <DollarSign size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                    Precio Oficial
+                <div className="p-3 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg">
+                  <div className="text-micro text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <DollarSign size={10} className="text-primary" />
+                    Precio Base
                   </div>
-                  <div className="text-sm font-extrabold text-[#0077D4] dark:text-[#00C2E0] font-mono mt-1">
+                  <div className="text-sm font-bold font-mono text-primary dark:text-secondary mt-1">
                     Bs. {Number(viewServicio.precio).toFixed(2)}
                   </div>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                  <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 font-semibold flex items-center gap-1">
-                    <Clock size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                    Duración
+                <div className="col-span-2 p-3 rounded-sm border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg">
+                  <div className="text-micro text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Clock size={10} className="text-primary" />
+                    Duración Estimada
                   </div>
-                  <div className="text-xs font-bold text-[#0840A8] dark:text-white font-mono mt-1">
+                  <div className="text-small font-bold font-mono text-primary-dark dark:text-white mt-1">
                     {viewServicio.duracion_estimada_minutos} minutos
                   </div>
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
-                <div className="text-[10px] text-[#0077D4] dark:text-blue-200/70 font-semibold flex items-center gap-1 mb-1">
-                  <FileText size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
-                  Descripción del Procedimiento
+              <div className="p-3 rounded-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-dark-surface">
+                <div className="text-micro text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
+                  <FileText size={10} className="text-primary" />
+                  Descripción
                 </div>
-                <p className="text-xs text-[#0077D4] dark:text-blue-100/90 leading-relaxed font-medium">
+                <p className="text-small text-slate-600 dark:text-slate-300 leading-relaxed">
                   {viewServicio.descripcion || 'Sin descripción adicional registrada para este servicio.'}
                 </p>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-white dark:bg-[#0840A8]/20 flex items-center justify-end">
+            <div className="p-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex items-center justify-end">
               <button
                 onClick={() => setViewServicio(null)}
-                className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white text-xs font-bold shadow-md cursor-pointer hover:opacity-90"
+                className="px-4 py-1.5 rounded bg-white dark:bg-dark-surface hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold border border-slate-300 dark:border-slate-700 transition-colors cursor-pointer"
               >
                 Cerrar
               </button>

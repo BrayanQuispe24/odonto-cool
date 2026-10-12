@@ -8,7 +8,19 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     react(),
-    babel({ presets: [reactCompilerPreset()] })
+    babel({ 
+      presets: [reactCompilerPreset()],
+      exclude: [/node_modules\/@fullcalendar/]
+    })
   ],
+  optimizeDeps: {
+    include: [
+      '@fullcalendar/react', 
+      '@fullcalendar/core', 
+      '@fullcalendar/daygrid', 
+      '@fullcalendar/timegrid', 
+      '@fullcalendar/interaction'
+    ]
+  }
 })
 

@@ -58,19 +58,19 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-[1000] bg-[#001433]/90 dark:bg-[#001026]/90 backdrop-blur-xl border-b border-[#00C2E0]/30 transition-all duration-300 ${
-        isScrolled ? 'shadow-[0_12px_40px_rgba(0,10,36,0.6)] bg-[#000E24]/95 border-b border-[#00C2E0]/45' : 'shadow-[0_8px_32px_rgba(0,16,41,0.4)]'
+      className={`fixed top-0 left-0 w-full z-[1000] bg-[#001433]/90 dark:bg-[#001026]/90 backdrop-blur-xl border-b border-secondary/30 transition-all duration-300 ${
+        isScrolled ? 'shadow-[0_12px_40px_rgba(0,10,36,0.6)] bg-[#000E24]/95 border-b border-secondary/45' : 'shadow-[0_8px_32px_rgba(0,16,41,0.4)]'
       }`}
     >
 
       <div
-        className="absolute bottom-0 left-0 h-[3px] bg-gradient-to-r from-[#0077D4] to-[#00C2E0] transition-[width] duration-100 ease-linear z-[1001]"
+        className="absolute bottom-0 left-0 h-[3px] bg-gradient-to-r from-primary to-secondary transition-[width] duration-100 ease-linear z-[1001]"
         style={{ width: `${scrollProgress}%` }}
       />
 
       <div className="max-w-[1440px] mx-auto px-6 lg:px-10 h-[68px] flex items-center justify-between">
         <a href="#hero" className="flex items-center gap-3 font-display text-2xl font-extrabold text-white shrink-0">
-          <div className="p-1 rounded-xl bg-white/10 shadow-sm border border-[#00C2E0]/30 backdrop-blur-xs">
+          <div className="p-1 rounded-xl bg-white/10 shadow-sm border border-secondary/30 backdrop-blur-xs">
             <img 
               src="/assets/images/image.png" 
               alt="ODONTO COOL Logo" 
@@ -89,8 +89,8 @@ export const Navbar: React.FC<NavbarProps> = ({
                 href={link.href}
                 className={`text-sm whitespace-nowrap py-1.5 relative transition-colors duration-200 ${
                   isActive
-                    ? 'text-[#00C2E0] font-extrabold'
-                    : 'text-slate-200 hover:text-[#00C2E0] font-bold'
+                    ? 'text-secondary font-extrabold'
+                    : 'text-slate-200 hover:text-secondary font-bold'
                 }`}
               >
                 {link.label}
@@ -106,28 +106,23 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isAuthenticated ? (
             <>
               <Link to="/dashboard">
-                <Button variant="light" size="md" className="border-2 border-[#00C2E0]/40 font-extrabold text-white bg-white/10 hover:bg-white/20 hover:border-[#00C2E0]">
+                <Button variant="secondary" className="border-secondary/40 text-white bg-white/10 hover:bg-white/20 font-semibold">
                   Dashboard 👤
                 </Button>
               </Link>
-              <Button variant="dark" size="md" onClick={logout}>
+              <Button variant="dark" onClick={logout}>
                 Salir
               </Button>
             </>
           ) : (
             <Link to="/login">
-              <Button variant="light" size="md" className="border-2 border-[#00C2E0]/40 font-extrabold text-white bg-white/10 hover:bg-white/20 hover:border-[#00C2E0]">
+              <Button variant="secondary" className="border-secondary/40 text-white bg-white/10 hover:bg-white/20 font-semibold">
                 Acceso 🔑
               </Button>
             </Link>
           )}
 
-          <Button
-            variant="teal"
-            size="md"
-            onClick={onOpenModal}
-            className="shadow-lg shadow-[#0077D4]/40 hover:shadow-xl hover:shadow-[#00C2E0]/50 hover:-translate-y-0.5 transition-all ring-2 ring-[#0077D4]/30"
-          >
+          <Button onClick={onOpenModal}>
             Agendar Cita ➔
           </Button>
         </div>

@@ -23,9 +23,6 @@ export const FacilitiesSection: React.FC = () => {
         {/* Section Header */}
         <div className="reveal flex flex-col md:flex-row items-start md:items-end justify-between gap-4 sm:gap-5 mb-6 sm:mb-8">
           <div>
-            <Badge variant="mint" className="mb-3">
-              🏥 Tour Virtual
-            </Badge>
             <h2 className="font-display text-2xl sm:text-4xl lg:text-[3.2rem] font-extrabold text-white mb-2 tracking-tight leading-tight">
               Nuestras Instalaciones & Tecnología Odontológica
             </h2>
@@ -38,14 +35,14 @@ export const FacilitiesSection: React.FC = () => {
           <div className="flex items-center gap-3 shrink-0 self-end md:self-auto">
             <button
               onClick={scrollLeft}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#0840A8] text-white border border-[#00C2E0]/25 flex items-center justify-center text-base sm:text-lg cursor-pointer hover:bg-[#0077D4] hover:border-[#0077D4] transition-all"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#0840A8] text-white border border-secondary/25 flex items-center justify-center text-base sm:text-lg cursor-pointer hover:bg-[#0077D4] hover:border-primary transition-all"
               aria-label="Anterior"
             >
               ←
             </button>
             <button
               onClick={scrollRight}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#0840A8] text-white border border-[#00C2E0]/25 flex items-center justify-center text-base sm:text-lg cursor-pointer hover:bg-[#0077D4] hover:border-[#0077D4] transition-all"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#0840A8] text-white border border-secondary/25 flex items-center justify-center text-base sm:text-lg cursor-pointer hover:bg-[#0077D4] hover:border-primary transition-all"
               aria-label="Siguiente"
             >
               →
@@ -63,7 +60,7 @@ export const FacilitiesSection: React.FC = () => {
             {FACILITIES.map((facility) => (
               <div
                 key={facility.id}
-                className="group min-w-[260px] sm:min-w-[320px] max-w-[320px] bg-[#002D5E] rounded-2xl overflow-hidden border border-[#00C2E0]/20 hover:-translate-y-1 hover:border-[#00C2E0] hover:shadow-lg transition-all duration-300 shrink-0"
+                className="group min-w-[260px] sm:min-w-[320px] max-w-[320px] bg-dark-surface rounded-2xl overflow-hidden border border-secondary/20 hover:-translate-y-1 hover:border-secondary hover:shadow-lg transition-all duration-300 shrink-0"
               >
                 <div className="h-[180px] sm:h-[220px] overflow-hidden">
                   <img

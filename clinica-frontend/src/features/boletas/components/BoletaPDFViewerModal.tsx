@@ -18,23 +18,25 @@ export const BoletaPDFViewerModal: React.FC<BoletaPDFViewerModalProps> = ({
   if (!isOpen || !boleta) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 rounded-2xl shadow-2xl shadow-[#001C3D]/90 w-full max-w-5xl overflow-hidden text-[#0840A8] dark:text-white flex flex-col h-[90vh]">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+      <div className="bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-800 rounded-sm shadow-xl w-full max-w-5xl overflow-hidden text-slate-800 dark:text-slate-200 flex flex-col h-[90vh]">
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-between bg-gradient-to-r from-[#0840A8] via-[#0077D4] to-[#00C2E0] text-white shrink-0">
+        <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-dark-surface shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-white/15 border border-white/20 text-[#0077D4] dark:text-[#00C2E0]">
+            <div className="p-2 rounded-sm bg-[#0077D4]/10 dark:bg-[#0077D4]/20 text-[#0077D4]">
               <FileText size={22} />
             </div>
             <div>
-              <h3 className="text-base font-bold flex items-center gap-2 text-[#0840A8] dark:text-white">
+              <h3 className="text-base font-bold flex items-center gap-2 text-primary-dark dark:text-white">
                 <span>Vista Previa de Boleta en PDF (React PDF)</span>
               </h3>
-              <p className="text-xs text-[#0077D4] dark:text-blue-100/90 font-mono">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                 Boleta Nº {boleta.numero_boleta} | Paciente:{' '}
-                {boleta.cita?.paciente
+                {boleta.paciente
+                  ? `${boleta.paciente.nombre} ${boleta.paciente.apellido}`
+                  : boleta.cita?.paciente
                   ? `${boleta.cita.paciente.nombre} ${boleta.cita.paciente.apellido}`
-                  : 'Paciente General'}
+                  : boleta.cita?.nombre_paciente_unregistered || 'Paciente General'}
               </p>
             </div>
           </div>
@@ -43,7 +45,7 @@ export const BoletaPDFViewerModal: React.FC<BoletaPDFViewerModalProps> = ({
             <PDFDownloadLink
               document={<BoletaPDFDocument boleta={boleta} />}
               fileName={`Boleta-${boleta.numero_boleta}.pdf`}
-              className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-[#0840A8] dark:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-md shadow-emerald-500/30"
+              className="px-4 py-2 rounded-sm bg-[#0077D4] hover:bg-[#0840A8] text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
             >
               {({ loading }) => (
                 <>
@@ -55,7 +57,7 @@ export const BoletaPDFViewerModal: React.FC<BoletaPDFViewerModalProps> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white/80 hover:text-[#0840A8] dark:text-white transition-colors cursor-pointer"
+              className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -63,14 +65,14 @@ export const BoletaPDFViewerModal: React.FC<BoletaPDFViewerModalProps> = ({
         </div>
 
         {/* PDF Viewer Container */}
-        <div className="flex-1 bg-slate-900 w-full overflow-hidden p-2">
-          <PDFViewer className="w-full h-full border-0 rounded-xl">
+        <div className="flex-1 bg-slate-200 dark:bg-slate-900 w-full overflow-hidden p-0 sm:p-2 border-y border-slate-200 dark:border-slate-800">
+          <PDFViewer className="w-full h-full border-0 rounded-sm">
             <BoletaPDFDocument boleta={boleta} />
           </PDFViewer>
         </div>
 
         {/* Modal Footer */}
-        <div className="p-3.5 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-between bg-[#0840A8]/20 shrink-0 text-xs text-[#0077D4] dark:text-blue-200/80">
+        <div className="p-4 bg-slate-50 dark:bg-dark-bg flex items-center justify-between shrink-0 text-small text-slate-500 dark:text-slate-400">
           <div>
             Generado con <strong>@react-pdf/renderer</strong> • Listo para imprimir o descargar
           </div>
@@ -78,7 +80,7 @@ export const BoletaPDFViewerModal: React.FC<BoletaPDFViewerModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white text-xs font-semibold cursor-pointer transition-all border border-white/10"
+            className="px-4 py-2 rounded-sm bg-white dark:bg-dark-surface border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-small font-semibold shadow-sm cursor-pointer transition-colors"
           >
             Cerrar Vista Previa
           </button>

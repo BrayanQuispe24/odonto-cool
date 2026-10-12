@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Eye,
   UserX,
+  Filter,
 } from 'lucide-react';
 import type { User } from '../../auth/store/authStore';
 
@@ -106,12 +107,12 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
   const endRecord = Math.min(safeCurrentPage * pageSize, filteredUsers.length);
 
   return (
-    <div className="bg-white dark:bg-[#002D5E] rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-xl shadow-sm dark:shadow-[#001C3D]/50 overflow-hidden transition-all duration-300">
-      {/* ENTERPRISE TOOLBAR */}
-      <div className="p-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-[#0840A8]/20 flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div className="bg-white dark:bg-dark-surface rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-all duration-300">
+      {/* TOOLBAR */}
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-dark-surface flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Search input */}
         <div className="relative flex-1 max-w-lg">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[#0077D4] dark:text-[#00C2E0]">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
             <Search size={15} />
           </div>
           <input
@@ -121,13 +122,13 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            placeholder="Buscar por nombre, correo, empresa o rol..."
-            className="w-full pl-9 pr-8 py-2.5 rounded-xl text-xs font-medium border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+            placeholder="Buscar por nombre, correo, código..."
+            className="w-full pl-9 pr-8 px-2.5 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-[#0077D4] dark:text-blue-200/70 hover:text-[#0840A8] dark:text-white cursor-pointer"
+              className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors"
             >
               <X size={14} />
             </button>
@@ -136,6 +137,10 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 font-bold uppercase tracking-wider whitespace-nowrap">
+            <Filter size={14} />
+            <span>Filtros:</span>
+          </div>
           {/* Role Filter */}
           <select
             value={selectedRole}
@@ -143,13 +148,11 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
               setSelectedRole(e.target.value);
               setCurrentPage(1);
             }}
-            className="bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-semibold px-3 py-2.5 rounded-xl focus:outline-none focus:border-[#00C2E0] cursor-pointer transition-all"
+            className="px-2.5 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer min-w-[140px]"
           >
-            <option value="all" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-              Todos los Roles
-            </option>
+            <option value="all">Todos los Roles</option>
             {uniqueRoles.map((role) => (
-              <option key={role} value={role} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
+              <option key={role} value={role}>
                 {role}
               </option>
             ))}
@@ -162,52 +165,44 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
               setSelectedStatus(e.target.value);
               setCurrentPage(1);
             }}
-            className="bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-semibold px-3 py-2.5 rounded-xl focus:outline-none focus:border-[#00C2E0] cursor-pointer transition-all"
+            className="px-2.5 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all cursor-pointer min-w-[140px]"
           >
-            <option value="all" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-              Todos los Estados
-            </option>
-            <option value="active" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-              Activo
-            </option>
-            <option value="suspended" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
-              Suspendido
-            </option>
+            <option value="all">Todos los Estados</option>
+            <option value="active">Activo</option>
+            <option value="suspended">Suspendido</option>
           </select>
         </div>
       </div>
 
-      {/* ENTERPRISE DATA TABLE (DESKTOP VIEW) */}
+      {/* DESKTOP DATA TABLE */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#E5F7FF] dark:bg-[#0840A8]/40 border-b border-[#0840A8]/15 dark:border-[#0840A8]/60 text-[11px] font-extrabold uppercase tracking-wider text-[#0077D4] dark:text-blue-100 select-none">
-              <th className="py-3.5 px-4 w-10 text-center">
+            <tr className="bg-slate-50 dark:bg-dark-bg border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 select-none">
+              <th className="py-3 px-4 w-10 text-center">
                 <input
                   type="checkbox"
                   checked={allPaginatedSelected}
                   onChange={handleSelectAll}
-                  className="rounded border-[#0840A8]/15 dark:border-[#0077D4]/60 text-[#0077D4] focus:ring-[#00C2E0] cursor-pointer"
+                  className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-secondary cursor-pointer"
                 />
               </th>
-              <th className="py-3.5 px-4">USUARIO / CORREO</th>
-              <th className="py-3.5 px-4">ROL ASIGNADO</th>
-              <th className="py-3.5 px-4">CÓDIGO / ID</th>
-              <th className="py-3.5 px-4">ESTADO</th>
-              <th className="py-3.5 px-4 text-right">ACCIONES</th>
+              <th className="py-3 px-4">USUARIO / CORREO</th>
+              <th className="py-3 px-4">ROL ASIGNADO</th>
+              <th className="py-3 px-4">CÓDIGO / ID</th>
+              <th className="py-3 px-4">ESTADO</th>
+              <th className="py-3 px-4 text-right">ACCIONES</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#0840A8]/15 dark:divide-[#0840A8]/30 text-xs text-[#0840A8] dark:text-blue-50 font-medium">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-small text-slate-700 dark:text-slate-300 font-medium">
             {paginatedUsers.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-12 text-center text-[#0077D4] dark:text-blue-200/70 font-medium">
-                  No se encontraron usuarios que coincidan con la búsqueda.
+                <td colSpan={6} className="py-8 text-center text-slate-500 font-medium">
+                  No se encontraron usuarios registrados.
                 </td>
               </tr>
             ) : (
               paginatedUsers.map((user) => {
-                const isAdmin = user.rol?.nombre === 'Administrador';
-                const isDoctor = user.rol?.nombre === 'Doctor';
                 const isSelected = selectedUserIds.includes(user.id);
                 const initials = getInitials(user.email);
                 const userName = user.name || getNameFromEmail(user.email);
@@ -217,32 +212,32 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
                     key={user.id}
                     className={`transition-colors duration-200 ${
                       isSelected
-                        ? 'bg-[#0077D4]/30'
-                        : 'bg-white dark:bg-[#002D5E] hover:bg-[#E5F7FF] dark:hover:bg-[#0840A8]/30'
+                        ? 'bg-blue-50 dark:bg-blue-900/20'
+                        : 'bg-white dark:bg-dark-surface hover:bg-slate-50 dark:hover:bg-dark-bg/50'
                     }`}
                   >
                     {/* CHECKBOX */}
-                    <td className="py-3.5 px-4 text-center">
+                    <td className="py-3 px-4 text-center">
                       <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => handleSelectRow(user.id)}
-                        className="rounded border-[#0840A8]/15 dark:border-[#0077D4]/60 text-[#0077D4] focus:ring-[#00C2E0] cursor-pointer"
+                        className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-secondary cursor-pointer"
                       />
                     </td>
 
                     {/* USUARIO / CORREO */}
-                    <td className="py-3.5 px-4">
+                    <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-[#0077D4]/30 border border-[#0840A8]/15 dark:border-[#00C2E0]/40 text-[#0077D4] dark:text-[#00C2E0] font-extrabold text-xs flex items-center justify-center shrink-0">
+                        <div className="w-9 h-9 rounded-sm bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
                           {initials}
                         </div>
                         <div>
-                          <div className="font-bold text-[#0840A8] dark:text-white text-xs">
+                          <div className="font-bold text-primary-dark dark:text-white text-small">
                             {userName}
                           </div>
-                          <div className="text-[11px] text-[#0077D4] dark:text-blue-200/70 font-mono flex items-center gap-1">
-                            <Mail size={12} className="text-[#0077D4] dark:text-[#00C2E0] shrink-0" />
+                          <div className="text-xs text-slate-500 font-mono flex items-center gap-1">
+                            <Mail size={12} className="text-slate-400 shrink-0" />
                             <span>{user.email}</span>
                           </div>
                         </div>
@@ -250,59 +245,50 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
                     </td>
 
                     {/* ROL ASIGNADO */}
-                    <td className="py-3.5 px-4">
-                      <span
-                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase tracking-wider ${
-                          isAdmin
-                            ? 'bg-purple-950/80 text-purple-200 border border-purple-500/50'
-                            : isDoctor
-                            ? 'bg-[#0840A8]/50 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/50'
-                            : 'bg-emerald-950/80 text-emerald-200 border border-emerald-500/50'
-                        }`}
-                      >
+                    <td className="py-3 px-4">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-tiny font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                         {user.rol?.nombre || 'USUARIO'}
                       </span>
                     </td>
 
                     {/* CÓDIGO / ID */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
+                    <td className="py-3 px-4">
+                      <span className="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">
                         {user.codigo_usuario || `USR-${user.id}`}
                       </span>
                     </td>
 
                     {/* ESTADO */}
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <td className="py-3 px-4">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-tiny font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         ACTIVO
                       </span>
                     </td>
 
                     {/* ACCIONES */}
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => (onView ? onView(user) : onEdit(user))}
                           title="Ver detalle"
-                          className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white border border-white/10 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-sm text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                         >
                           <Eye size={14} />
                         </button>
                         <button
                           onClick={() => onEdit(user)}
                           title="Editar usuario"
-                          className="p-1.5 rounded-lg bg-[#0077D4]/30 hover:bg-[#0077D4]/50 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-sm text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors cursor-pointer"
                         >
                           <Edit2 size={14} />
                         </button>
                         <button
                           onClick={() => onDelete(user)}
-                          title="Suspender / Eliminar usuario"
-                          className="px-2.5 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 transition-colors cursor-pointer flex items-center gap-1"
+                          title="Suspender usuario"
+                          className="p-1.5 rounded-sm text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 transition-colors cursor-pointer"
                         >
-                          <UserX size={13} />
-                          <span>Suspender</span>
+                          <UserX size={14} />
                         </button>
                       </div>
                     </td>
@@ -315,21 +301,21 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
       </div>
 
       {/* MOBILE CARDS VIEW */}
-      <div className="block md:hidden p-4 space-y-3">
+      <div className="block md:hidden p-4 space-y-3 bg-slate-50 dark:bg-slate-900">
         {/* Select all bar on mobile */}
         {paginatedUsers.length > 0 && (
-          <div className="flex items-center justify-between pb-2 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 text-xs font-semibold text-[#0077D4] dark:text-blue-100">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-400">
             <label className="flex items-center gap-2 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={allPaginatedSelected}
                 onChange={handleSelectAll}
-                className="rounded border-[#0840A8]/15 dark:border-[#0077D4]/60 text-[#0077D4] focus:ring-[#00C2E0]"
+                className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-secondary"
               />
               <span>Seleccionar todos ({paginatedUsers.length})</span>
             </label>
             {selectedUserIds.length > 0 && (
-              <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white">
+              <span className="text-small font-bold px-2 py-0.5 rounded-sm bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
                 {selectedUserIds.length} selec.
               </span>
             )}
@@ -337,13 +323,11 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
         )}
 
         {paginatedUsers.length === 0 ? (
-          <div className="py-8 text-center text-[#0077D4] dark:text-blue-200/70 text-xs font-medium">
-            No se encontraron usuarios que coincidan con la búsqueda.
+          <div className="py-8 text-center text-slate-500 text-xs font-medium">
+            No se encontraron usuarios registrados.
           </div>
         ) : (
           paginatedUsers.map((user) => {
-            const isAdmin = user.rol?.nombre === 'Administrador';
-            const isDoctor = user.rol?.nombre === 'Doctor';
             const isSelected = selectedUserIds.includes(user.id);
             const initials = getInitials(user.email);
             const userName = user.name || getNameFromEmail(user.email);
@@ -351,79 +335,72 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
             return (
               <div
                 key={user.id}
-                className={`p-4 rounded-xl border transition-all duration-200 ${
+                className={`p-4 rounded-sm border transition-all duration-200 ${
                   isSelected
-                    ? 'bg-[#0077D4]/30 border-[#00C2E0] shadow-sm'
-                    : 'bg-[#F4F9FF] dark:bg-[#001C3D] border-[#0840A8]/15 dark:border-[#0077D4]/40'
-                }`}
+                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800/50'
+                    : 'bg-white dark:bg-dark-surface border-slate-200 dark:border-slate-800'
+                } space-y-3`}
               >
                 {/* Header: Checkbox + Avatar + User Info + Status */}
-                <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => handleSelectRow(user.id)}
-                      className="rounded border-[#0840A8]/15 dark:border-[#0077D4]/60 text-[#0077D4] focus:ring-[#00C2E0] cursor-pointer shrink-0 mt-0.5"
+                      className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-secondary cursor-pointer shrink-0 mt-1"
                     />
-                    <div className="w-9 h-9 rounded-xl bg-[#0077D4]/30 border border-[#0840A8]/15 dark:border-[#00C2E0]/40 text-[#0077D4] dark:text-[#00C2E0] font-extrabold text-xs flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-sm bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-sm flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
                       {initials}
                     </div>
                     <div>
-                      <h4 className="font-bold text-[#0840A8] dark:text-white text-sm leading-tight">
+                      <h4 className="font-bold text-primary-dark dark:text-white text-sm">
                         {userName}
                       </h4>
-                      <span className="inline-block mt-0.5 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#0077D4]/40">
+                      <p className="text-xs font-mono font-medium text-slate-500">
                         {user.codigo_usuario || `USR-${user.id}`}
-                      </span>
+                      </p>
                     </div>
                   </div>
-
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 shrink-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    ACTIVO
-                  </span>
                 </div>
 
                 {/* Info Rows */}
-                <div className="space-y-1.5 pt-2 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 text-xs">
-                  <div className="flex items-center justify-between text-[#0077D4] dark:text-blue-100">
-                    <span className="text-[11px] font-semibold text-[#0077D4] dark:text-blue-200/70">Correo:</span>
-                    <span className="font-mono text-[#0840A8] dark:text-white truncate max-w-[200px] flex items-center gap-1">
-                      <Mail size={12} className="text-[#0077D4] dark:text-[#00C2E0] shrink-0" />
+                <div className="space-y-1.5 pt-2 border-t border-slate-200 dark:border-slate-800 text-xs">
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                    <span className="font-semibold">Correo:</span>
+                    <span className="font-mono text-primary-dark dark:text-white truncate max-w-[180px] flex items-center gap-1">
+                      <Mail size={12} className="text-slate-400 shrink-0" />
                       {user.email}
                     </span>
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-[#0077D4] dark:text-blue-200/70">Rol:</span>
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider ${
-                        isAdmin
-                          ? 'bg-purple-950/80 text-purple-200 border border-purple-500/50'
-                          : isDoctor
-                          ? 'bg-[#0840A8]/50 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/50'
-                          : 'bg-emerald-950/80 text-emerald-200 border border-emerald-500/50'
-                      }`}
-                    >
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                    <span className="font-semibold">Estado:</span>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-tiny font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      ACTIVO
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-slate-600 dark:text-slate-400">
+                    <span className="font-semibold">Rol:</span>
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-tiny font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                       {user.rol?.nombre || 'USUARIO'}
                     </span>
                   </div>
                 </div>
 
                 {/* Actions Footer */}
-                <div className="grid grid-cols-3 gap-1.5 pt-3 mt-3 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50">
+                <div className="grid grid-cols-3 gap-1.5 pt-3 border-t border-slate-200 dark:border-slate-800">
                   <button
                     onClick={() => (onView ? onView(user) : onEdit(user))}
-                    className="w-full py-1.5 px-1 rounded-lg bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white border border-white/10 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors cursor-pointer whitespace-nowrap overflow-hidden"
+                    className="w-full py-1.5 px-1 rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 text-small font-semibold flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                   >
-                    <Eye size={13} className="shrink-0 text-[#0077D4] dark:text-[#00C2E0]" />
+                    <Eye size={13} className="shrink-0 text-slate-500" />
                     <span className="truncate">Ver</span>
                   </button>
 
                   <button
                     onClick={() => onEdit(user)}
-                    className="w-full py-1.5 px-1 rounded-lg bg-[#0077D4]/30 hover:bg-[#0077D4]/50 text-[#0077D4] dark:text-[#00C2E0] border border-[#0840A8]/15 dark:border-[#00C2E0]/40 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors cursor-pointer whitespace-nowrap overflow-hidden"
+                    className="w-full py-1.5 px-1 rounded-sm border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-small font-semibold flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap hover:bg-emerald-100 transition-colors"
                   >
                     <Edit2 size={13} className="shrink-0" />
                     <span className="truncate">Editar</span>
@@ -431,7 +408,7 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
 
                   <button
                     onClick={() => onDelete(user)}
-                    className="w-full py-1.5 px-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors cursor-pointer whitespace-nowrap overflow-hidden"
+                    className="w-full py-1.5 px-1 rounded-sm border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 text-small font-semibold flex items-center justify-center gap-1 cursor-pointer whitespace-nowrap hover:bg-rose-100 transition-colors"
                   >
                     <UserX size={13} className="shrink-0" />
                     <span className="truncate">Suspender</span>
@@ -443,43 +420,42 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
         )}
       </div>
 
-      {/* FOOTER */}
-      <div className="p-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 bg-[#0840A8]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-[#0077D4] dark:text-blue-200/80">
+      {/* FOOTER PAGINATION */}
+      <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-dark-bg flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
         <div>
-          Mostrando <strong className="text-[#0840A8] dark:text-white font-bold">{filteredUsers.length === 0 ? 0 : startRecord}</strong> -{' '}
-          <strong className="text-[#0840A8] dark:text-white font-bold">{endRecord}</strong> de{' '}
-          <strong className="text-[#0840A8] dark:text-white font-bold">{filteredUsers.length}</strong> registros
+          Mostrando <strong>{filteredUsers.length === 0 ? 0 : startRecord}</strong> -{' '}
+          <strong>{endRecord}</strong> de <strong>{filteredUsers.length}</strong> registros
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
             disabled={safeCurrentPage === 1}
-            className="p-1.5 rounded-lg border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white disabled:opacity-40 cursor-pointer"
+            className="p-1 rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 disabled:opacity-40 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           >
-            <ChevronLeft size={15} />
+            <ChevronLeft size={16} />
           </button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+          
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <button
-              key={pageNum}
-              onClick={() => setCurrentPage(pageNum)}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                safeCurrentPage === pageNum
-                  ? 'bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white shadow-md shadow-[#0077D4]/30'
-                  : 'bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0077D4] dark:text-blue-100 hover:text-white'
+              key={p}
+              onClick={() => setCurrentPage(p)}
+              className={`min-w-[28px] h-7 px-1.5 rounded-sm text-xs font-bold transition-all cursor-pointer ${
+                safeCurrentPage === p
+                  ? 'bg-[#0077D4] text-white border border-[#0077D4]'
+                  : 'bg-white dark:bg-dark-surface border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              {pageNum}
+              {p}
             </button>
           ))}
-
+          
           <button
             onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
             disabled={safeCurrentPage === totalPages}
-            className="p-1.5 rounded-lg border border-[#0840A8]/15 dark:border-[#0077D4]/40 bg-[#F4F9FF] dark:bg-[#001C3D] text-[#0840A8] dark:text-white disabled:opacity-40 cursor-pointer"
+            className="p-1 rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 disabled:opacity-40 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
           >
-            <ChevronRight size={15} />
+            <ChevronRight size={16} />
           </button>
         </div>
       </div>

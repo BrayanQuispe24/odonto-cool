@@ -68,13 +68,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
       {/* Centered 3D Animated Hero Header Container */}
       <div className="min-h-[calc(100vh-70px)] pt-24 pb-12 flex flex-col items-center justify-center relative z-10">
         <div className="reveal reveal-3d max-w-[1200px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center my-auto">
-          {/* Mint Badge */}
-          <div className="reveal mb-4 sm:mb-5">
-            <Badge variant="mint">
-              ✦ Odontología Digital & Estética Dental de Vanguardia
-            </Badge>
-          </div>
-
           {/* Hero Title */}
           <h1 className="reveal font-display text-2xl sm:text-4xl md:text-5xl lg:text-[4.4rem] font-extrabold text-white max-w-[880px] mb-4 sm:mb-6 leading-[1.15] sm:leading-[1.1] tracking-tight drop-shadow-md">
             Diseñamos tu mejor sonrisa con precisión digital y sin dolor
@@ -106,53 +99,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
           {/* Radial Cyan Glow Aura */}
           <div className="absolute -inset-4 w-full h-full glow-cyan rounded-3xl blur-3xl opacity-80 pointer-events-none -z-10" />
           
-          {/* Floating Glass Badge 1 - Top Right */}
-          <div className="hidden md:flex absolute top-6 right-6 z-10 bg-white/95 dark:bg-[#002D5E]/95 backdrop-blur-md border border-[#00C2E0]/30 p-3.5 px-5 rounded-2xl shadow-[0_16px_36px_rgba(0,45,94,0.2)] items-center gap-3 animate-float hover:scale-105 transition-all">
-            <div className="w-[38px] h-[38px] rounded-xl bg-gradient-to-br from-[#0077D4] to-[#00C2E0] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-md">
-              ✦
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-extrabold text-white leading-tight">
-                99.5% Éxito Clínico
-              </div>
-              <div className="text-xs font-bold text-[#002D5E] dark:text-[#E5F7FF]">
-                Implantes & Ortodoncia Digital
-              </div>
-            </div>
-          </div>
-
-          {/* Floating Glass Badge 2 - Bottom Left */}
-          <div className="hidden md:flex absolute bottom-6 left-6 z-10 bg-white/95 dark:bg-[#002D5E]/95 backdrop-blur-md border border-[#00C2E0]/30 p-3.5 px-5 rounded-2xl shadow-[0_16px_36px_rgba(0,45,94,0.2)] items-center gap-3 animate-float-reverse hover:scale-105 transition-all">
-            <div className="w-[38px] h-[38px] rounded-xl bg-gradient-to-br from-[#0077D4] to-[#00C2E0] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-md">
-              ★
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-extrabold text-white leading-tight">
-                4.9 / 5.0 en Google
-              </div>
-              <div className="text-xs font-bold text-[#002D5E] dark:text-[#E5F7FF]">
-                +520 Pacientes Satisfechos
-              </div>
-            </div>
-          </div>
-
-          {/* Floating Glass Badge 3 - Bottom Right */}
-          <div className="hidden md:flex absolute bottom-6 right-6 z-10 bg-white/95 dark:bg-[#002D5E]/95 backdrop-blur-md border border-[#00C2E0]/30 p-3.5 px-5 rounded-2xl shadow-[0_16px_36px_rgba(0,45,94,0.2)] items-center gap-3 animate-float hover:scale-105 transition-all">
-            <div className="w-[38px] h-[38px] rounded-xl bg-gradient-to-br from-[#0840A8] to-[#0077D4] text-white flex items-center justify-center font-bold text-lg shrink-0 shadow-md">
-              ✓
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-extrabold text-white leading-tight">
-                0% Dolor Garantizado
-              </div>
-              <div className="text-xs font-bold text-[#002D5E] dark:text-[#E5F7FF]">
-                Anestesia Computarizada
-              </div>
-            </div>
-          </div>
 
           {/* Image Container */}
-          <div className="w-full max-w-[1000px] h-[260px] sm:h-[360px] md:h-[460px] lg:h-[500px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_24px_60px_rgba(8,64,168,0.18)] border border-[#00C2E0]/30">
+          <div className="w-full max-w-[1000px] h-[260px] sm:h-[360px] md:h-[460px] lg:h-[500px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_24px_60px_rgba(8,64,168,0.18)] border border-secondary/30">
             <img
               src="/assets/images/fondolanding.jpeg"
               alt="Instalaciones de ODONTO COOL"
@@ -161,67 +110,49 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
           </div>
         </div>
 
-        {/* Hero Stats Grid */}
+        {/* Hero Stats Grid - Enterprise Professional Redesign */}
         <div
           ref={metricsRef}
-          className="reveal grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 bg-[#002D5E] p-5 sm:p-8 px-6 sm:px-10 rounded-2xl sm:rounded-3xl shadow-[0_12px_32px_rgba(8,64,168,0.12)] border border-[#00C2E0]/30 mt-8 sm:mt-12 w-full text-left transition-colors duration-300"
+          className="reveal mt-12 sm:mt-16 w-full max-w-[1020px] mx-auto"
         >
-          {/* Stat 1 */}
-          <div className="flex items-center gap-3.5 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0077D4]/15 text-[#00C2E0] flex items-center justify-center text-lg sm:text-xl shrink-0 font-bold">
-              🏥
-            </div>
-            <div>
-              <div className="font-display text-xl sm:text-2xl font-extrabold text-white leading-tight">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-0 md:divide-x divide-secondary/20 border-y border-secondary/20 py-8">
+            {/* Stat 1 */}
+            <div className="flex flex-col items-center justify-center text-center px-4">
+              <div className="font-display text-3xl sm:text-4xl font-light text-white mb-2 tracking-tight">
                 {patientsCount.toLocaleString()}+
               </div>
-              <div className="text-xs font-bold text-[#00C2E0] dark:text-[#E5F7FF]">
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
                 Pacientes Atendidos
               </div>
             </div>
-          </div>
 
-          {/* Stat 2 */}
-          <div className="flex items-center gap-3.5 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0077D4]/15 text-[#00C2E0] flex items-center justify-center text-lg sm:text-xl shrink-0 font-bold">
-              ⭐
-            </div>
-            <div>
-              <div className="font-display text-xl sm:text-2xl font-extrabold text-white leading-tight">
+            {/* Stat 2 */}
+            <div className="flex flex-col items-center justify-center text-center px-4">
+              <div className="font-display text-3xl sm:text-4xl font-light text-white mb-2 tracking-tight">
                 {satisfactionCount}%
               </div>
-              <div className="text-xs font-bold text-[#00C2E0] dark:text-[#E5F7FF]">
-                Satisfacción Clínicamente Comprobada
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
+                Satisfacción Clínica
               </div>
             </div>
-          </div>
 
-          {/* Stat 3 */}
-          <div className="flex items-center gap-3.5 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0077D4]/15 text-[#00C2E0] flex items-center justify-center text-lg sm:text-xl shrink-0 font-bold">
-              👨‍⚕️
-            </div>
-            <div>
-              <div className="font-display text-xl sm:text-2xl font-extrabold text-white leading-tight">
-                {yearsCount}+ Años
+            {/* Stat 3 */}
+            <div className="flex flex-col items-center justify-center text-center px-4">
+              <div className="font-display text-3xl sm:text-4xl font-light text-white mb-2 tracking-tight">
+                {yearsCount}+
               </div>
-              <div className="text-xs font-bold text-[#00C2E0] dark:text-[#E5F7FF]">
-                Especialistas de Nivel Internacional
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
+                Años Experiencia
               </div>
             </div>
-          </div>
 
-          {/* Stat 4 */}
-          <div className="flex items-center gap-3.5 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#0077D4]/15 text-[#00C2E0] flex items-center justify-center text-lg sm:text-xl shrink-0 font-bold">
-              ✨
-            </div>
-            <div>
-              <div className="font-display text-xl sm:text-2xl font-extrabold text-white leading-tight">
-                0% Dolor
+            {/* Stat 4 */}
+            <div className="flex flex-col items-center justify-center text-center px-4">
+              <div className="font-display text-3xl sm:text-4xl font-light text-white mb-2 tracking-tight">
+                0%
               </div>
-              <div className="text-xs font-bold text-[#00C2E0] dark:text-[#E5F7FF]">
-                Sedación & Anestesia Digital
+              <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
+                Dolor & Sedación
               </div>
             </div>
           </div>

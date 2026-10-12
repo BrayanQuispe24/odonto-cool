@@ -2,11 +2,11 @@ import React from 'react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-[#000E24] text-white pt-20 pb-24 border-t border-[#00C2E0]/20 relative" id="faq">
+    <footer className="bg-[#000E24] text-white pt-20 pb-24 border-t border-secondary/20 relative" id="faq">
       <div className="max-w-[1200px] mx-auto px-6">
         {/* Brand Logo & Title Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
-          <div className="p-2 bg-white/10 rounded-2xl border border-[#00C2E0]/30 backdrop-blur-md">
+          <div className="p-2 bg-white/10 rounded-2xl border border-secondary/30 backdrop-blur-md">
             <img 
               src="/assets/images/image.png" 
               alt="ODONTO COOL Logo" 
@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
           </div>
           <div>
             <span className="font-display text-2xl font-extrabold text-white block">ODONTO COOL</span>
-            <span className="text-xs text-[#00C2E0] font-medium">Excelencia & Tecnología Odontológica</span>
+            <span className="text-xs text-secondary font-medium">Excelencia & Tecnología Odontológica</span>
           </div>
         </div>
 
@@ -30,13 +30,13 @@ export const Footer: React.FC = () => {
             © 2026 ODONTO COOL Clínica Odontológica. Todos los derechos reservados. Excelencia en salud oral.
           </div>
           <div className="flex gap-5 font-medium">
-            <a href="#" className="hover:text-[#00C2E0] transition-colors">
+            <a href="#" className="hover:text-secondary transition-colors">
               Privacidad
             </a>
-            <a href="#" className="hover:text-[#00C2E0] transition-colors">
+            <a href="#" className="hover:text-secondary transition-colors">
               Términos Médicos
             </a>
-            <a href="#" className="hover:text-[#00C2E0] transition-colors">
+            <a href="#" className="hover:text-secondary transition-colors">
               Soporte
             </a>
           </div>

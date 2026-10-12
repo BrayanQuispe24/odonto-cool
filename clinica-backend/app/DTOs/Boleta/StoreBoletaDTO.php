@@ -5,7 +5,8 @@ namespace App\DTOs\Boleta;
 class StoreBoletaDTO
 {
     public function __construct(
-        public int $cita_id,
+        public ?int $cita_id,
+        public ?int $paciente_id,
         public ?int $doctor_id,
         public string $fecha_emision,
         public string $numero_boleta,
@@ -30,7 +31,8 @@ class StoreBoletaDTO
             : 'Contado';
 
         return new self(
-            cita_id: (int) $data['cita_id'],
+            cita_id: isset($data['cita_id']) && $data['cita_id'] ? (int) $data['cita_id'] : null,
+            paciente_id: isset($data['paciente_id']) && $data['paciente_id'] ? (int) $data['paciente_id'] : null,
             doctor_id: isset($data['doctor_id']) && $data['doctor_id'] ? (int) $data['doctor_id'] : null,
             fecha_emision: $data['fecha_emision'] ?? date('Y-m-d'),
             numero_boleta: $data['numero_boleta'] ?? ('BOL-' . strtoupper(substr(md5(uniqid()), 0, 6))),

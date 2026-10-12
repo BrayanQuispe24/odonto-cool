@@ -14,9 +14,9 @@ class StoreBoletaAction
     public function execute(StoreBoletaDTO $dto): BoletaServicioPrestado
     {
         return DB::transaction(function () use ($dto) {
-            $cita = Cita::findOrFail($dto->cita_id);
-
-            $doctorId = $dto->doctor_id ?: $cita->doctor_id;
+            $cita = $dto->cita_id ? Cita::find($dto->cita_id) : null;
+            $doctorId = $dto->doctor_id ?: ($cita ? $cita->doctor_id : null);
+            $pacienteId = $dto->paciente_id ?: ($cita ? $cita->paciente_id : null);
 
             $montoComision = $dto->monto_comision_dr !== null
                 ? $dto->monto_comision_dr
@@ -33,6 +33,7 @@ class StoreBoletaAction
 
             $boleta = BoletaServicioPrestado::create([
                 'cita_id' => $dto->cita_id,
+                'paciente_id' => $pacienteId,
                 'doctor_id' => $doctorId,
                 'fecha_emision' => $dto->fecha_emision,
                 'numero_boleta' => $dto->numero_boleta,
@@ -53,6 +54,7 @@ class StoreBoletaAction
                     'servicio_id' => $detalle['servicio_id'],
                     'diente_id' => isset($detalle['diente_id']) && $detalle['diente_id'] ? $detalle['diente_id'] : null,
                     'descripcion' => $detalle['descripcion'] ?? null,
+                    'precio_unitario' => isset($detalle['precio_unitario']) ? (float) $detalle['precio_unitario'] : null,
                     'descuento' => isset($detalle['descuento']) ? (float) $detalle['descuento'] : 0,
                 ]);
             }

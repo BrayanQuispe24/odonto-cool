@@ -412,26 +412,26 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
   return (
     <div
       ref={containerRef}
-      className={`bg-[#F4F9FF] dark:bg-[#001C3D] select-none transition-all duration-300 flex flex-col overflow-hidden ${
+      className={`bg-light-surface dark:bg-dark-bg select-none transition-all duration-300 flex flex-col overflow-hidden ${
         isFullscreen
           ? 'fixed inset-0 z-[9999] w-screen h-screen rounded-none border-none p-0'
-          : 'relative w-full h-[calc(100vh-230px)] min-h-[620px] rounded-2xl border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-2xl shadow-[#001C3D]/80'
+          : 'relative w-full h-[calc(100vh-230px)] min-h-[620px] rounded-sm border border-slate-200 dark:border-slate-800 shadow-sm'
       }`}
     >
       {/* LOADING OVERLAY */}
       {isLoading && (
-        <div className="absolute inset-0 z-20 bg-[#F4F9FF] dark:bg-[#001C3D]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-[#0840A8] dark:text-white space-y-4">
+        <div className="absolute inset-0 z-20 bg-light-surface dark:bg-dark-bg/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-primary-dark dark:text-white space-y-4">
           <div className="relative w-16 h-16 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border-4 border-[#0840A8]/15 dark:border-[#0077D4]/30 border-t-[#00C2E0] animate-spin" />
-            <Sparkles className="text-[#0077D4] dark:text-[#00C2E0] animate-pulse" size={24} />
+            <div className="absolute inset-0 rounded-full border-4 border-primary-dark/15 dark:border-primary/30 border-t-[#00C2E0] animate-spin" />
+            <Sparkles className="text-primary dark:text-secondary animate-pulse" size={24} />
           </div>
           <div className="text-center space-y-1">
-            <h4 className="text-sm font-bold text-[#0840A8] dark:text-white tracking-wide">Cargando Odontograma 3D</h4>
-            <p className="text-xs text-[#0077D4] dark:text-blue-200/70 font-mono">Procesando modelo tridimensional... {loadProgress}%</p>
+            <h4 className="text-sm font-bold text-primary-dark dark:text-white tracking-wide">Cargando Odontograma 3D</h4>
+            <p className="text-xs text-primary dark:text-blue-200/70 font-mono">Procesando modelo tridimensional... {loadProgress}%</p>
           </div>
-          <div className="w-64 h-2 bg-white dark:bg-[#002D5E] rounded-full overflow-hidden border border-[#0840A8]/15 dark:border-[#00C2E0]/30">
+          <div className="w-64 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-[#0077D4] to-[#00C2E0] transition-all duration-300 rounded-full"
+              className="h-full bg-[#0077D4] transition-all duration-300 rounded-full"
               style={{ width: `${loadProgress}%` }}
             />
           </div>
@@ -440,9 +440,9 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
 
       {/* ERROR OVERLAY */}
       {loadError && (
-        <div className="absolute inset-0 z-20 bg-rose-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-[#0840A8] dark:text-white text-center space-y-3">
+        <div className="absolute inset-0 z-20 bg-rose-950/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-primary-dark dark:text-white text-center space-y-3">
           <AlertCircle className="text-rose-400" size={40} />
-          <h4 className="text-base font-bold text-[#0840A8] dark:text-white">{loadError}</h4>
+          <h4 className="text-base font-bold text-primary-dark dark:text-white">{loadError}</h4>
           <p className="text-xs text-rose-200/80 max-w-md">
             No se pudo leer el archivo GLB en <code className="font-mono text-cyan-300">{modelUrl}</code>.
           </p>
@@ -453,36 +453,36 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
       <div className="absolute top-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
         {/* MODEL TITLE BADGE & PRESET VIEWS */}
         <div className="pointer-events-auto flex flex-wrap items-center gap-2">
-          <div className="px-4 py-2 rounded-xl bg-white dark:bg-[#002D5E]/85 backdrop-blur-md border border-[#0840A8]/15 dark:border-[#00C2E0]/40 text-[#0840A8] dark:text-white flex items-center gap-2 shadow-lg">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#00C2E0] animate-pulse" />
-            <span className="text-xs font-extrabold tracking-wide text-[#0840A8] dark:text-white">
-              {isFullscreen ? 'ODONTOGRAMA 3D - MODO PANTALLA COMPLETA 100%' : 'VISOR 3D ODONTOLÓGICO'}
+          <div className="px-3 py-1.5 rounded-sm bg-white/95 dark:bg-dark-surface/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white flex items-center gap-2 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-[#0077D4] animate-pulse" />
+            <span className="text-tiny font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+              {isFullscreen ? 'ODONTOGRAMA 3D (PANTALLA COMPLETA)' : 'VISOR 3D ODONTOLÓGICO'}
             </span>
           </div>
 
           {/* PRESET VIEW BUTTONS */}
-          <div className="flex items-center gap-1 p-1 rounded-xl bg-white dark:bg-[#002D5E]/85 backdrop-blur-md border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-lg text-xs font-bold text-[#0840A8] dark:text-white">
+          <div className="flex items-center gap-1 p-1 rounded-sm bg-white/95 dark:bg-dark-surface/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm text-small font-semibold text-slate-600 dark:text-slate-300">
             <button
               onClick={() => setPresetView('frontal')}
-              className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-[#0077D4] hover:text-[#0840A8] dark:text-white cursor-pointer transition-all"
+              className="px-2.5 py-1 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             >
               Frontal
             </button>
             <button
               onClick={() => setPresetView('oclusal')}
-              className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-[#0077D4] hover:text-[#0840A8] dark:text-white cursor-pointer transition-all"
+              className="px-2.5 py-1 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
             >
               Oclusal
             </button>
             <button
               onClick={() => setPresetView('lateral_izq')}
-              className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-[#0077D4] hover:text-[#0840A8] dark:text-white cursor-pointer transition-all hidden sm:inline"
+              className="px-2.5 py-1 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors hidden sm:inline"
             >
               Lat. Izq
             </button>
             <button
               onClick={() => setPresetView('lateral_der')}
-              className="px-2.5 py-1.5 rounded-lg bg-white/10 hover:bg-[#0077D4] hover:text-[#0840A8] dark:text-white cursor-pointer transition-all hidden sm:inline"
+              className="px-2.5 py-1 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors hidden sm:inline"
             >
               Lat. Der
             </button>
@@ -490,34 +490,34 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
         </div>
 
         {/* QUICK CONTROLS */}
-        <div className="pointer-events-auto flex items-center gap-1.5 p-1.5 rounded-xl bg-white dark:bg-[#002D5E]/85 backdrop-blur-md border border-[#0840A8]/15 dark:border-[#00C2E0]/30 shadow-lg">
+        <div className="pointer-events-auto flex items-center gap-1 p-1 rounded-sm bg-white/95 dark:bg-dark-surface/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-sm">
           <button
             onClick={rotateModelX90}
             title="Girar modelo 90° (Eje X)"
-            className="p-2.5 rounded-lg bg-white/10 hover:bg-[#0077D4] text-[#0840A8] dark:text-white cursor-pointer transition-all flex items-center gap-1 text-[11px] font-bold"
+            className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors flex items-center gap-1 text-small font-semibold"
           >
             <RefreshCw size={14} />
-            <span className="text-[10px]">Rotar X</span>
+            <span className="text-tiny hidden lg:inline">Rotar X</span>
           </button>
 
           <button
             onClick={rotateModelY90}
             title="Girar modelo 90° (Eje Y)"
-            className="p-2.5 rounded-lg bg-white/10 hover:bg-[#0077D4] text-[#0840A8] dark:text-white cursor-pointer transition-all flex items-center gap-1 text-[11px] font-bold"
+            className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors flex items-center gap-1 text-small font-semibold"
           >
             <Compass size={14} />
-            <span className="text-[10px]">Rotar Y</span>
+            <span className="text-tiny hidden lg:inline">Rotar Y</span>
           </button>
 
-          <div className="w-px h-5 bg-[#00C2E0]/30 mx-0.5" />
+          <div className="w-px h-5 bg-slate-300 dark:bg-slate-600 mx-1" />
 
           <button
             onClick={() => setIsAutoRotate(!isAutoRotate)}
             title={isAutoRotate ? 'Pausar rotación' : 'Activar rotación automática'}
-            className={`p-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`p-1.5 rounded-sm cursor-pointer transition-colors ${
               isAutoRotate
-                ? 'bg-[#0077D4] text-[#0840A8] dark:text-white'
-                : 'bg-white/10 text-[#0077D4] dark:text-blue-200 hover:text-[#0840A8] dark:text-white'
+                ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             {isAutoRotate ? <Pause size={15} /> : <Play size={15} />}
@@ -526,10 +526,10 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
           <button
             onClick={() => setIsWireframe(!isWireframe)}
             title="Alternar estructura alámbrica"
-            className={`p-2.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`p-1.5 rounded-sm cursor-pointer transition-colors ${
               isWireframe
-                ? 'bg-[#00C2E0] text-[#001C3D]'
-                : 'bg-white/10 text-[#0077D4] dark:text-blue-200 hover:text-[#0840A8] dark:text-white'
+                ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Layers size={15} />
@@ -542,26 +542,26 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
               )
             }
             title={`Iluminación: ${lightPreset}`}
-            className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#0077D4] dark:text-[#00C2E0] cursor-pointer transition-all flex items-center gap-1.5 text-[11px] font-bold"
+            className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors flex items-center gap-1.5 text-small font-semibold"
           >
             <Sun size={15} />
-            <span className="capitalize text-[10px] hidden sm:inline">{lightPreset}</span>
+            <span className="capitalize text-tiny hidden sm:inline">{lightPreset}</span>
           </button>
 
           <button
             onClick={handleResetCamera}
             title="Restablecer vista inicial"
-            className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white cursor-pointer transition-all"
+            className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
           >
             <RotateCcw size={15} />
           </button>
 
-          <div className="w-px h-5 bg-[#00C2E0]/30 mx-0.5" />
+          <div className="w-px h-5 bg-slate-300 dark:bg-slate-600 mx-1" />
 
           <button
             onClick={handleZoomIn}
             title="Acercar (+)"
-            className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white cursor-pointer transition-all"
+            className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
           >
             <ZoomIn size={15} />
           </button>
@@ -569,20 +569,20 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
           <button
             onClick={handleZoomOut}
             title="Alejar (-)"
-            className="p-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white cursor-pointer transition-all"
+            className="p-1.5 rounded-sm hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer transition-colors"
           >
             <ZoomOut size={15} />
           </button>
 
-          <div className="w-px h-5 bg-[#00C2E0]/30 mx-0.5" />
+          <div className="w-px h-5 bg-slate-300 dark:bg-slate-600 mx-1" />
 
           {/* FULLSCREEN TOGGLE BUTTON */}
           <button
             onClick={toggleFullscreen}
             title={isFullscreen ? 'Salir de pantalla completa (Esc)' : 'Ver en pantalla completa (100%)'}
-            className="p-2.5 rounded-lg bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white hover:brightness-110 cursor-pointer transition-all shadow-md shadow-[#0077D4]/30 flex items-center gap-1.5 text-xs font-bold"
+            className="px-3 py-1.5 rounded-sm bg-[#0077D4] hover:bg-[#0840A8] text-white cursor-pointer transition-colors shadow-sm flex items-center gap-1.5 text-small font-semibold"
           >
-            {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+            {isFullscreen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
             <span className="hidden md:inline">{isFullscreen ? 'Salir' : 'Pantalla Completa'}</span>
           </button>
         </div>
@@ -597,13 +597,13 @@ export const Odontogram3DViewer: React.FC<Odontogram3DViewerProps> = ({
 
       {/* BOTTOM INFO OVERLAY */}
       <div className="absolute bottom-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
-        <div className="pointer-events-auto px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#002D5E]/85 backdrop-blur-md border border-[#0840A8]/15 dark:border-[#00C2E0]/30 text-xs text-[#0077D4] dark:text-blue-100 flex items-center gap-2 shadow-lg">
-          <Eye size={14} className="text-[#0077D4] dark:text-[#00C2E0]" />
-          <span>Haz clic y arrastra para rotar 360° • Usa 'Rotar X/Y' o los botones de vista Frontal/Oclusal para orientar</span>
+        <div className="pointer-events-auto px-3 py-1.5 rounded-sm bg-white/95 dark:bg-dark-surface/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 text-small text-slate-600 dark:text-slate-300 flex items-center gap-2 shadow-sm">
+          <Eye size={14} className="text-slate-400" />
+          <span>Haz clic y arrastra para rotar 360° • Usa 'Rotar X/Y' o las vistas para orientar</span>
         </div>
 
         {selectedToothName && (
-          <div className="pointer-events-auto px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] text-white text-xs font-bold shadow-md shadow-[#0077D4]/40 flex items-center gap-2">
+          <div className="pointer-events-auto px-4 py-1.5 rounded-sm bg-slate-800 dark:bg-slate-700 text-white text-small font-semibold shadow-sm flex items-center gap-2">
             <span>Pieza Seleccionada: {selectedToothName}</span>
           </div>
         )}

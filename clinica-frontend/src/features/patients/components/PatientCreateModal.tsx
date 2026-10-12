@@ -89,15 +89,15 @@ export const PatientCreateModal: React.FC<PatientCreateModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white dark:bg-[#002D5E] border border-[#0840A8]/15 dark:border-[#00C2E0]/30 rounded-2xl shadow-2xl shadow-[#001C3D]/80 w-full max-w-lg overflow-hidden text-[#0840A8] dark:text-white flex flex-col max-h-[90vh]">
-        <div className="px-6 py-4 border-b border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-between bg-gradient-to-r from-[#0840A8] to-[#0077D4]">
-          <h3 className="text-base font-bold flex items-center gap-2 text-[#0840A8] dark:text-white">
-            <UserPlus className="text-[#0077D4] dark:text-[#00C2E0]" size={18} />
+      <div className="bg-white dark:bg-dark-surface border border-primary-dark/15 dark:border-secondary/30 rounded-2xl shadow-2xl shadow-[#001C3D]/80 w-full max-w-lg overflow-hidden text-primary-dark dark:text-white flex flex-col max-h-[90vh]">
+        <div className="px-6 py-4 border-b border-primary-dark/15 dark:border-primary-dark/50 flex items-center justify-between bg-gradient-to-r from-[#0840A8] to-[#0077D4]">
+          <h3 className="text-base font-bold flex items-center gap-2 text-primary-dark dark:text-white">
+            <UserPlus className="text-primary dark:text-secondary" size={18} />
             <span>Registrar Nuevo Paciente</span>
           </h3>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#0077D4] dark:text-blue-100/80 hover:text-[#0840A8] dark:text-white hover:bg-white/10 cursor-pointer transition-colors"
+            className="p-1.5 rounded-lg text-primary dark:text-blue-100/80 hover:text-primary-dark dark:text-white hover:bg-white/10 cursor-pointer transition-colors"
           >
             <X size={18} />
           </button>
@@ -112,7 +112,7 @@ export const PatientCreateModal: React.FC<PatientCreateModalProps> = ({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">
                 Código de Paciente <span className="text-rose-400">*</span>
               </label>
               <input
@@ -120,23 +120,23 @@ export const PatientCreateModal: React.FC<PatientCreateModalProps> = ({
                 value={codigoPaciente}
                 onChange={(e) => setCodigoPaciente(e.target.value)}
                 required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-mono font-bold focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-mono font-bold focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1 flex items-center gap-1">
-                <Building2 size={12} className="text-[#0077D4] dark:text-[#00C2E0]" />
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1 flex items-center gap-1">
+                <Building2 size={12} className="text-primary dark:text-secondary" />
                 Sucursal Registro <span className="text-rose-400">*</span>
               </label>
               <select
                 value={sucursalId}
                 onChange={(e) => setSucursalId(Number(e.target.value))}
                 required
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               >
                 {sucursales.map((suc) => (
-                  <option key={suc.id} value={suc.id} className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">
+                  <option key={suc.id} value={suc.id} className="bg-white dark:bg-dark-surface text-primary-dark dark:text-white">
                     {suc.nombre} ({suc.codigo_sucursal})
                   </option>
                 ))}
@@ -146,7 +146,7 @@ export const PatientCreateModal: React.FC<PatientCreateModalProps> = ({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">
                 Nombres <span className="text-rose-400">*</span>
               </label>
               <input
@@ -155,11 +155,11 @@ export const PatientCreateModal: React.FC<PatientCreateModalProps> = ({
                 onChange={(e) => setNombre(e.target.value)}
                 required
                 placeholder="Ej. Juan"
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">
                 Apellidos <span className="text-rose-400">*</span>
               </label>
               <input
@@ -168,72 +168,72 @@ export const PatientCreateModal: React.FC<PatientCreateModalProps> = ({
                 onChange={(e) => setApellido(e.target.value)}
                 required
                 placeholder="Ej. Pérez"
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">Edad</label>
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">Edad</label>
               <input
                 type="number"
                 value={edad}
                 onChange={(e) => setEdad(e.target.value === '' ? '' : Number(e.target.value))}
                 placeholder="Ej. 30"
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">Sexo</label>
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">Sexo</label>
               <select
                 value={sexo}
                 onChange={(e) => setSexo(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               >
-                <option value="Masculino" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Masculino</option>
-                <option value="Femenino" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Femenino</option>
-                <option value="Otro" className="bg-white dark:bg-[#002D5E] text-[#0840A8] dark:text-white">Otro</option>
+                <option value="Masculino" className="bg-white dark:bg-dark-surface text-primary-dark dark:text-white">Masculino</option>
+                <option value="Femenino" className="bg-white dark:bg-dark-surface text-primary-dark dark:text-white">Femenino</option>
+                <option value="Otro" className="bg-white dark:bg-dark-surface text-primary-dark dark:text-white">Otro</option>
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">Celular</label>
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">Celular</label>
               <input
                 type="text"
                 value={celular}
                 onChange={(e) => setCelular(e.target.value)}
                 placeholder="76543210"
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-mono placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-mono placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">
                 Fecha de Nacimiento
               </label>
               <input
                 type="date"
                 value={fechaNacimiento}
                 onChange={(e) => setFechaNacimiento(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">Ocupación</label>
+              <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">Ocupación</label>
               <input
                 type="text"
                 value={ocupacion}
                 onChange={(e) => setOcupacion(e.target.value)}
                 placeholder="Ej. Docente..."
-                className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+                className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#0077D4] dark:text-blue-100 mb-1">
+            <label className="block text-xs font-semibold text-primary dark:text-blue-100 mb-1">
               Domicilio Actual
             </label>
             <input
@@ -241,22 +241,22 @@ export const PatientCreateModal: React.FC<PatientCreateModalProps> = ({
               value={domicilio}
               onChange={(e) => setDomicilio(e.target.value)}
               placeholder="Dirección..."
-              className="w-full px-3 py-2.5 rounded-xl bg-[#F4F9FF] dark:bg-[#001C3D] border border-[#0840A8]/15 dark:border-[#0077D4]/40 text-[#0840A8] dark:text-white text-xs font-medium placeholder:text-[#0077D4] dark:text-blue-200/40 focus:outline-none focus:border-[#00C2E0] focus:ring-1 focus:ring-[#00C2E0] transition-all"
+              className="w-full px-3 py-2.5 rounded-xl bg-light-surface dark:bg-dark-bg border border-primary-dark/15 dark:border-primary/40 text-primary-dark dark:text-white text-xs font-medium placeholder:text-primary dark:text-blue-200/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
             />
           </div>
 
-          <div className="pt-4 border-t border-[#0840A8]/15 dark:border-[#0840A8]/50 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-primary-dark/15 dark:border-primary-dark/50 flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#0840A8] dark:text-white border border-white/10 text-xs font-semibold cursor-pointer transition-all"
+              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-primary-dark dark:text-white border border-white/10 text-xs font-semibold cursor-pointer transition-all"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#0077D4] to-[#00C2E0] hover:from-[#0840A8] hover:to-[#0077D4] text-white text-xs font-bold shadow-md shadow-[#0077D4]/30 disabled:opacity-50 cursor-pointer transition-all"
+              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary to-secondary hover:from-[#0840A8] hover:to-[#0077D4] text-white text-xs font-bold shadow-md shadow-[#0077D4]/30 disabled:opacity-50 cursor-pointer transition-all"
             >
               {isSubmitting ? 'Registrando...' : 'Registrar Paciente'}
             </button>

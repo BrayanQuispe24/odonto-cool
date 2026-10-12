@@ -18,6 +18,18 @@ use Illuminate\Support\Facades\Gate;
 
 class ServicioController extends Controller
 {
+    public function publicIndex(Request $request, ListServiciosAction $action): JsonResponse
+    {
+        $categoria = $request->query('categoria') ? (string) $request->query('categoria') : null;
+        
+        // Force state to true to only show active services in the public landing
+        $servicios = $action->execute($categoria, true);
+
+        return response()->json([
+            'servicios' => $servicios
+        ], 200);
+    }
+
     public function index(Request $request, ListServiciosAction $action): JsonResponse
     {
         Gate::authorize('viewAny', Servicio::class);

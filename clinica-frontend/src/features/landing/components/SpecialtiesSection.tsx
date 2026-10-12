@@ -4,6 +4,7 @@ import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
 import { SPECIALTY_CARDS } from '../data/landingData';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { getPublicServiciosApi } from '../../services/services/servicioService';
 
 interface SpecialtiesSectionProps {
   onOpenModal: () => void;
@@ -13,8 +14,32 @@ export const SpecialtiesSection: React.FC<SpecialtiesSectionProps> = ({
   onOpenModal,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [cardsQueue, setCardsQueue] = useState([...SPECIALTY_CARDS]);
+  const [cardsQueue, setCardsQueue] = useState<any[]>([...SPECIALTY_CARDS]);
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    const loadServicios = async () => {
+      try {
+        const data = await getPublicServiciosApi();
+        if (data && data.length > 0) {
+          const mappedCards = data.map((srv, idx) => ({
+            id: srv.id,
+            badge: srv.categoria || 'Odontología General',
+            badgeType: idx % 2 === 0 ? 'teal' : 'dark',
+            title: srv.nombre,
+            description: srv.descripcion || 'Tratamiento odontológico de alta calidad y precisión.',
+            precio: srv.precio,
+            duracion: srv.duracion_estimada_minutos,
+            cardVariant: idx % 2 === 0 ? 'dark' : 'blue',
+          }));
+          setCardsQueue(mappedCards);
+        }
+      } catch (error) {
+        console.error('Error al cargar servicios públicos:', error);
+      }
+    };
+    loadServicios();
+  }, []);
   
   // States for fluid animation
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -97,13 +122,10 @@ export const SpecialtiesSection: React.FC<SpecialtiesSectionProps> = ({
   }, [isHovered]);
 
   return (
-    <section id="especialidades" className="py-16 sm:py-24 relative bg-[#001C3D] text-white border-b border-[#00C2E0]/15 overflow-hidden">
+    <section id="especialidades" className="py-16 sm:py-24 relative bg-dark-bg text-white border-b border-secondary/15 overflow-hidden">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 relative">
         {/* Section Header */}
         <div className="reveal text-center max-w-[720px] mx-auto mb-8 sm:mb-12">
-          <Badge variant="mint" className="mx-auto mb-3 sm:mb-4">
-            ✨ Catálogo Clínico
-          </Badge>
           <h2 className="font-display text-2xl sm:text-4xl lg:text-[3.2rem] font-extrabold text-white mt-2 sm:mt-3 mb-3 sm:mb-4 tracking-tight leading-tight">
             Tratamientos Odontológicos de Alta Gama
           </h2>
@@ -116,14 +138,14 @@ export const SpecialtiesSection: React.FC<SpecialtiesSectionProps> = ({
         <div className="hidden md:flex justify-end gap-3 mb-4 pr-2">
           <button
             onClick={rotateLeft}
-            className="w-12 h-12 rounded-full bg-[#002D5E] hover:bg-[#0077D4] text-white border border-[#0077D4]/30 flex items-center justify-center transition-all shadow-lg hover:shadow-cyan-500/20"
+            className="w-12 h-12 rounded-full bg-dark-surface hover:bg-[#0077D4] text-white border border-primary/30 flex items-center justify-center transition-all shadow-lg hover:shadow-cyan-500/20"
             aria-label="Ver tratamientos anteriores"
           >
             <ChevronLeft size={24} />
           </button>
           <button
             onClick={rotateRight}
-            className="w-12 h-12 rounded-full bg-[#002D5E] hover:bg-[#0077D4] text-white border border-[#0077D4]/30 flex items-center justify-center transition-all shadow-lg hover:shadow-cyan-500/20"
+            className="w-12 h-12 rounded-full bg-dark-surface hover:bg-[#0077D4] text-white border border-primary/30 flex items-center justify-center transition-all shadow-lg hover:shadow-cyan-500/20"
             aria-label="Ver siguientes tratamientos"
           >
             <ChevronRight size={24} />
@@ -153,7 +175,7 @@ export const SpecialtiesSection: React.FC<SpecialtiesSectionProps> = ({
                   key={card.id}
                   className={`shrink-0 w-[85vw] md:w-[45vw] lg:w-[350px] rounded-2xl sm:rounded-3xl p-6 sm:p-8 flex flex-col justify-between min-h-[320px] transition-all duration-300 hover:-translate-y-2 relative group ${
                     isDark
-                      ? 'bg-[#002D5E] text-white border border-[#00C2E0]/20 shadow-xl shadow-black/20'
+                      ? 'bg-dark-surface text-white border border-secondary/20 shadow-xl shadow-black/20'
                       : 'bg-gradient-to-br from-[#0840A8] to-[#0077D4] text-white shadow-xl shadow-[#0840A8]/30'
                   }`}
                 >
@@ -178,19 +200,21 @@ export const SpecialtiesSection: React.FC<SpecialtiesSectionProps> = ({
                     </p>
                   </div>
 
-                  <div className="flex flex-col items-start gap-4 mt-8 pt-5 border-t border-white/15">
-                    <span className="text-[#00C2E0] font-semibold text-sm">
-                      {card.feature}
-                    </span>
-                    <Button
-                      variant={isDark ? 'teal' : 'dark'}
-                      size="sm"
-                      onClick={onOpenModal}
-                      className="w-full mt-2"
-                    >
-                      {card.btnText}
-                    </Button>
+                  <div className="flex flex-col gap-3 mt-8 pt-5 border-t border-white/15">
+                    {card.precio !== undefined && card.precio !== null && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-white/70 font-medium">Precio de referencia:</span>
+                        <span className="font-bold text-white">${Number(card.precio).toFixed(2)}</span>
+                      </div>
+                    )}
+                    {card.duracion !== undefined && card.duracion !== null && (
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-white/70 font-medium">Tiempo aprox.:</span>
+                        <span className="font-semibold text-white">{card.duracion} min</span>
+                      </div>
+                    )}
                   </div>
+
                 </div>
               );
             })}

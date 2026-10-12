@@ -50,8 +50,8 @@ export const LoginForm: React.FC = () => {
         <label className="text-xs font-extrabold text-white uppercase tracking-wider">
           Correo Electrónico
         </label>
-        <div className="relative flex items-center bg-[#001C3D] border-2 border-[#00C2E0]/40 rounded-xl px-3.5 py-2.5 focus-within:border-[#0077D4] focus-within:ring-2 focus-within:ring-[#0077D4]/20 transition-all">
-          <span className="text-base text-[#00C2E0] mr-2.5 shrink-0">
+        <div className="relative flex items-center bg-dark-bg border-2 border-secondary/40 rounded-xl px-3.5 py-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+          <span className="text-base text-secondary mr-2.5 shrink-0">
             ✉️
           </span>
           <input
@@ -73,8 +73,8 @@ export const LoginForm: React.FC = () => {
         <label className="text-xs font-extrabold text-white uppercase tracking-wider">
           Contraseña
         </label>
-        <div className="relative flex items-center bg-[#001C3D] border-2 border-[#00C2E0]/40 rounded-xl px-3.5 py-2.5 focus-within:border-[#0077D4] focus-within:ring-2 focus-within:ring-[#0077D4]/20 transition-all">
-          <span className="text-base text-[#00C2E0] mr-2.5 shrink-0">
+        <div className="relative flex items-center bg-dark-bg border-2 border-secondary/40 rounded-xl px-3.5 py-2.5 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+          <span className="text-base text-secondary mr-2.5 shrink-0">
             🔒
           </span>
           <input
@@ -86,7 +86,7 @@ export const LoginForm: React.FC = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 text-xs font-extrabold text-[#00C2E0] hover:underline cursor-pointer"
+            className="absolute right-3 text-xs font-extrabold text-secondary hover:underline cursor-pointer"
           >
             {showPassword ? 'Ocultar' : 'Mostrar'}
           </button>
@@ -102,7 +102,7 @@ export const LoginForm: React.FC = () => {
       <div className="flex justify-end text-xs">
         <a
           href="#"
-          className="font-bold text-[#00C2E0] hover:underline transition-colors"
+          className="font-bold text-secondary hover:underline transition-colors"
         >
           ¿Olvidaste tu contraseña?
         </a>
