@@ -14,18 +14,32 @@ use App\Http\Requests\Paciente\StorePacienteRequest;
 use App\Http\Requests\Paciente\UpdatePacienteRequest;
 use App\Models\Paciente;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class PacienteController extends Controller
 {
-    public function index(ListPacientesAction $action): JsonResponse
+    public function index(Request $request, ListPacientesAction $action): JsonResponse
     {
         Gate::authorize('viewAny', Paciente::class);
 
-        $pacientes = $action->execute();
+        $perPage = $request->query('per_page') ? (int) $request->query('per_page') : null;
+        $result = $action->execute($perPage);
+
+        if ($result instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) {
+            return response()->json([
+                'pacientes' => $result->items(),
+                'pagination' => [
+                    'total' => $result->total(),
+                    'per_page' => $result->perPage(),
+                    'current_page' => $result->currentPage(),
+                    'last_page' => $result->lastPage(),
+                ],
+            ], 200);
+        }
 
         return response()->json([
-            'pacientes' => $pacientes
+            'pacientes' => $result
         ], 200);
     }
 

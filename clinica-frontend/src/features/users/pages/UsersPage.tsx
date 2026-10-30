@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { UserPlus, ShieldCheck, Mail, User as UserIcon, RefreshCw, Stethoscope, Phone } from 'lucide-react';
+import { UserPlus, ShieldCheck, Mail, User as UserIcon, RefreshCw, Stethoscope, Phone, Edit3 } from 'lucide-react';
 import { useUsers } from '../hooks/useUsers';
 import { UserTable } from '../components/UserTable';
 import { UserFormPanel } from '../components/UserFormPanel';
+import { EditProfileModal } from '../components/EditProfileModal';
 import type { User } from '../../auth/store/authStore';
+import { UserAvatar } from '../../../components/common/UserAvatar';
 
 export const UsersPage: React.FC = () => {
   const {
@@ -14,6 +16,9 @@ export const UsersPage: React.FC = () => {
     isSubmitting,
     error,
     refetch,
+    updateProfile,
+    uploadAvatar,
+    deleteAvatar,
     createUser,
     updateUser,
     deleteUser,
@@ -23,6 +28,7 @@ export const UsersPage: React.FC = () => {
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [deletingUser, setDeletingUser] = useState<User | null>(null);
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   const handleOpenCreateModal = () => {
     setEditingUser(null);
@@ -75,26 +81,37 @@ export const UsersPage: React.FC = () => {
         <div>
           {/* Main Tab Navigation */}
           {!(mainTab === 'form' && (editingUser || isReadOnly)) && (
-            <div className="flex border-b border-slate-200 dark:border-slate-800 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-800 mb-6 gap-2">
+              <div className="flex">
+                <button
+                  onClick={() => setMainTab('list')}
+                  className={`px-4 py-2 text-small font-semibold border-b-2 transition-all cursor-pointer ${
+                    mainTab === 'list'
+                      ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
+                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-secondary'
+                  }`}
+                >
+                  Listado de Usuarios
+                </button>
+                <button
+                  onClick={handleOpenCreateModal}
+                  className={`px-4 py-2 text-small font-semibold border-b-2 transition-all cursor-pointer ${
+                    mainTab === 'form'
+                      ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
+                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-secondary'
+                  }`}
+                >
+                  Registrar Nuevo Usuario
+                </button>
+              </div>
+
               <button
-                onClick={() => setMainTab('list')}
-                className={`px-4 py-2 text-small font-semibold border-b-2 transition-all cursor-pointer ${
-                  mainTab === 'list'
-                    ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
-                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-secondary'
-                }`}
+                type="button"
+                onClick={() => setIsEditProfileOpen(true)}
+                className="self-start sm:self-auto px-3 py-1.5 rounded-sm bg-white dark:bg-dark-surface hover:bg-slate-50 dark:hover:bg-dark-bg text-slate-700 dark:text-slate-200 text-tiny font-bold flex items-center gap-2 transition-colors cursor-pointer border border-slate-200 dark:border-slate-700 shadow-xs mb-1"
               >
-                Listado de Usuarios
-              </button>
-              <button
-                onClick={handleOpenCreateModal}
-                className={`px-4 py-2 text-small font-semibold border-b-2 transition-all cursor-pointer ${
-                  mainTab === 'form'
-                    ? 'border-primary text-primary dark:border-secondary dark:text-secondary'
-                    : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-secondary'
-                }`}
-              >
-                Registrar Nuevo Usuario
+                <UserAvatar src={profile?.foto_perfil} email={profile?.email} size="xs" />
+                <span>Mi Perfil</span>
               </button>
             </div>
           )}
@@ -131,19 +148,33 @@ export const UsersPage: React.FC = () => {
       ) : (
         /* NON-ADMIN VIEW: PROFILE CARD ONLY */
         <div className="max-w-xl mx-auto bg-white dark:bg-dark-surface rounded-sm border border-slate-200 dark:border-slate-800 p-8 shadow-sm space-y-6 text-slate-800 dark:text-slate-200">
-          <div className="flex items-center gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
-            <div className="w-14 h-14 rounded-sm bg-[#0077D4] text-white flex items-center justify-center font-bold text-2xl shadow-sm">
-              <UserIcon size={28} />
+          <div className="flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+            <div className="flex items-center gap-4">
+              <UserAvatar
+                src={profile?.foto_perfil}
+                name={profile?.doctor ? `${profile.doctor.nombre} ${profile.doctor.apellido}` : profile?.email}
+                email={profile?.email}
+                size="xl"
+              />
+              <div>
+                <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                  {profile?.email || 'Usuario'}
+                </h2>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 mt-1">
+                  <ShieldCheck size={14} />
+                  {profile?.rol?.nombre || 'Especialista'}
+                </span>
+              </div>
             </div>
-            <div>
-              <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">
-                {profile?.email || 'Usuario'}
-              </h2>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 mt-1">
-                <ShieldCheck size={14} />
-                {profile?.rol?.nombre || 'Especialista'}
-              </span>
-            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsEditProfileOpen(true)}
+              className="py-1.5 px-3.5 rounded-sm bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-bold transition-colors flex items-center gap-2 cursor-pointer shadow-sm"
+            >
+              <Edit3 size={14} />
+              <span>Editar Perfil</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -258,6 +289,17 @@ export const UsersPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* EDIT PROFILE MODAL */}
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+        profile={profile}
+        onSave={updateProfile}
+        onUploadAvatar={uploadAvatar}
+        onDeleteAvatar={deleteAvatar}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 };

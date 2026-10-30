@@ -12,11 +12,14 @@ use App\Models\BoletaServicioPrestado;
 use App\Models\Cuota;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class BoletaServicioPrestadoController extends Controller
 {
     public function index(Request $request, ListBoletasAction $action): JsonResponse
     {
+        Gate::authorize('viewAny', BoletaServicioPrestado::class);
+
         $citaId = $request->query('cita_id') ? (int) $request->query('cita_id') : null;
         $doctorId = $request->query('doctor_id') ? (int) $request->query('doctor_id') : null;
         $pacienteId = $request->query('paciente_id') ? (int) $request->query('paciente_id') : null;
@@ -25,17 +28,35 @@ class BoletaServicioPrestadoController extends Controller
         $sucursalId = null;
         if ($user && $user->rol && $user->rol->nombre === 'Doctor') {
             $sucursalId = $user->sucursal_id;
+        } elseif ($request->query('sucursal_id')) {
+            $sucursalId = (int) $request->query('sucursal_id');
         }
 
-        $boletas = $action->execute($citaId, $doctorId, $pacienteId, $estado, $sucursalId);
+        $perPage = $request->query('per_page') ? (int) $request->query('per_page') : null;
+
+        $result = $action->execute($citaId, $doctorId, $pacienteId, $estado, $sucursalId, $perPage);
+
+        if ($result instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator) {
+            return response()->json([
+                'boletas' => $result->items(),
+                'pagination' => [
+                    'total' => $result->total(),
+                    'per_page' => $result->perPage(),
+                    'current_page' => $result->currentPage(),
+                    'last_page' => $result->lastPage(),
+                ],
+            ], 200);
+        }
 
         return response()->json([
-            'boletas' => $boletas
+            'boletas' => $result
         ], 200);
     }
 
     public function store(Request $request, StoreBoletaAction $action): JsonResponse
     {
+        Gate::authorize('create', BoletaServicioPrestado::class);
+
         $request->validate([
             'cita_id' => 'nullable|integer|exists:citas,id',
             'paciente_id' => 'nullable|integer|exists:pacientes,id',
@@ -69,6 +90,8 @@ class BoletaServicioPrestadoController extends Controller
 
     public function show(BoletaServicioPrestado $boleta, ShowBoletaAction $action): JsonResponse
     {
+        Gate::authorize('view', $boleta);
+
         $boletaDetalle = $action->execute($boleta);
 
         return response()->json([
@@ -78,6 +101,8 @@ class BoletaServicioPrestadoController extends Controller
 
     public function update(Request $request, BoletaServicioPrestado $boleta): JsonResponse
     {
+        Gate::authorize('update', $boleta);
+
         $request->validate([
             'estado' => 'nullable|string',
             'metodo_pago' => 'nullable|string',
@@ -94,6 +119,8 @@ class BoletaServicioPrestadoController extends Controller
 
     public function destroy(BoletaServicioPrestado $boleta, DeleteBoletaAction $action): JsonResponse
     {
+        Gate::authorize('delete', $boleta);
+
         $action->execute($boleta);
 
         return response()->json([
@@ -103,6 +130,7 @@ class BoletaServicioPrestadoController extends Controller
 
     public function pagarCuota(Request $request, BoletaServicioPrestado $boleta, Cuota $cuota): JsonResponse
     {
+        Gate::authorize('modifyCuotas', $boleta);
         if ($error = $this->checkCanModifyCuotas($request, $boleta)) {
             return $error;
         }
@@ -130,6 +158,7 @@ class BoletaServicioPrestadoController extends Controller
 
     public function storeCuota(Request $request, BoletaServicioPrestado $boleta): JsonResponse
     {
+        Gate::authorize('modifyCuotas', $boleta);
         if ($error = $this->checkCanModifyCuotas($request, $boleta)) {
             return $error;
         }
@@ -166,6 +195,7 @@ class BoletaServicioPrestadoController extends Controller
 
     public function updateCuota(Request $request, BoletaServicioPrestado $boleta, Cuota $cuota): JsonResponse
     {
+        Gate::authorize('modifyCuotas', $boleta);
         if ($error = $this->checkCanModifyCuotas($request, $boleta)) {
             return $error;
         }
@@ -202,6 +232,7 @@ class BoletaServicioPrestadoController extends Controller
 
     public function destroyCuota(Request $request, BoletaServicioPrestado $boleta, Cuota $cuota): JsonResponse
     {
+        Gate::authorize('modifyCuotas', $boleta);
         if ($error = $this->checkCanModifyCuotas($request, $boleta)) {
             return $error;
         }

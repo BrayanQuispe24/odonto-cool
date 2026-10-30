@@ -11,6 +11,7 @@ import {
   Filter,
 } from 'lucide-react';
 import type { User } from '../../auth/store/authStore';
+import { UserAvatar } from '../../../components/common/UserAvatar';
 
 interface UserTableProps {
   users: User[];
@@ -229,9 +230,12 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
                     {/* USUARIO / CORREO */}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-sm bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
-                          {initials}
-                        </div>
+                        <UserAvatar
+                          src={user.foto_perfil}
+                          name={userName}
+                          email={user.email}
+                          size="sm"
+                        />
                         <div>
                           <div className="font-bold text-primary-dark dark:text-white text-small">
                             {userName}
@@ -350,9 +354,12 @@ export const UserTable: React.FC<UserTableProps> = ({ users, onView, onEdit, onD
                       onChange={() => handleSelectRow(user.id)}
                       className="rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-secondary cursor-pointer shrink-0 mt-1"
                     />
-                    <div className="w-10 h-10 rounded-sm bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-sm flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
-                      {initials}
-                    </div>
+                    <UserAvatar
+                      src={user.foto_perfil}
+                      name={userName}
+                      email={user.email}
+                      size="md"
+                    />
                     <div>
                       <h4 className="font-bold text-primary-dark dark:text-white text-sm">
                         {userName}

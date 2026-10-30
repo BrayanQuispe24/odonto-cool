@@ -1,17 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
+import type { HeroConfig } from '../../landing-config/types/landingConfig';
 
 interface HeroSectionProps {
+  config?: HeroConfig;
   onOpenModal: () => void;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({ config, onOpenModal }) => {
   const [patientsCount, setPatientsCount] = useState(0);
   const [satisfactionCount, setSatisfactionCount] = useState(0);
   const [yearsCount, setYearsCount] = useState(0);
   const metricsRef = useRef<HTMLDivElement>(null);
   const hasAnimated = useRef(false);
+
+  const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace('/api', '');
+
+  const targetPatients = config?.stats?.pacientes_count ?? 3000;
+  const targetSatisfaction = config?.stats?.satisfaccion_count ?? 99.5;
+  const targetYears = config?.stats?.experiencia_count ?? 4;
+  const targetPain = config?.stats?.dolor_count ?? 0;
+
+  const heroImage = config?.imagen_url
+    ? (config.imagen_url.startsWith('http') ? config.imagen_url : `${apiBaseUrl}${config.imagen_url}`)
+    : '/assets/images/fondolanding.jpeg';
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -31,7 +44,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
     }
 
     return () => observer.disconnect();
-  }, []);
+  }, [targetPatients, targetSatisfaction, targetYears]);
 
   const animateMetrics = () => {
     const duration = 2000;
@@ -44,15 +57,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
       const progress = frame / frames;
       const easeOut = 1 - Math.pow(1 - progress, 3);
 
-      setPatientsCount(Math.floor(3000 * easeOut));
-      setSatisfactionCount(parseFloat((99.5 * easeOut).toFixed(1)));
-      setYearsCount(Math.floor(4 * easeOut));
+      setPatientsCount(Math.floor(targetPatients * easeOut));
+      setSatisfactionCount(parseFloat((targetSatisfaction * easeOut).toFixed(1)));
+      setYearsCount(Math.floor(targetYears * easeOut));
 
       if (frame >= frames) {
         clearInterval(timer);
-        setPatientsCount(3000);
-        setSatisfactionCount(99.5);
-        setYearsCount(4);
+        setPatientsCount(targetPatients);
+        setSatisfactionCount(targetSatisfaction);
+        setYearsCount(targetYears);
       }
     }, intervalTime);
   };
@@ -70,22 +83,22 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
         <div className="reveal reveal-3d max-w-[1200px] mx-auto px-4 sm:px-6 flex flex-col items-center text-center my-auto">
           {/* Hero Title */}
           <h1 className="reveal font-display text-2xl sm:text-4xl md:text-5xl lg:text-[4.4rem] font-extrabold text-white max-w-[880px] mb-4 sm:mb-6 leading-[1.15] sm:leading-[1.1] tracking-tight drop-shadow-md">
-            Diseñamos tu mejor sonrisa con precisión digital y sin dolor
+            {config?.titulo || 'Diseñamos tu mejor sonrisa con precisión digital y sin dolor'}
           </h1>
 
           {/* Hero Subtitle */}
           <p className="reveal stagger-1 text-sm sm:text-base md:text-lg font-bold text-[#E5F7FF] max-w-[640px] mb-8 sm:mb-10 leading-relaxed drop-shadow-sm">
-            Tratamientos odontológicos integrales, ortodoncia invisible, implantes de carga inmediata y diseño de sonrisa digital con tecnología clínica de nivel internacional.
+            {config?.subtitulo || 'Tratamientos odontológicos integrales, ortodoncia invisible, implantes de carga inmediata y diseño de sonrisa digital con tecnología clínica de nivel internacional.'}
           </p>
 
           {/* CTA Buttons */}
           <div className="reveal stagger-2 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 w-full sm:w-auto px-4 sm:px-0">
             <Button variant="teal" size="lg" onClick={onOpenModal} className="w-full sm:w-auto">
-              Agendar Cita Diagnóstica ➔
+              {config?.cta_texto || 'Agendar Cita Diagnóstica ➔'}
             </Button>
-            <a href="#simulador" className="w-full sm:w-auto">
+            <a href="#especialidades" className="w-full sm:w-auto">
               <Button variant="light" size="lg" className="w-full sm:w-auto">
-                Ver Casos Clínicos ➔
+                {config?.secundario_texto || 'Ver Tratamientos ➔'}
               </Button>
             </a>
           </div>
@@ -103,7 +116,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
           {/* Image Container */}
           <div className="w-full max-w-[1000px] h-[260px] sm:h-[360px] md:h-[460px] lg:h-[500px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-[0_24px_60px_rgba(8,64,168,0.18)] border border-secondary/30">
             <img
-              src="/assets/images/fondolanding.jpeg"
+              src={heroImage}
               alt="Instalaciones de ODONTO COOL"
               className="w-full h-full object-cover object-center"
             />
@@ -122,7 +135,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
                 {patientsCount.toLocaleString()}+
               </div>
               <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
-                Pacientes Atendidos
+                {config?.stats?.pacientes_label || 'Pacientes Atendidos'}
               </div>
             </div>
 
@@ -132,7 +145,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
                 {satisfactionCount}%
               </div>
               <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
-                Satisfacción Clínica
+                {config?.stats?.satisfaccion_label || 'Satisfacción Clínica'}
               </div>
             </div>
 
@@ -142,17 +155,17 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenModal }) => {
                 {yearsCount}+
               </div>
               <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
-                Años Experiencia
+                {config?.stats?.experiencia_label || 'Años Experiencia'}
               </div>
             </div>
 
             {/* Stat 4 */}
             <div className="flex flex-col items-center justify-center text-center px-4">
               <div className="font-display text-3xl sm:text-4xl font-light text-white mb-2 tracking-tight">
-                0%
+                {targetPain}%
               </div>
               <div className="text-[10px] sm:text-xs uppercase tracking-[0.15em] font-medium text-[#E5F7FF] opacity-80">
-                Dolor & Sedación
+                {config?.stats?.dolor_label || 'Dolor & Sedación'}
               </div>
             </div>
           </div>

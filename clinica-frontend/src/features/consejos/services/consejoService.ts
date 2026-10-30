@@ -15,6 +15,13 @@ export const getPublicConsejosApi = async (): Promise<Consejo[]> => {
   return response.data.consejos;
 };
 
+export const getConsejosApi = async (all = true): Promise<Consejo[]> => {
+  const response = await api.get<ConsejosResponse>('/consejos', {
+    params: { all },
+  });
+  return response.data.consejos;
+};
+
 export const createConsejoApi = async (data: ConsejoFormData): Promise<Consejo> => {
   const formData = new FormData();
   formData.append('titulo', data.titulo);

@@ -96,6 +96,7 @@ interface BoletasListPDFDocumentProps {
   boletas: BoletaServicioPrestado[];
   fechaDesde?: string;
   fechaHasta?: string;
+  sucursalNombre?: string;
 }
 
 const getPacienteName = (b: BoletaServicioPrestado): string =>
@@ -117,6 +118,7 @@ export const BoletasListPDFDocument: React.FC<BoletasListPDFDocumentProps> = ({
   boletas,
   fechaDesde,
   fechaHasta,
+  sucursalNombre,
 }) => {
   const totales = boletas.reduce(
     (acc, b) => {
@@ -141,6 +143,9 @@ export const BoletasListPDFDocument: React.FC<BoletasListPDFDocumentProps> = ({
           <View>
             <Text style={styles.title}>Reporte de Boletas Emitidas</Text>
             <Text style={styles.subtitle}>Clínica Odontológica Odonto Cool</Text>
+            {sucursalNombre && (
+              <Text style={styles.subtitle}>Sucursal: {sucursalNombre}</Text>
+            )}
           </View>
           <View style={styles.dateInfo}>
             <Text style={styles.subtitle}>Fecha de impresión: {new Date().toLocaleDateString('es-ES')}</Text>

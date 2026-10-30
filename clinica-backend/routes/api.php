@@ -16,6 +16,10 @@ use App\Http\Controllers\Api\SucursalController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ExpedienteController;
 use App\Http\Controllers\Api\BackupController;
+use App\Http\Controllers\Api\ProformaController;
+use App\Http\Controllers\Api\ConsejoController;
+use App\Http\Controllers\Api\LandingSettingController;
+use App\Http\Controllers\Api\LandingFaqController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -27,7 +31,16 @@ Route::get('/modelos-3d/{id}/file', [Modelo3DController::class, 'getFile']);
 Route::get('/public/servicios', [ServicioController::class, 'publicIndex']);
 
 // Public endpoint for landing page to list active consejos/articulos
-Route::get('/public/consejos', [\App\Http\Controllers\ConsejoController::class, 'index']);
+Route::get('/public/consejos', [ConsejoController::class, 'index']);
+
+// Public endpoint for landing page settings (Hero, Contacto, Visibilidad)
+Route::get('/public/landing-settings', [LandingSettingController::class, 'index']);
+
+// Public endpoint for FAQs
+Route::get('/public/faqs', [LandingFaqController::class, 'index']);
+
+// Public endpoint for featured doctors on landing page
+Route::get('/public/doctores', [DoctorController::class, 'publicIndex']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -39,14 +52,21 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reportes/financiero', [ReporteController::class, 'financiero']);
 
     Route::get('/me', [UserController::class, 'me']);
+    Route::put('/me', [UserController::class, 'updateMe']);
+    Route::post('/me/avatar', [UserController::class, 'uploadAvatar']);
+    Route::delete('/me/avatar', [UserController::class, 'deleteAvatar']);
     Route::apiResource('users', UserController::class);
     Route::get('/roles', [RolController::class, 'index']);
 
     Route::apiResource('doctores', DoctorController::class);
+    Route::put('/doctores/{id}/toggle-landing', [DoctorController::class, 'toggleLanding']);
+
     Route::apiResource('pacientes', PacienteController::class);
     Route::get('/citas/disponibilidad', [CitaController::class, 'disponibilidad']);
     Route::apiResource('citas', CitaController::class);
+
     Route::apiResource('servicios', ServicioController::class);
+    Route::put('/servicios/{id}/toggle-landing', [ServicioController::class, 'toggleLanding']);
     Route::apiResource('dientes', DienteController::class);
 
     Route::apiResource('boletas', BoletaServicioPrestadoController::class);
@@ -54,6 +74,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/boletas/{boleta}/cuotas/{cuota}', [BoletaServicioPrestadoController::class, 'updateCuota']);
     Route::delete('/boletas/{boleta}/cuotas/{cuota}', [BoletaServicioPrestadoController::class, 'destroyCuota']);
     Route::post('/boletas/{boleta}/cuotas/{cuota}/pagar', [BoletaServicioPrestadoController::class, 'pagarCuota']);
+
+    Route::apiResource('proformas', ProformaController::class);
+    Route::put('/proformas/{proforma}/cambiar-estado', [ProformaController::class, 'cambiarEstado']);
 
     Route::get('/pacientes/{paciente}/antecedentes', [AntecedenteController::class, 'show']);
     Route::put('/pacientes/{paciente}/antecedentes', [AntecedenteController::class, 'update']);
@@ -66,9 +89,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('expedientes', ExpedienteController::class);
 
     // Consejos (Articles/Tips)
-    Route::post('/consejos', [\App\Http\Controllers\ConsejoController::class, 'store']);
-    Route::put('/consejos/{id}', [\App\Http\Controllers\ConsejoController::class, 'update']);
-    Route::delete('/consejos/{id}', [\App\Http\Controllers\ConsejoController::class, 'destroy']);
+    Route::get('/consejos', [ConsejoController::class, 'index']);
+    Route::post('/consejos', [ConsejoController::class, 'store']);
+    Route::put('/consejos/{id}', [ConsejoController::class, 'update']);
+    Route::delete('/consejos/{id}', [ConsejoController::class, 'destroy']);
+
+    // Configuración de Landing Page (Admin)
+    Route::get('/landing-settings', [LandingSettingController::class, 'index']);
+    Route::post('/landing-settings', [LandingSettingController::class, 'update']);
+    Route::apiResource('landing-faqs', LandingFaqController::class);
 
     // Módulo de Backups (Solo Administradores)
     Route::middleware([\App\Http\Middleware\EnsureIsAdmin::class])->group(function () {

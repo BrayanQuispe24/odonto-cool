@@ -4,9 +4,14 @@ namespace App\Actions\Auth;
 
 use App\DTOs\Auth\RegisterDTO;
 use App\Helpers\HelperFunctions;
+use App\Mail\UserCredentialsMail;
 use App\Models\Rol;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class RegisterAction
 {
@@ -14,7 +19,7 @@ class RegisterAction
 
     public function execute(RegisterDTO $dto): array
     {
-        //primero buscamos al rol
+        // primero buscamos al rol
         $rol = Rol::where('id', '=', $dto->rol_id)->first();
         if (!$rol) {
             return [
@@ -23,28 +28,47 @@ class RegisterAction
             ];
         }
         $codigo_usuario = $this->generarCodigoUsuario($rol);
-        $usuario = User::create([
-            'codigo_usuario' => $codigo_usuario,
-            'email' => $dto->email,
-            'password' => Hash::make($dto->password),
-            'rol_id' => $dto->rol_id,
-        ]);
+        $plainPassword = $dto->password;
 
-        //creamos el token
-        $token = $usuario->createToken('auth-token')->plainTextToken;
+        return DB::transaction(function () use ($dto, $codigo_usuario, $plainPassword) {
+            $usuario = User::create([
+                'codigo_usuario' => $codigo_usuario,
+                'email' => $dto->email,
+                'password' => Hash::make($plainPassword),
+                'rol_id' => $dto->rol_id,
+            ]);
 
-        //retornamos el token y los datos del usuario
-        return [
-            'token' => $token,
-            'usuario' => $usuario,
-            'token_type' => 'Bearer'
-        ];
+            $usuario->load('rol');
+
+            // Enviar correo con credenciales de forma atómica
+            try {
+                Mail::to($usuario->email)->send(new UserCredentialsMail($usuario, $plainPassword));
+            } catch (\Throwable $e) {
+                Log::error("Fallo al enviar credenciales a {$usuario->email}: " . $e->getMessage(), [
+                    'exception' => $e,
+                ]);
+
+                throw ValidationException::withMessages([
+                    'email' => 'No se pudo entregar el correo a esta dirección. Verifique que el correo electrónico exista y esté habilitado para recibir mensajes.',
+                ]);
+            }
+
+            // creamos el token
+            $token = $usuario->createToken('auth-token')->plainTextToken;
+
+            // retornamos el token y los datos del usuario
+            return [
+                'token' => $token,
+                'usuario' => $usuario,
+                'token_type' => 'Bearer'
+            ];
+        });
     }
 
     private function generarCodigoUsuario(Rol $rol): string
     {
+        $prefix = strtoupper(substr($rol->nombre, 0, 3));
         $cantidad = User::where('rol_id', $rol->id)->count();
-        $codigo = "US" . '-' . $rol->nombre() . '-' . $cantidad + 1;
-        return $codigo;
+        return sprintf('%s-%03d', $prefix, $cantidad + 1);
     }
 }

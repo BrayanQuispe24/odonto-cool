@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { X, Mail, Lock, Shield, Eye, Save } from 'lucide-react';
+import { X, Mail, Lock, Shield, Eye, EyeOff, Save, KeyRound, Send, Loader2 } from 'lucide-react';
 import { useRoles } from '../../roles/hooks/useRoles';
 import type { User } from '../../auth/store/authStore';
 
@@ -48,14 +48,17 @@ export const UserFormPanel: React.FC<UserFormPanelProps> = ({
 }) => {
   const { roles } = useRoles();
   const isEditing = Boolean(userToEdit);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    setValue,
     reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(isEditing ? updateUserSchema : createUserSchema),
+    mode: 'onTouched',
     defaultValues: {
       email: '',
       password: '',
@@ -63,6 +66,31 @@ export const UserFormPanel: React.FC<UserFormPanelProps> = ({
     },
   });
 
+  const handleGeneratePassword = () => {
+    const uppercase = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const lowercase = 'abcdefghijkmnpqrstuvwxyz';
+    const numbers = '23456789';
+    const symbols = '!@#$%&*';
+    const all = uppercase + lowercase + numbers + symbols;
+
+    let pass = '';
+    pass += uppercase[Math.floor(Math.random() * uppercase.length)];
+    pass += lowercase[Math.floor(Math.random() * lowercase.length)];
+    pass += numbers[Math.floor(Math.random() * numbers.length)];
+    pass += symbols[Math.floor(Math.random() * symbols.length)];
+
+    for (let i = 4; i < 10; i++) {
+      pass += all[Math.floor(Math.random() * all.length)];
+    }
+
+    // Mezclar caracteres
+    pass = pass.split('').sort(() => 0.5 - Math.random()).join('');
+
+    setValue('password', pass, { shouldValidate: true });
+    setShowPassword(true);
+  };
+
+  // Solo resetear el formulario cuando cambie el usuario a editar
   useEffect(() => {
     if (userToEdit) {
       reset({
@@ -70,14 +98,15 @@ export const UserFormPanel: React.FC<UserFormPanelProps> = ({
         password: '',
         rol_id: userToEdit.rol_id || userToEdit.rol?.id || 1,
       });
-    } else {
-      reset({
-        email: '',
-        password: '',
-        rol_id: roles[0]?.id || 1,
-      });
     }
-  }, [userToEdit, reset, roles]);
+  }, [userToEdit, reset]);
+
+  // Si se cargan los roles por primera vez en modo creación, asignar el primer rol por defecto sin tocar email ni contraseña
+  useEffect(() => {
+    if (!userToEdit && roles.length > 0) {
+      setValue('rol_id', roles[0].id);
+    }
+  }, [roles, userToEdit, setValue]);
 
   const handleFormSubmit = async (data: any) => {
     if (isReadOnly) return;
@@ -119,6 +148,38 @@ export const UserFormPanel: React.FC<UserFormPanelProps> = ({
             : 'Complete el formulario para crear una nueva cuenta.'}
         </p>
 
+        {/* BANNER EN PROCESO DE CARGA Y VERIFICACIÓN */}
+        {isSubmitting && (
+          <div className="p-3.5 rounded-sm bg-blue-50/90 dark:bg-blue-950/40 border border-blue-300 dark:border-blue-800 flex items-start gap-3 text-xs text-blue-900 dark:text-blue-200 shadow-sm animate-pulse">
+            <Loader2 size={18} className="text-primary dark:text-secondary shrink-0 mt-0.5 animate-spin" />
+            <div className="leading-relaxed">
+              <span className="font-bold text-primary-dark dark:text-white block mb-0.5">
+                {isEditing ? 'Actualizando usuario...' : 'Verificando buzón y despachando credenciales...'}
+              </span>
+              <span>
+                {isEditing
+                  ? 'Guardando los cambios del usuario en el sistema...'
+                  : 'Contactando en tiempo real al servidor de correo para comprobar la existencia del buzón y enviando las credenciales de acceso vía SMTP. Por favor, espere un momento.'}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* NOTIFICACIÓN INFORMATIVA DE ENVÍO DE CREDENCIALES (MODO NORMAL) */}
+        {!isReadOnly && !isEditing && !isSubmitting && (
+          <div className="p-3.5 rounded-sm bg-blue-50/90 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/60 flex items-start gap-3 text-xs text-blue-900 dark:text-blue-200 shadow-xs">
+            <Send size={16} className="text-primary dark:text-secondary shrink-0 mt-0.5" />
+            <div className="leading-relaxed">
+              <span className="font-bold text-primary-dark dark:text-white block mb-0.5">
+                Verificación de Correo y Envío Automático
+              </span>
+              <span>
+                El sistema verificará la existencia real del buzón de correo ingresado. Tras la creación, el usuario recibirá automáticamente un email corporativo con su código de usuario y contraseña temporal para iniciar sesión.
+              </span>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* EMAIL */}
           <div>
@@ -142,18 +203,45 @@ export const UserFormPanel: React.FC<UserFormPanelProps> = ({
 
           {/* PASSWORD */}
           <div>
-            <label className="block text-tiny font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
-              <Lock size={12} className="text-slate-400" />
-              {isReadOnly ? 'Contraseña' : isEditing ? 'Contraseña (Opcional)' : 'Contraseña'}
-              {!isReadOnly && !isEditing && <span className="text-rose-500">*</span>}
-            </label>
-            <input
-              type="password"
-              disabled={isReadOnly || isSubmitting}
-              placeholder={isReadOnly ? '•••••••• (Protegida)' : isEditing ? '•••••••• (Dejar en blanco para no cambiar)' : '••••••••'}
-              {...register('password')}
-              className="w-full px-2.5 py-1.5 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-tiny font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                <Lock size={12} className="text-slate-400" />
+                {isReadOnly ? 'Contraseña' : isEditing ? 'Contraseña (Opcional)' : 'Contraseña'}
+                {!isReadOnly && !isEditing && <span className="text-rose-500">*</span>}
+              </label>
+
+              {!isReadOnly && !isEditing && (
+                <button
+                  type="button"
+                  onClick={handleGeneratePassword}
+                  className="text-tiny font-bold text-primary dark:text-secondary hover:underline flex items-center gap-1 cursor-pointer"
+                >
+                  <KeyRound size={11} />
+                  Generar segura
+                </button>
+              )}
+            </div>
+
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                disabled={isReadOnly || isSubmitting}
+                placeholder={isReadOnly ? '•••••••• (Protegida)' : isEditing ? '•••••••• (Dejar en blanco para no cambiar)' : '••••••••'}
+                {...register('password')}
+                className="w-full px-2.5 py-1.5 pr-9 rounded-sm text-small font-medium border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-primary-dark dark:text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+              />
+              {!isReadOnly && (
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer p-0.5"
+                  title={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+                >
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              )}
+            </div>
+
             {!isReadOnly && errors.password && (
               <span className="text-xs text-rose-500 font-medium mt-1 block">
                 {errors.password.message as string}
@@ -192,7 +280,11 @@ export const UserFormPanel: React.FC<UserFormPanelProps> = ({
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="px-4 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 text-small font-semibold cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto shadow-sm disabled:opacity-50"
+            className={`px-4 py-1.5 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 text-small font-semibold transition-colors w-full sm:w-auto shadow-sm ${
+              isSubmitting
+                ? 'opacity-50 cursor-not-allowed'
+                : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800'
+            }`}
           >
             {isReadOnly ? 'Volver al Listado' : 'Cancelar y Volver'}
           </button>
@@ -201,10 +293,23 @@ export const UserFormPanel: React.FC<UserFormPanelProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-5 py-1.5 rounded-sm bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-semibold shadow-sm disabled:opacity-50 cursor-pointer transition-colors w-full sm:w-auto flex items-center justify-center gap-2"
+              className={`px-5 py-1.5 rounded-sm bg-[#0077D4] hover:bg-[#0840A8] text-white text-small font-semibold shadow-sm transition-all w-full sm:w-auto flex items-center justify-center gap-2 ${
+                isSubmitting
+                  ? 'opacity-80 cursor-wait pointer-events-none'
+                  : 'cursor-pointer'
+              }`}
             >
-              <Save size={16} />
-              {isSubmitting ? 'Guardando...' : isEditing ? 'Actualizar Usuario' : 'Crear Usuario'}
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin text-white shrink-0" />
+                  <span>{isEditing ? 'Actualizando...' : 'Verificando y Creando...'}</span>
+                </>
+              ) : (
+                <>
+                  <Save size={16} />
+                  <span>{isEditing ? 'Actualizar Usuario' : 'Crear Usuario'}</span>
+                </>
+              )}
             </button>
           )}
         </div>

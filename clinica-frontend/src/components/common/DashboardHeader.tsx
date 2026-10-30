@@ -19,6 +19,7 @@ import { useAuthStore } from '../../features/auth/store/authStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { AppointmentModal } from '../../features/landing/components/AppointmentModal';
 import { toast } from 'sonner';
+import { UserAvatar } from './UserAvatar';
 
 export const DashboardHeader: React.FC = () => {
   const { setMobileOpen, toggleCollapse, isCollapsed } = useSidebarStore();
@@ -174,10 +175,11 @@ export const DashboardHeader: React.FC = () => {
               aria-expanded={showUserDropdown}
               className="flex items-center gap-2.5 p-1.5 pr-2.5 rounded-xl hover:bg-light-surface dark:hover:bg-dark-surface transition-colors active:scale-97 cursor-pointer border border-transparent hover:border-primary-dark/15 dark:hover:border-secondary/30"
             >
-              <img
-                src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=200&auto=format&fit=crop"
-                alt="Avatar doctor"
-                className="w-8 h-8 rounded-lg object-cover ring-2 ring-primary"
+              <UserAvatar
+                src={user?.foto_perfil}
+                name={user?.doctor ? `Dr. ${user.doctor.nombre} ${user.doctor.apellido}` : user?.email}
+                email={user?.email}
+                size="sm"
               />
               <div className="hidden lg:flex flex-col text-left">
                 <span className="text-xs font-extrabold text-primary-dark dark:text-white leading-tight">
@@ -200,7 +202,10 @@ export const DashboardHeader: React.FC = () => {
 
                 <div className="space-y-1">
                   <button
-                    onClick={() => setShowUserDropdown(false)}
+                    onClick={() => {
+                      setShowUserDropdown(false);
+                      navigate('/dashboard/users');
+                    }}
                     className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-bold text-primary-dark dark:text-white hover:bg-light-surface dark:hover:bg-[#0840A8]/50 transition-colors cursor-pointer"
                   >
                     <User size={15} className="text-primary dark:text-secondary" />

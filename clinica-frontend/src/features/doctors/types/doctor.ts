@@ -6,6 +6,8 @@ export interface Doctor {
   apellido: string;
   telefonos?: string[] | null;
   especialidades?: string[] | null;
+  destacado_en_landing?: boolean;
+  bio_landing?: string | null;
   created_at?: string;
   updated_at?: string;
   usuario?: {
@@ -13,12 +15,13 @@ export interface Doctor {
     name?: string;
     email: string;
     codigo_usuario?: string;
+    foto_perfil?: string | null;
   };
   sucursal?: {
     id: number;
     nombre?: string;
     codigo_sucursal?: string;
-    ubicacion: string;
+    ubicacion?: string;
   };
 }
 

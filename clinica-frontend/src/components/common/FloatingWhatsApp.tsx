@@ -1,9 +1,21 @@
 import React from 'react';
 
-export const FloatingWhatsApp: React.FC = () => {
+interface FloatingWhatsAppProps {
+  whatsapp?: string;
+  mensaje?: string;
+}
+
+export const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
+  whatsapp = '59178494110',
+  mensaje = 'Hola, quisiera agendar una cita diagnóstica.',
+}) => {
+  const cleanPhone = whatsapp.replace(/[^0-9]/g, '');
+  const encodedMsg = encodeURIComponent(mensaje);
+  const href = `https://wa.me/${cleanPhone}${encodedMsg ? `?text=${encodedMsg}` : ''}`;
+
   return (
     <a
-      href="https://wa.me/59178494110"
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       className="group fixed bottom-7 right-7 w-[60px] h-[60px] rounded-full bg-[#25D366] text-white shadow-[0_10px_28px_rgba(37,211,102,0.4)] flex items-center justify-center z-[1500] hover:scale-110 hover:shadow-[0_14px_36px_rgba(37,211,102,0.6)] transition-all duration-300"

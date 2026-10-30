@@ -21,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(\App\Models\BoletaServicioPrestado::class, \App\Policies\BoletaPolicy::class);
+        Gate::policy(\App\Models\Proforma::class, \App\Policies\ProformaPolicy::class);
+
         if (config('app.env') === 'production') {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }

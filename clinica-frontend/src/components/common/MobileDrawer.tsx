@@ -19,7 +19,6 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   const navLinks = [
     { href: '#hero', label: 'Inicio' },
     { href: '#especialidades', label: 'Especialidades' },
-    { href: '#simulador', label: 'Antes & Después' },
     { href: '#tecnologia', label: 'Tecnología' },
     { href: '#especialistas', label: 'Especialistas' },
     { href: '#faq', label: 'Preguntas' },

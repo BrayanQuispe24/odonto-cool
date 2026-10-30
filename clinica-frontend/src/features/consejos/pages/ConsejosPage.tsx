@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FileText, Search, Plus, Trash2, Edit2, ChevronLeft, ChevronRight, Eye, AlertCircle, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { getPublicConsejosApi, createConsejoApi, deleteConsejoApi, updateConsejoApi } from '../services/consejoService';
+import { getConsejosApi, createConsejoApi, deleteConsejoApi, updateConsejoApi } from '../services/consejoService';
 import type { Consejo, ConsejoFormData } from '../types/consejo';
 import { useUserRole } from '../../../hooks/useUserRole';
 
@@ -11,6 +11,8 @@ export const ConsejosPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:8000/api').replace('/api', '');
+
   // Navigation state
   const [mainTab, setMainTab] = useState<'list' | 'form' | 'detail'>('list');
   const [selectedConsejo, setSelectedConsejo] = useState<Consejo | null>(null);
@@ -19,6 +21,7 @@ export const ConsejosPage: React.FC = () => {
   // Form state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<ConsejoFormData>({ titulo: '', categoria: '', descripcion: '' });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   // Delete modal state
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -33,10 +36,10 @@ export const ConsejosPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getPublicConsejosApi();
+      const data = await getConsejosApi(true);
       setConsejos(data);
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Error al cargar el listado de consejos.');
+      setError(err?.response?.data?.message || 'Error al cargar el listado de artículos.');
     } finally {
       setLoading(false);
     }
@@ -49,6 +52,7 @@ export const ConsejosPage: React.FC = () => {
   const handleOpenCreateForm = () => {
     setSelectedConsejo(null);
     setFormData({ titulo: '', categoria: '', descripcion: '' });
+    setImagePreview(null);
     setIsReadOnly(false);
     setMainTab('form');
   };
@@ -60,6 +64,11 @@ export const ConsejosPage: React.FC = () => {
       categoria: consejo.categoria || '',
       descripcion: consejo.descripcion,
     });
+    setImagePreview(
+      consejo.imagen_url
+        ? (consejo.imagen_url.startsWith('http') ? consejo.imagen_url : `${apiBaseUrl}${consejo.imagen_url}`)
+        : null
+    );
     setIsReadOnly(false);
     setMainTab('form');
   };
@@ -71,6 +80,11 @@ export const ConsejosPage: React.FC = () => {
       categoria: consejo.categoria || '',
       descripcion: consejo.descripcion,
     });
+    setImagePreview(
+      consejo.imagen_url
+        ? (consejo.imagen_url.startsWith('http') ? consejo.imagen_url : `${apiBaseUrl}${consejo.imagen_url}`)
+        : null
+    );
     setIsReadOnly(true);
     setMainTab('detail');
   };
@@ -210,8 +224,8 @@ export const ConsejosPage: React.FC = () => {
               </div>
             </div>
 
-            {/* TABLE VIEW */}
-            <div className="overflow-x-auto">
+            {/* DESKTOP TABLE VIEW */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50 dark:bg-dark-bg border-b border-slate-200 dark:border-slate-800 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 select-none">
@@ -241,8 +255,19 @@ export const ConsejosPage: React.FC = () => {
                       >
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-sm bg-slate-100 dark:bg-slate-800 text-primary dark:text-secondary font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
-                              <FileText size={16} />
+                            <div className="w-10 h-10 rounded-sm overflow-hidden bg-slate-100 dark:bg-slate-800 text-primary dark:text-secondary font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                              {c.imagen_url ? (
+                                <img
+                                  src={c.imagen_url.startsWith('http') ? c.imagen_url : `${apiBaseUrl}${c.imagen_url}`}
+                                  alt={c.titulo}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              ) : (
+                                <FileText size={16} />
+                              )}
                             </div>
                             <div>
                               <div className="font-bold text-primary-dark dark:text-white text-small">
@@ -293,6 +318,67 @@ export const ConsejosPage: React.FC = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            {/* MOBILE STACKED CARDS VIEW */}
+            <div className="block md:hidden p-4 space-y-3 bg-slate-50 dark:bg-slate-900">
+              {loading ? (
+                <div className="p-8 text-center text-slate-500 text-xs">Cargando artículos...</div>
+              ) : currentConsejos.length === 0 ? (
+                <div className="p-8 text-center text-slate-500 text-xs">No hay artículos registrados.</div>
+              ) : (
+                currentConsejos.map((c) => (
+                  <div
+                    key={c.id}
+                    className="p-4 rounded-sm border bg-white dark:bg-dark-surface border-slate-200 dark:border-slate-800 space-y-3"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-sm overflow-hidden bg-slate-100 dark:bg-slate-800 text-primary dark:text-secondary font-bold text-xs flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+                        {c.imagen_url ? (
+                          <img
+                            src={c.imagen_url.startsWith('http') ? c.imagen_url : `${apiBaseUrl}${c.imagen_url}`}
+                            alt={c.titulo}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <FileText size={18} />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-slate-900 dark:text-white text-sm truncate">{c.titulo}</div>
+                        <span className="inline-flex mt-1 items-center px-1.5 py-0.5 rounded text-tiny font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                          {c.categoria || 'General'}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{c.descripcion}</p>
+                    <div className="grid grid-cols-3 gap-1.5 pt-3 border-t border-slate-200 dark:border-slate-800">
+                      <button
+                        onClick={() => handleOpenViewForm(c)}
+                        className="w-full py-1.5 rounded-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 text-small font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <Eye size={13} /> Ver
+                      </button>
+                      {isAdmin && (
+                        <>
+                          <button
+                            onClick={() => handleOpenEditForm(c)}
+                            className="w-full py-1.5 rounded-sm border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-small font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Edit2 size={13} /> Editar
+                          </button>
+                          <button
+                            onClick={() => handleOpenDeleteModal(c)}
+                            className="w-full py-1.5 rounded-sm border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 text-small font-semibold flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Trash2 size={13} /> Eliminar
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             {/* FOOTER PAGINATION */}
@@ -393,13 +479,51 @@ export const ConsejosPage: React.FC = () => {
                   />
                 </div>
 
+                {imagePreview && (
+                  <div className="space-y-1 md:col-span-2">
+                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                      Vista previa de portada
+                    </label>
+                    <div className="relative w-full max-w-sm h-44 rounded-sm overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+                      <img
+                        src={imagePreview}
+                        alt="Vista previa"
+                        className="w-full h-full object-cover"
+                      />
+                      {!isReadOnly && formData.imagen && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, imagen: undefined });
+                            setImagePreview(
+                              selectedConsejo?.imagen_url
+                                ? (selectedConsejo.imagen_url.startsWith('http') ? selectedConsejo.imagen_url : `${apiBaseUrl}${selectedConsejo.imagen_url}`)
+                                : null
+                            );
+                          }}
+                          className="absolute top-2 right-2 p-1 rounded-sm bg-rose-600 text-white text-xs hover:bg-rose-700 transition-colors cursor-pointer"
+                          title="Descartar imagen seleccionada"
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {!isReadOnly && (
                   <div className="space-y-1 md:col-span-2">
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">Imagen de Portada</label>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => setFormData({ ...formData, imagen: e.target.files?.[0] })}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setFormData({ ...formData, imagen: file });
+                          setImagePreview(URL.createObjectURL(file));
+                        }
+                      }}
                       className="w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-sm file:border-0 file:text-xs file:font-bold file:uppercase file:tracking-wider file:bg-primary/10 file:text-primary dark:file:bg-secondary/10 dark:file:text-secondary hover:file:bg-primary/20 dark:hover:file:bg-secondary/20 cursor-pointer"
                     />
                     <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Formatos soportados: JPG, PNG, WEBP (Max: 5MB)</p>
@@ -407,7 +531,26 @@ export const ConsejosPage: React.FC = () => {
                 )}
               </div>
 
-              {!isReadOnly && (
+              {isReadOnly ? (
+                <div className="flex items-center justify-between pt-5 border-t border-slate-200 dark:border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setMainTab('list')}
+                    className="px-4 py-2 rounded-sm border border-slate-300 dark:border-slate-700 bg-white dark:bg-dark-surface text-slate-700 dark:text-slate-300 text-small font-bold cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                  >
+                    Volver al Listado
+                  </button>
+                  {isAdmin && selectedConsejo && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditForm(selectedConsejo)}
+                      className="px-4 py-2 rounded-sm bg-primary hover:bg-primary/90 text-white text-small font-bold shadow-sm cursor-pointer transition-all flex items-center gap-1.5"
+                    >
+                      <Edit2 size={14} /> Editar Artículo
+                    </button>
+                  )}
+                </div>
+              ) : (
                 <div className="flex items-center justify-end gap-3 pt-5 border-t border-slate-200 dark:border-slate-800">
                   <button
                     type="button"

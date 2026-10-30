@@ -1,15 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FAQ_ITEMS } from '../data/landingData';
+import { getPublicFaqsApi } from '../../landing-faqs/services/landingFaqService';
+import type { LandingFaq } from '../../landing-faqs/types/landingFaq';
+import type { ContactoConfig } from '../../landing-config/types/landingConfig';
 
-export const FAQSection: React.FC = () => {
-  const [activeFaqId, setActiveFaqId] = useState<string | null>('faq-1');
+interface FAQSectionProps {
+  contacto?: ContactoConfig;
+}
 
-  const toggleFaq = (id: string) => {
+export const FAQSection: React.FC<FAQSectionProps> = ({ contacto }) => {
+  const [faqs, setFaqs] = useState<Array<{ id: string | number; question: string; answer: string }>>([
+    ...FAQ_ITEMS,
+  ]);
+  const [activeFaqId, setActiveFaqId] = useState<string | number | null>('faq-1');
+
+  useEffect(() => {
+    const loadFaqs = async () => {
+      try {
+        const data = await getPublicFaqsApi();
+        if (data && data.length > 0) {
+          const mapped = data.map((f) => ({
+            id: f.id,
+            question: f.pregunta,
+            answer: f.respuesta,
+          }));
+          setFaqs(mapped);
+          setActiveFaqId(mapped[0]?.id ?? null);
+        }
+      } catch (err) {
+        console.error('Error al cargar preguntas frecuentes públicas', err);
+      }
+    };
+    loadFaqs();
+  }, []);
+
+  const toggleFaq = (id: string | number) => {
     setActiveFaqId((prev) => (prev === id ? null : id));
   };
 
   return (
-    <section className="py-16 sm:py-20 bg-[#001026] text-white border-b border-secondary/15 relative">
+    <section id="faq" className="py-16 sm:py-20 bg-[#001026] text-white border-b border-secondary/15 relative">
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
         <div className="reveal grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           {/* Left info column */}
@@ -25,18 +55,26 @@ export const FAQSection: React.FC = () => {
               <div className="font-bold text-white mb-2 flex items-center gap-2 text-sm sm:text-base">
                 Ubicación & Contacto
               </div>
-              <div className="text-xs sm:text-sm text-slate-200 leading-relaxed">
-                Av. Principal 1230, Centro Médico Lux, Piso 4<br />
-                Teléfono Directo: (02) 294-8500<br />
-                WhatsApp Citas: +593 99 123 4567<br />
-                Horario: Lun - Sáb de 8:00 AM a 8:00 PM
+              <div className="text-xs sm:text-sm text-slate-200 leading-relaxed space-y-1">
+                <div>
+                  <strong>Dirección:</strong> {contacto?.direccion || 'Av. Principal #123, Santa Cruz, Bolivia'}
+                </div>
+                <div>
+                  <strong>Teléfono Directo:</strong> {contacto?.telefono || '+591 78494110'}
+                </div>
+                <div>
+                  <strong>WhatsApp Citas:</strong> +{contacto?.whatsapp || '59178494110'}
+                </div>
+                <div>
+                  <strong>Horario:</strong> {contacto?.horario || 'Lunes a Sábado: 08:30 - 20:00'}
+                </div>
               </div>
             </div>
           </div>
 
           {/* Right accordion column */}
           <div className="reveal-right lg:col-span-7 flex flex-col">
-            {FAQ_ITEMS.map((faq) => {
+            {faqs.map((faq) => {
               const isOpen = activeFaqId === faq.id;
               return (
                 <div

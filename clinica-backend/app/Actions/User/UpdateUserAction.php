@@ -24,6 +24,6 @@ class UpdateUserAction
 
         $user->update($data);
 
-        return $user->fresh()->load('rol');
+        return $user->fresh()->load(['rol', 'doctor']);
     }
 }

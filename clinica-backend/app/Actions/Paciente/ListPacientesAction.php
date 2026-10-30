@@ -3,12 +3,19 @@
 namespace App\Actions\Paciente;
 
 use App\Models\Paciente;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
 
 class ListPacientesAction
 {
-    public function execute(): Collection
+    public function execute(?int $perPage = null): LengthAwarePaginator|Collection
     {
-        return Paciente::with(['sucursal', 'antecedente', 'citas'])->latest()->get();
+        $query = Paciente::with(['sucursal', 'antecedente', 'citas'])->latest();
+
+        if ($perPage && $perPage > 0) {
+            return $query->paginate($perPage);
+        }
+
+        return $query->get();
     }
 }

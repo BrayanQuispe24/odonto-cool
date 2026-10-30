@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
   X,
@@ -11,9 +11,13 @@ import {
   Clock,
   XCircle,
   Printer,
+  Building2,
 } from 'lucide-react';
 import type { BoletaServicioPrestado } from '../types/boleta';
+import type { Sucursal } from '../../sucursales/types/sucursal';
+import { getSucursalesApi } from '../../sucursales/services/sucursalService';
 import { BoletasListPDFViewerModal } from './BoletasListPDFViewerModal';
+import { useUserRole } from '../../../hooks/useUserRole';
 
 interface BoletasTableProps {
   boletas: BoletaServicioPrestado[];
@@ -35,6 +39,22 @@ const getDoctorName = (b: BoletaServicioPrestado): string =>
     : b.cita?.doctor
     ? `${b.cita.doctor.nombre} ${b.cita.doctor.apellido}`
     : '';
+
+const getBoletaSucursal = (b: BoletaServicioPrestado): { id?: number; nombre: string } => {
+  if (b.cita?.sucursal) {
+    return {
+      id: b.cita.sucursal_id || b.cita.sucursal.id,
+      nombre: b.cita.sucursal.nombre || 'Sucursal',
+    };
+  }
+  if (b.doctor?.sucursal) {
+    return {
+      id: b.doctor.sucursal_id || b.doctor.sucursal.id,
+      nombre: b.doctor.sucursal.nombre || 'Sucursal',
+    };
+  }
+  return { id: undefined, nombre: '' };
+};
 
 const getComision = (b: BoletaServicioPrestado): number => {
   const labCost = Number(b.costo_laboratorio || 0);
@@ -70,14 +90,25 @@ const EstadoBadge: React.FC<{ estado?: string }> = ({ estado }) => {
 };
 
 export const BoletasTable: React.FC<BoletasTableProps> = ({ boletas, onView, onDelete }) => {
+  const { isAdmin } = useUserRole();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSucursal, setSelectedSucursal] = useState<string>('all');
   const [selectedEstado, setSelectedEstado] = useState<string>('all');
   const [selectedTipoPaga, setSelectedTipoPaga] = useState<string>('all');
   const [fechaDesde, setFechaDesde] = useState('');
   const [fechaHasta, setFechaHasta] = useState('');
+  const [sucursales, setSucursales] = useState<Sucursal[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const pageSize = 12;
+
+  useEffect(() => {
+    if (isAdmin) {
+      getSucursalesApi()
+        .then((data) => setSucursales(data))
+        .catch(() => {});
+    }
+  }, [isAdmin]);
 
   const filteredBoletas = useMemo(() => {
     const term = searchTerm.toLowerCase();
@@ -100,6 +131,12 @@ export const BoletasTable: React.FC<BoletasTableProps> = ({ boletas, onView, onD
       const matchesTipoPaga =
         selectedTipoPaga === 'all' || (b.tipo_paga || b.tipo_pago) === selectedTipoPaga;
 
+      const sucursalInfo = getBoletaSucursal(b);
+      const matchesSucursal =
+        !isAdmin ||
+        selectedSucursal === 'all' ||
+        (sucursalInfo.id !== undefined && String(sucursalInfo.id) === selectedSucursal);
+
       let matchesFecha = true;
       if (fechaDesde || fechaHasta) {
         // b.fecha_emision usually is 'YYYY-MM-DDTHH:mm:ss.000Z' or similar string
@@ -110,9 +147,9 @@ export const BoletasTable: React.FC<BoletasTableProps> = ({ boletas, onView, onD
         }
       }
 
-      return matchesSearch && matchesEstado && matchesTipoPaga && matchesFecha;
+      return matchesSearch && matchesEstado && matchesTipoPaga && matchesFecha && matchesSucursal;
     });
-  }, [boletas, searchTerm, selectedEstado, selectedTipoPaga, fechaDesde, fechaHasta]);
+  }, [boletas, searchTerm, selectedEstado, selectedTipoPaga, selectedSucursal, fechaDesde, fechaHasta, isAdmin]);
 
   const totals = useMemo(() => {
     return filteredBoletas.reduce(
@@ -195,6 +232,30 @@ export const BoletasTable: React.FC<BoletasTableProps> = ({ boletas, onView, onD
             />
           </div>
 
+          {/* SUCURSAL (Exclusivo Administrador) */}
+          {isAdmin && (
+            <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-700 pl-2">
+              <Building2 size={12} className="text-slate-400" />
+              <select
+                id="boletas-filter-sucursal"
+                value={selectedSucursal}
+                onChange={(e) => {
+                  setSelectedSucursal(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className={`${selectClass} min-w-[140px]`}
+              >
+                <option value="all">Todas las sucursales</option>
+                {sucursales.map((suc) => (
+                  <option key={suc.id} value={String(suc.id)}>
+                    {suc.nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* TIPO PAGO & ESTADO */}
           <div className="flex items-center gap-1.5 ml-2 border-l border-slate-200 dark:border-slate-700 pl-2">
             <Filter size={12} className="text-slate-400" />
             <select
@@ -241,6 +302,11 @@ export const BoletasTable: React.FC<BoletasTableProps> = ({ boletas, onView, onD
         boletas={filteredBoletas}
         fechaDesde={fechaDesde}
         fechaHasta={fechaHasta}
+        sucursalNombre={
+          selectedSucursal === 'all'
+            ? undefined
+            : sucursales.find((s) => String(s.id) === selectedSucursal)?.nombre
+        }
       />
 
       {/* TABLE */}
@@ -295,6 +361,14 @@ export const BoletasTable: React.FC<BoletasTableProps> = ({ boletas, onView, onD
                       <span className="font-mono font-bold text-primary dark:text-secondary print:text-black">
                         {boleta.numero_boleta}
                       </span>
+                      {getBoletaSucursal(boleta).nombre && (
+                        <div className="flex items-center gap-1 text-tiny text-slate-500 dark:text-slate-400 mt-0.5 print:text-black">
+                          <Building2 size={10} className="shrink-0 text-primary dark:text-secondary" />
+                          <span className="truncate max-w-[130px]" title={getBoletaSucursal(boleta).nombre}>
+                            {getBoletaSucursal(boleta).nombre}
+                          </span>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-2 font-mono text-slate-600 dark:text-slate-300 print:text-black">
                       {String(boleta.fecha_emision).split('T')[0]}

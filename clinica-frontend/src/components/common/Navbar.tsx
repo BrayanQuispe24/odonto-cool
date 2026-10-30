@@ -3,16 +3,20 @@ import { Link } from 'react-router-dom';
 import { Button } from '../ui/Button';
 import { useAuthStore } from '../../features/auth/store/authStore';
 
+import type { AnuncioTopConfig } from '../../features/landing-config/types/landingConfig';
+
 interface NavbarProps {
   onOpenModal: () => void;
   onToggleMobileMenu: () => void;
   isMobileMenuOpen: boolean;
+  anuncio?: AnuncioTopConfig;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenModal,
   onToggleMobileMenu,
   isMobileMenuOpen,
+  anuncio,
 }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -27,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       setScrollProgress(progress);
       setIsScrolled(scrollTop > 30);
 
-      const sections = ['hero', 'especialidades', 'simulador', 'tecnologia', 'especialistas', 'faq'];
+      const sections = ['hero', 'especialidades', 'tecnologia', 'especialistas', 'faq'];
       const scrollPosition = window.scrollY + 200;
 
       for (const sectionId of sections) {
@@ -50,7 +54,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const navLinks = [
     { href: '#hero', label: 'Inicio', id: 'hero' },
     { href: '#especialidades', label: 'Tratamientos', id: 'especialidades' },
-    { href: '#simulador', label: 'Casos Clínicos', id: 'simulador' },
     { href: '#tecnologia', label: 'Tecnología', id: 'tecnologia' },
     { href: '#especialistas', label: 'Especialistas', id: 'especialistas' },
     { href: '#faq', label: 'Preguntas', id: 'faq' },
@@ -62,6 +65,19 @@ export const Navbar: React.FC<NavbarProps> = ({
         isScrolled ? 'shadow-[0_12px_40px_rgba(0,10,36,0.6)] bg-[#000E24]/95 border-b border-secondary/45' : 'shadow-[0_8px_32px_rgba(0,16,41,0.4)]'
       }`}
     >
+      {anuncio?.activo && anuncio?.mensaje && (
+        <div className="bg-[#0077D4] text-white text-xs font-semibold py-1.5 px-4 text-center border-b border-secondary/20 flex items-center justify-center gap-2">
+          <span>{anuncio.mensaje}</span>
+          {anuncio.enlace && (
+            <a
+              href={anuncio.enlace}
+              className="underline text-[#00C2E0] hover:text-white transition-colors"
+            >
+              Más información ➔
+            </a>
+          )}
+        </div>
+      )}
 
       <div
         className="absolute bottom-0 left-0 h-[3px] bg-gradient-to-r from-primary to-secondary transition-[width] duration-100 ease-linear z-[1001]"

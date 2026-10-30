@@ -10,6 +10,7 @@ interface BoletasListPDFViewerModalProps {
   boletas: BoletaServicioPrestado[];
   fechaDesde?: string;
   fechaHasta?: string;
+  sucursalNombre?: string;
 }
 
 export const BoletasListPDFViewerModal: React.FC<BoletasListPDFViewerModalProps> = ({
@@ -18,6 +19,7 @@ export const BoletasListPDFViewerModal: React.FC<BoletasListPDFViewerModalProps>
   boletas,
   fechaDesde,
   fechaHasta,
+  sucursalNombre,
 }) => {
   if (!isOpen) return null;
 
@@ -47,6 +49,7 @@ export const BoletasListPDFViewerModal: React.FC<BoletasListPDFViewerModalProps>
                   boletas={boletas}
                   fechaDesde={fechaDesde}
                   fechaHasta={fechaHasta}
+                  sucursalNombre={sucursalNombre}
                 />
               }
               fileName={`Reporte-Boletas-${new Date().toISOString().split('T')[0]}.pdf`}
@@ -76,6 +79,7 @@ export const BoletasListPDFViewerModal: React.FC<BoletasListPDFViewerModalProps>
               boletas={boletas}
               fechaDesde={fechaDesde}
               fechaHasta={fechaHasta}
+              sucursalNombre={sucursalNombre}
             />
           </PDFViewer>
         </div>

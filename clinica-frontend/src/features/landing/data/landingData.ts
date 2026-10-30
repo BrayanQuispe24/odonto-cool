@@ -143,15 +143,6 @@ export const SPECIALTY_CARDS: SpecialtyCard[] = [
   },
 ];
 
-export const PILL_BULLETS = [
-  { text: 'Tratamientos de caries con resinas estéticas', category: 'general' },
-  { text: 'Limpieza dental profunda con ultrasonido', category: 'general' },
-  { text: 'Ortodoncia con brackets metálicos y estéticos', category: 'ortodoncia' },
-  { text: 'Extracciones seguras y cirugía bucal', category: 'general' },
-  { text: 'Prótesis dentales y rehabilitación oral', category: 'implantes' },
-  { text: 'Atención personalizada para toda la familia', category: 'general' },
-];
-
 export const DOCTORS: Doctor[] = [
   {
     id: 'dr-mendoza',

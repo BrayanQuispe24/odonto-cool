@@ -20,6 +20,8 @@ class Doctor extends Model
         'apellido',
         'telefonos',
         'especialidades',
+        'destacado_en_landing',
+        'bio_landing',
     ];
 
     protected function casts(): array
@@ -27,6 +29,7 @@ class Doctor extends Model
         return [
             'telefonos' => 'array',
             'especialidades' => 'array',
+            'destacado_en_landing' => 'boolean',
         ];
     }
 

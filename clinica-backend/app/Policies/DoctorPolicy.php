@@ -31,7 +31,11 @@ class DoctorPolicy
 
     public function update(User $authUser, Doctor $doctor): bool
     {
-        return $authUser->rol && $authUser->rol->nombre === 'Administrador';
+        if ($authUser->rol && $authUser->rol->nombre === 'Administrador') {
+            return true;
+        }
+
+        return (int) $authUser->id === (int) $doctor->usuario_id;
     }
 
     public function delete(User $authUser, Doctor $doctor): bool

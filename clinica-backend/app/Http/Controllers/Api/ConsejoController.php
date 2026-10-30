@@ -1,33 +1,32 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Consejo;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ConsejoController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        $consejos = Consejo::where('estado', true)->get();
+        $query = Consejo::query();
+        if (!$request->boolean('all')) {
+            $query->where('estado', true);
+        }
+        $consejos = $query->orderBy('id', 'desc')->get();
         return response()->json(['consejos' => $consejos], 200);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
@@ -50,25 +49,9 @@ class ConsejoController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Consejo $consejo)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Consejo $consejo)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         $consejo = Consejo::find($id);
         if (!$consejo) {
@@ -84,10 +67,9 @@ class ConsejoController extends Controller
         ]);
 
         if ($request->hasFile('imagen')) {
-            // Delete old image if exists
             if ($consejo->imagen_url) {
                 $oldPath = str_replace('/storage/', '', $consejo->imagen_url);
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                Storage::disk('public')->delete($oldPath);
             }
             $path = $request->file('imagen')->store('consejos', 'public');
             $validated['imagen_url'] = '/storage/' . $path;
@@ -104,11 +86,16 @@ class ConsejoController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         $consejo = Consejo::find($id);
         if (!$consejo) {
             return response()->json(['message' => 'Consejo no encontrado'], 404);
+        }
+
+        if ($consejo->imagen_url) {
+            $oldPath = str_replace('/storage/', '', $consejo->imagen_url);
+            Storage::disk('public')->delete($oldPath);
         }
 
         $consejo->delete();

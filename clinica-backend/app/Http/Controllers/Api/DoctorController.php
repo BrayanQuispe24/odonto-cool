@@ -14,10 +14,41 @@ use App\Http\Requests\Doctor\StoreDoctorRequest;
 use App\Http\Requests\Doctor\UpdateDoctorRequest;
 use App\Models\Doctor;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class DoctorController extends Controller
 {
+    public function publicIndex(): JsonResponse
+    {
+        $doctores = Doctor::with(['usuario', 'sucursal'])
+            ->where('destacado_en_landing', true)
+            ->get();
+
+        return response()->json([
+            'doctores' => $doctores
+        ], 200);
+    }
+
+    public function toggleLanding(Request $request, $id): JsonResponse
+    {
+        $doctor = Doctor::with(['usuario', 'sucursal'])->findOrFail($id);
+        $doctor->destacado_en_landing = $request->has('destacado_en_landing')
+            ? $request->boolean('destacado_en_landing')
+            : !$doctor->destacado_en_landing;
+
+        if ($request->has('bio_landing')) {
+            $doctor->bio_landing = $request->input('bio_landing');
+        }
+
+        $doctor->save();
+
+        return response()->json([
+            'message' => $doctor->destacado_en_landing ? 'Doctor visible en la vitrina de la landing' : 'Doctor retirado de la vitrina',
+            'doctor' => $doctor,
+        ], 200);
+    }
+
     public function index(ListDoctorsAction $action): JsonResponse
     {
         Gate::authorize('viewAny', Doctor::class);

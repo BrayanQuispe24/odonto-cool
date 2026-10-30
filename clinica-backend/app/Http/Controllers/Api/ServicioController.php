@@ -22,11 +22,26 @@ class ServicioController extends Controller
     {
         $categoria = $request->query('categoria') ? (string) $request->query('categoria') : null;
         
-        // Force state to true to only show active services in the public landing
-        $servicios = $action->execute($categoria, true);
+        $servicios = Servicio::where('estado', true)
+            ->where('destacado_en_landing', true)
+            ->when($categoria, fn($q) => $q->where('categoria', $categoria))
+            ->orderBy('nombre', 'asc')
+            ->get();
 
         return response()->json([
             'servicios' => $servicios
+        ], 200);
+    }
+
+    public function toggleLanding($id): JsonResponse
+    {
+        $servicio = Servicio::findOrFail($id);
+        $servicio->destacado_en_landing = !$servicio->destacado_en_landing;
+        $servicio->save();
+
+        return response()->json([
+            'message' => $servicio->destacado_en_landing ? 'Servicio visible en la vitrina de la landing' : 'Servicio retirado de la vitrina',
+            'servicio' => $servicio,
         ], 200);
     }
 

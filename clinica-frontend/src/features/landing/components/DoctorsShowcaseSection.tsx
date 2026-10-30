@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Badge } from '../../../components/ui/Badge';
 import { Button } from '../../../components/ui/Button';
-import { DOCTORS } from '../data/landingData';
+import { DOCTORS, type Doctor } from '../data/landingData';
+import { getPublicDoctoresDestacadosApi } from '../../landing-destacados/services/landingDestacadosService';
+import { getFullAvatarUrl } from '../../../components/common/UserAvatar';
 
 interface DoctorsShowcaseSectionProps {
   onOpenModal: () => void;
@@ -10,10 +12,50 @@ interface DoctorsShowcaseSectionProps {
 export const DoctorsShowcaseSection: React.FC<DoctorsShowcaseSectionProps> = ({
   onOpenModal,
 }) => {
-  const [selectedDoctorId, setSelectedDoctorId] = useState(DOCTORS[0].id);
+  const [doctorsList, setDoctorsList] = useState<Doctor[]>(DOCTORS);
+  const [selectedDoctorId, setSelectedDoctorId] = useState(DOCTORS[0]?.id || '');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const currentDoctor = DOCTORS.find((doc) => doc.id === selectedDoctorId) || DOCTORS[0];
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDoctors = async () => {
+      try {
+        const publicDocs = await getPublicDoctoresDestacadosApi();
+        if (!isMounted) return;
+        if (publicDocs && publicDocs.length > 0) {
+          const mapped: Doctor[] = publicDocs.map((doc, index) => {
+            const fallbackImg = DOCTORS[index % DOCTORS.length]?.image || '/assets/images/dental_doctor.png';
+            const fullUrl = getFullAvatarUrl(doc.usuario?.foto_perfil);
+            const mainSpec = doc.especialidades && doc.especialidades.length > 0
+              ? doc.especialidades[0]
+              : 'Odontólogo Especialista';
+
+            return {
+              id: `doc-${doc.id}`,
+              name: `Dr(a). ${doc.nombre} ${doc.apellido}`,
+              shortName: `Dr(a). ${doc.apellido || doc.nombre}`,
+              role: mainSpec,
+              tag: doc.especialidades && doc.especialidades.length > 0 ? doc.especialidades.join(' • ') : 'Especialista Odontológico',
+              bio: doc.bio_landing?.trim()
+                ? `"${doc.bio_landing.trim()}"`
+                : `"Especialista en ${mainSpec} comprometido con la excelencia clínica, diagnóstico de precisión y la salud dental integral."`,
+              image: fullUrl || fallbackImg,
+            };
+          });
+          setDoctorsList(mapped);
+          setSelectedDoctorId(mapped[0].id);
+        }
+      } catch {
+        // Fallback silently to static DOCTORS
+      }
+    };
+    fetchDoctors();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const currentDoctor = doctorsList.find((doc) => doc.id === selectedDoctorId) || doctorsList[0] || DOCTORS[0];
 
   const handleSelectDoctor = (id: string) => {
     if (id === selectedDoctorId) return;
@@ -26,14 +68,15 @@ export const DoctorsShowcaseSection: React.FC<DoctorsShowcaseSectionProps> = ({
 
   // Efecto de carrusel automático
   useEffect(() => {
+    if (doctorsList.length <= 1) return;
     const timer = setInterval(() => {
-      const currentIndex = DOCTORS.findIndex((doc) => doc.id === selectedDoctorId);
-      const nextIndex = (currentIndex + 1) % DOCTORS.length;
-      handleSelectDoctor(DOCTORS[nextIndex].id);
+      const currentIndex = doctorsList.findIndex((doc) => doc.id === selectedDoctorId);
+      const nextIndex = (currentIndex + 1) % doctorsList.length;
+      handleSelectDoctor(doctorsList[nextIndex].id);
     }, 6000); // 6 segundos para que lean con calma
 
     return () => clearInterval(timer);
-  }, [selectedDoctorId]);
+  }, [selectedDoctorId, doctorsList]);
 
   return (
     <section id="especialistas" className="py-16 sm:py-24 bg-[#0840A8] text-white relative">
@@ -88,7 +131,7 @@ export const DoctorsShowcaseSection: React.FC<DoctorsShowcaseSectionProps> = ({
 
           {/* Avatar Selector Strip */}
           <div className="flex items-center justify-center gap-3 sm:gap-6 mt-8 sm:mt-10 pt-6 sm:pt-7 border-t border-secondary/20 flex-wrap pb-4">
-            {DOCTORS.map((doc) => {
+            {doctorsList.map((doc) => {
               const isActive = doc.id === selectedDoctorId;
               return (
                 <button

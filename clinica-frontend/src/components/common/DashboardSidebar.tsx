@@ -20,12 +20,17 @@ import {
   ShieldCheck,
   X,
   Database,
+  Calculator,
+  Newspaper,
+  HelpCircle,
+  Star,
 } from 'lucide-react';
 import { useSidebarStore } from '../../features/dashboard/store/useSidebarStore';
 import { useAuthStore } from '../../features/auth/store/authStore';
 import { useSettingsStore } from '../../store/useSettingsStore';
 import { logoutApi } from '../../features/auth/services/authService';
 import { toast } from 'sonner';
+import { UserAvatar } from './UserAvatar';
 
 export interface NavGroup {
   title: string;
@@ -55,15 +60,45 @@ const NAV_GROUPS: NavGroup[] = [
       { name: 'Servicios & Precios', path: '/dashboard/servicios', icon: Stethoscope },
       { name: 'Piezas Dentales', path: '/dashboard/piezas-dentales', icon: Activity, roles: ['Administrador'] },
       { name: 'Doctores', path: '/dashboard/doctors', icon: UserCheck, roles: ['Administrador'] },
-      { name: 'Consejos & Artículos', path: '/dashboard/consejos', icon: FileText, roles: ['Administrador'] },
     ],
   },
   {
     title: 'Administración',
     items: [
       { name: 'Sucursales', path: '/dashboard/branches', icon: Building2, badge: 'Tenant' },
+      { name: 'Proformas & Cotizaciones', path: '/dashboard/proformas', icon: Calculator, badge: 'Nuevo' },
       { name: 'Facturación', path: '/dashboard/billing', icon: CreditCard },
       { name: 'Reportes & Analítica', path: '/dashboard/reportes', icon: BarChart3, badge: 'PDF/Excel', roles: ['Administrador'] },
+    ],
+  },
+  {
+    title: 'Landing Page',
+    items: [
+      {
+        name: 'Ajustes & Hero',
+        path: '/dashboard/landing/ajustes',
+        icon: Sparkles,
+        roles: ['Administrador'],
+      },
+      {
+        name: 'Artículos & Blog',
+        path: '/dashboard/landing/articulos',
+        icon: Newspaper,
+        badge: 'CMS',
+        roles: ['Administrador'],
+      },
+      {
+        name: 'Preguntas Frecuentes',
+        path: '/dashboard/landing/faqs',
+        icon: HelpCircle,
+        roles: ['Administrador'],
+      },
+      {
+        name: 'Vitrina & Destacados',
+        path: '/dashboard/landing/destacados',
+        icon: Star,
+        roles: ['Administrador'],
+      },
     ],
   },
   {
@@ -256,14 +291,13 @@ export const DashboardSidebar: React.FC = () => {
           >
             {/* AVATAR + INFO */}
             <div className="flex items-center gap-2.5 overflow-hidden min-w-0">
-              <div className="relative shrink-0">
-                <img
-                  src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?q=80&w=200&auto=format&fit=crop"
-                  alt={user?.email || 'Usuario'}
-                  className="w-9 h-9 rounded-sm object-cover border border-[#041F54]"
-                />
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#00C2E0] border-2 border-[#05286B] rounded-full" />
-              </div>
+              <UserAvatar
+                src={user?.foto_perfil}
+                name={user?.doctor ? `${user.doctor.nombre} ${user.doctor.apellido}` : user?.email}
+                email={user?.email}
+                size="md"
+                indicator
+              />
 
               {(!isCollapsed || isMobileOpen) && (
                 <div className="flex flex-col min-w-0 flex-1">

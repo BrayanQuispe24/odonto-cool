@@ -13,6 +13,15 @@ export interface UpdateUserPayload {
   rol_id?: number;
 }
 
+export interface UpdateProfilePayload {
+  email: string;
+  password?: string;
+  nombre?: string;
+  apellido?: string;
+  telefonos?: string[];
+  especialidades?: string[];
+}
+
 export interface UsersResponse {
   usuarios: User[];
 }
@@ -32,9 +41,33 @@ export const getProfileApi = async (): Promise<User> => {
   return response.data.usuario;
 };
 
-export const createUserApi = async (payload: CreateUserPayload): Promise<User> => {
-  const response = await api.post<SingleUserResponse>('/users', payload);
+export const updateProfileApi = async (payload: UpdateProfilePayload): Promise<User> => {
+  const response = await api.put<SingleUserResponse>('/me', payload);
   return response.data.usuario;
+};
+
+export const uploadAvatarApi = async (file: File): Promise<User> => {
+  const formData = new FormData();
+  formData.append('foto', file);
+  const response = await api.post<SingleUserResponse>('/me/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data.usuario;
+};
+
+export const deleteAvatarApi = async (): Promise<User> => {
+  const response = await api.delete<SingleUserResponse>('/me/avatar');
+  return response.data.usuario;
+};
+
+export const createUserApi = async (payload: CreateUserPayload): Promise<{ usuario: User; message?: string }> => {
+  const response = await api.post<SingleUserResponse>('/users', payload);
+  return {
+    usuario: response.data.usuario,
+    message: response.data.message,
+  };
 };
 
 export const updateUserApi = async (id: number | string, payload: UpdateUserPayload): Promise<User> => {

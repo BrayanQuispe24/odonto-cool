@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Rules\NotDisposableEmail;
+use App\Rules\RealEmailDeliverable;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,7 +26,15 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'string', 'max:255', Rule::unique('users', 'email')],
+            'email' => [
+                'required',
+                'string',
+                'email:rfc,dns',
+                'max:255',
+                Rule::unique('users', 'email'),
+                new NotDisposableEmail(),
+                new RealEmailDeliverable(),
+            ],
             'password' => ['required', 'string', 'min:8', 'max:20', 'confirmed'],
             'rol_id' => ['required', Rule::exists('roles', 'id')],
         ];
@@ -34,7 +44,7 @@ class RegisterRequest extends FormRequest
     {
         return [
             'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'El correo electrónico debe ser un correo electrónico válido.',
+            'email.email' => 'El correo electrónico debe ser válido y pertenecer a un dominio activo capaz de recibir correos.',
             'email.string' => 'El correo electrónico debe ser una cadena de texto.',
             'email.max' => 'El correo electrónico no puede exceder los 255 caracteres.',
             'email.unique' => 'El correo electrónico ya existe.',

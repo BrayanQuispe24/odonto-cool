@@ -20,6 +20,7 @@ class Servicio extends Model
         'precio',
         'duracion_estimada_minutos',
         'estado',
+        'destacado_en_landing',
     ];
 
     protected function casts(): array
@@ -28,6 +29,7 @@ class Servicio extends Model
             'precio' => 'decimal:2',
             'duracion_estimada_minutos' => 'integer',
             'estado' => 'boolean',
+            'destacado_en_landing' => 'boolean',
         ];
     }
 

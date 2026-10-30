@@ -15,11 +15,16 @@ class UpdateUserRequest extends FormRequest
     {
         $userId = $this->route('user') ? $this->route('user')->id : null;
 
-        return [
+        $rules = [
             'email' => 'required|email|string|max:255|unique:users,email,' . $userId,
             'password' => 'nullable|string|min:6|max:20',
-            'rol_id' => 'nullable|exists:roles,id',
         ];
+
+        if ($this->user() && $this->user()->rol && $this->user()->rol->nombre === 'Administrador') {
+            $rules['rol_id'] = 'nullable|exists:roles,id';
+        }
+
+        return $rules;
     }
 
     public function messages(): array

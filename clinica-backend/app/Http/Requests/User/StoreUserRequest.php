@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\User;
 
+use App\Rules\NotDisposableEmail;
+use App\Rules\RealEmailDeliverable;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUserRequest extends FormRequest
@@ -14,7 +16,15 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|string|max:255|unique:users,email',
+            'email' => [
+                'required',
+                'string',
+                'email:rfc,dns',
+                'max:255',
+                'unique:users,email',
+                new NotDisposableEmail(),
+                new RealEmailDeliverable(),
+            ],
             'password' => 'required|string|min:6|max:20',
             'rol_id' => 'required|exists:roles,id',
         ];
@@ -24,8 +34,8 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'Ingrese un correo electrónico válido.',
-            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'email.email' => 'El correo electrónico debe ser válido y pertenecer a un dominio activo capaz de recibir correos.',
+            'email.unique' => 'Este correo electrónico ya está registrado en el sistema.',
             'password.required' => 'La contraseña es obligatoria.',
             'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
             'rol_id.required' => 'El rol es obligatorio.',

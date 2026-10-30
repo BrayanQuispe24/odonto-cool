@@ -12,7 +12,17 @@ export interface User {
   rol_id?: number;
   rol?: UserRole;
   name?: string;
+  foto_perfil?: string | null;
   sucursal_id?: number;
+  doctor?: {
+    id: number;
+    usuario_id?: number;
+    sucursal_id?: number;
+    nombre: string;
+    apellido: string;
+    telefonos?: string[];
+    especialidades?: string[];
+  };
 }
 
 interface AuthState {
@@ -20,6 +30,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   setAuth: (user: User, token: string) => void;
+  updateUser: (updatedUser: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -41,6 +52,14 @@ export const useAuthStore = create<AuthState>((set) => {
       localStorage.setItem('access_token', token);
       localStorage.setItem('user_data', JSON.stringify(user));
       set({ user, token, isAuthenticated: true });
+    },
+    updateUser: (updatedUser) => {
+      set((state) => {
+        if (!state.user) return state;
+        const merged = { ...state.user, ...updatedUser };
+        localStorage.setItem('user_data', JSON.stringify(merged));
+        return { user: merged };
+      });
     },
     logout: () => {
       localStorage.removeItem('access_token');

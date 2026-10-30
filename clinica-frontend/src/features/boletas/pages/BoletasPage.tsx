@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Receipt, Plus, AlertTriangle, List, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { BoletasTable } from '../components/BoletasTable';
@@ -12,6 +13,9 @@ import {
 } from '../services/boletaService';
 
 export const BoletasPage: React.FC = () => {
+  const location = useLocation();
+  const proformaFromState = location.state?.fromProforma ? location.state?.proforma : null;
+
   const [boletas, setBoletas] = useState<BoletaServicioPrestado[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,6 +24,12 @@ export const BoletasPage: React.FC = () => {
   const [mainTab, setMainTab] = useState<'list' | 'form'>('list');
   const [boletaToView, setBoletaToView] = useState<BoletaServicioPrestado | null>(null);
   const [boletaToDelete, setBoletaToDelete] = useState<BoletaServicioPrestado | null>(null);
+
+  useEffect(() => {
+    if (location.state?.fromProforma && location.state?.proforma) {
+      setMainTab('form');
+    }
+  }, [location.state]);
 
   const fetchBoletas = async () => {
     setLoading(true);
@@ -118,6 +128,7 @@ export const BoletasPage: React.FC = () => {
       {mainTab === 'form' && (
         <BoletaCreateModal
           isModal={false}
+          preloadedProforma={proformaFromState}
           onCancel={() => setMainTab('list')}
           onSubmit={async (data) => {
             await handleCreateBoleta(data);

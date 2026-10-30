@@ -34,6 +34,7 @@ interface BoletaCreateModalProps {
   onCancel?: () => void;
   onSubmit: (data: BoletaFormData) => Promise<void>;
   preselectedCita?: Cita | null;
+  preloadedProforma?: any | null;
 }
 
 /* ---------- Enterprise design tokens ---------- */
@@ -53,6 +54,7 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
   onCancel,
   onSubmit,
   preselectedCita,
+  preloadedProforma,
 }) => {
   const { user } = useAuthStore();
 
@@ -112,10 +114,30 @@ export const BoletaCreateModal: React.FC<BoletaCreateModalProps> = ({
           if (preselectedCita) {
             setSelectedCitaId(preselectedCita.id);
           }
+
+          if (preloadedProforma) {
+            setHasCita(false);
+            if (preloadedProforma.paciente_id) {
+              setSelectedPacienteId(preloadedProforma.paciente_id);
+            }
+            if (preloadedProforma.doctor_id) {
+              setSelectedDoctorId(preloadedProforma.doctor_id);
+            }
+            if (preloadedProforma.detalles && preloadedProforma.detalles.length > 0) {
+              const items: DetalleServicioItem[] = preloadedProforma.detalles.map((d: any) => ({
+                servicio_id: d.servicio_id,
+                diente_id: null,
+                descripcion: d.nombre_servicio || d.servicio?.nombre || '',
+                precio_unitario: Number(d.precio) || 0,
+                descuento: Number(d.descuento) || 0,
+              }));
+              setDetallesItems(items);
+            }
+          }
         })
         .catch(() => { });
     }
-  }, [isActive, preselectedCita]);
+  }, [isActive, preselectedCita, preloadedProforma]);
 
   const activeCita = useMemo(() => {
     if (preselectedCita && preselectedCita.id === Number(selectedCitaId)) {
